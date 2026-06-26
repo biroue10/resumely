@@ -1693,7 +1693,11 @@ function ThumbPreview({ tp, isMobile }) {
     return (
       <div ref={frameRef} style={{ height: H, background: "#f3f4f6",
         display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: Math.round(H * 0.65), color: "#c0c4cc", fontWeight: 100, lineHeight: 1, letterSpacing: "-4px" }}>+</div>
+        <svg width={Math.round(H * 0.52)} height={Math.round(H * 0.52)} viewBox="0 0 100 100"
+          fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
       </div>
     );
   }
@@ -2787,7 +2791,11 @@ function CoverThumbPreview({ tp, isMobile }) {
     return (
       <div ref={frameRef} style={{ height: H, background: "#f3f4f6",
         display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: Math.round(H * 0.65), color: "#c0c4cc", fontWeight: 100, lineHeight: 1, letterSpacing: "-4px" }}>+</div>
+        <svg width={Math.round(H * 0.52)} height={Math.round(H * 0.52)} viewBox="0 0 100 100"
+          fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
       </div>
     );
   }
