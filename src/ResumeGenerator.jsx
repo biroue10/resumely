@@ -15,31 +15,41 @@ const UI = {
     skills: "Skills (comma separated)", generate: "Generate resume", generating: "Generating…",
     heading: "Resume generator", sub: "Choose a language and template, add your details, get a polished resume.",
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
-    placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by" },
+    placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
+    emailError: "Please enter a valid email address",
+    phoneError: "Invalid number (e.g. +44 7911 123456)" },
   fr: { name: "Nom complet", title: "Titre professionnel", email: "E-mail", phone: "Téléphone",
     location: "Localisation", summary: "À propos de vous", experience: "Expérience", education: "Formation",
     skills: "Compétences (séparées par des virgules)", generate: "Générer le CV", generating: "Génération…",
     heading: "Générateur de CV", sub: "Choisissez une langue et un modèle, ajoutez vos infos, obtenez un CV soigné.",
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
-    placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par" },
+    placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
+    emailError: "Veuillez saisir une adresse e-mail valide",
+    phoneError: "Numéro invalide (ex. +33 6 12 34 56 78)" },
   es: { name: "Nombre completo", title: "Título profesional", email: "Correo", phone: "Teléfono",
     location: "Ubicación", summary: "Sobre ti", experience: "Experiencia", education: "Educación",
     skills: "Habilidades (separadas por comas)", generate: "Generar currículum", generating: "Generando…",
     heading: "Generador de currículums", sub: "Elige idioma y plantilla, añade tus datos y obtén un currículum pulido.",
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
-    placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por" },
+    placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
+    emailError: "Introduce un correo electrónico válido",
+    phoneError: "Número inválido (ej. +34 612 345 678)" },
   ar: { name: "الاسم الكامل", title: "المسمى الوظيفي", email: "البريد", phone: "الهاتف",
     location: "الموقع", summary: "نبذة عنك", experience: "الخبرة", education: "التعليم",
     skills: "المهارات (مفصولة بفواصل)", generate: "إنشاء السيرة الذاتية", generating: "جارٍ الإنشاء…",
     heading: "منشئ السيرة الذاتية", sub: "اختر لغة وقالباً، أضف بياناتك، واحصل على سيرة ذاتية متقنة.",
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
-    placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع" },
+    placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
+    emailError: "يرجى إدخال عنوان بريد إلكتروني صحيح",
+    phoneError: "رقم غير صحيح (مثال: +212 6 12 34 56 78)" },
   de: { name: "Vollständiger Name", title: "Berufsbezeichnung", email: "E-Mail", phone: "Telefon",
     location: "Standort", summary: "Über dich", experience: "Erfahrung", education: "Ausbildung",
     skills: "Fähigkeiten (durch Kommas getrennt)", generate: "Lebenslauf erstellen", generating: "Wird erstellt…",
     heading: "Lebenslauf-Generator", sub: "Sprache und Vorlage wählen, Daten eingeben, gepflegten Lebenslauf erhalten.",
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
-    placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von" },
+    placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
+    emailError: "Bitte eine gültige E-Mail-Adresse eingeben",
+    phoneError: "Ungültige Nummer (z.B. +49 170 1234567)" },
 };
 
 // ── Templates ─────────────────────────────────────────────────────
@@ -101,6 +111,8 @@ export default function ResumeGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const t = UI[lang];
   const rtl = LANGUAGES.find((l) => l.code === lang)?.rtl;
@@ -110,7 +122,29 @@ export default function ResumeGenerator() {
   const rPage  = { ...page,  padding: isMobile ? "16px 10px" : "32px 16px", overflowX: "hidden" };
   const rShell = { ...shell, padding: isMobile ? 16 : 32 };
 
+  function validateEmail(val) {
+    if (!val.trim()) return "";
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()) ? "" : t.emailError;
+  }
+  function validatePhone(val) {
+    if (!val.trim()) return "";
+    const digits = val.replace(/\D/g, "");
+    return /^\+?[\d\s\-().]{7,20}$/.test(val.trim()) && digits.length >= 7 ? "" : t.phoneError;
+  }
+  function onEmailChange(e) {
+    setForm({ ...form, email: e.target.value });
+    if (emailError) setEmailError(validateEmail(e.target.value));
+  }
+  function onPhoneChange(e) {
+    setForm({ ...form, phone: e.target.value });
+    if (phoneError) setPhoneError(validatePhone(e.target.value));
+  }
+
   async function generate() {
+    const eErr = validateEmail(form.email);
+    const pErr = validatePhone(form.phone);
+    setEmailError(eErr); setPhoneError(pErr);
+    if (eErr || pErr) return;
     setLoading(true); setError(""); setResult(null);
     const langName = LANGUAGES.find((l) => l.code === lang)?.label;
     const prompt = `You are an expert resume writer. Using the candidate details below, write a polished, ATS-friendly resume entirely in ${langName} (every word, including section headings, in ${langName}). Improve weak phrasing and use strong action verbs.
@@ -223,8 +257,20 @@ Skills: ${form.skills}`;
             <label style={lbl}>{t.name}</label>{field("name")}
             <label style={lbl}>{t.title}</label>{field("title")}
             <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
-              <div style={{ flex: 1 }}><label style={lbl}>{t.email}</label>{field("email")}</div>
-              <div style={{ flex: 1 }}><label style={lbl}>{t.phone}</label>{field("phone")}</div>
+              <div style={{ flex: 1 }}>
+                <label style={lbl}>{t.email}</label>
+                <input value={form.email} onChange={onEmailChange}
+                  onBlur={() => setEmailError(validateEmail(form.email))}
+                  style={{ ...inputStyle, ...(emailError ? { borderColor: "#f87171" } : {}) }} />
+                {emailError && <p style={fieldErr}>{emailError}</p>}
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={lbl}>{t.phone}</label>
+                <input value={form.phone} onChange={onPhoneChange}
+                  onBlur={() => setPhoneError(validatePhone(form.phone))}
+                  style={{ ...inputStyle, ...(phoneError ? { borderColor: "#f87171" } : {}) }} />
+                {phoneError && <p style={fieldErr}>{phoneError}</p>}
+              </div>
             </div>
             <label style={lbl}>{t.location}</label>{field("location")}
             <label style={lbl}>{t.summary}</label>{field("summary", true)}
@@ -587,6 +633,7 @@ const copyBtn = { position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, 
 const badge = { fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.3px" };
 const badgeLive = { border: "1px solid #2a3441" };
 const badgePolished = { border: "1px solid transparent" };
+const fieldErr = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
 const footerWrap = { marginTop: 36, paddingTop: 20, borderTop: "1px solid #232c38",
   display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center",
   gap: "6px 4px", fontSize: 13, color: "#5a6880" };
