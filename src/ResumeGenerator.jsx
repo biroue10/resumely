@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // ── Language config ──────────────────────────────────────────────
 const LANGUAGES = [
@@ -62,6 +62,16 @@ const AUTHOR = {
   linkedin: "", // paste your LinkedIn URL here, e.g. "https://linkedin.com/in/yourname"
 };
 
+function useIsMobile(bp = 768) {
+  const [mobile, setMobile] = useState(() => window.innerWidth < bp);
+  useEffect(() => {
+    const h = () => setMobile(window.innerWidth < bp);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, [bp]);
+  return mobile;
+}
+
 // Build resume data straight from the form so the preview updates as the user types.
 function buildLiveData(form, t) {
   const lines = (s) => s.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -96,6 +106,9 @@ export default function ResumeGenerator() {
   const rtl = LANGUAGES.find((l) => l.code === lang)?.rtl;
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const liveData = buildLiveData(form, t);
+  const isMobile = useIsMobile();
+  const rPage  = { ...page,  padding: isMobile ? "16px 10px" : "32px 16px", overflowX: "hidden" };
+  const rShell = { ...shell, padding: isMobile ? 16 : 32 };
 
   async function generate() {
     setLoading(true); setError(""); setResult(null);
@@ -156,8 +169,8 @@ Skills: ${form.skills}`;
 
   if (step === "templates") {
     return (
-      <div dir={rtl ? "rtl" : "ltr"} style={page}>
-        <div style={{ ...shell, maxWidth: 920 }}>
+      <div dir={rtl ? "rtl" : "ltr"} style={rPage}>
+        <div style={{ ...rShell, maxWidth: 920 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 22 }}>
             {LANGUAGES.map((l) => (
               <button key={l.code} onClick={() => setLang(l.code)}
@@ -166,16 +179,16 @@ Skills: ${form.skills}`;
               </button>
             ))}
           </div>
-          <h1 style={h1}>{t.heading}</h1>
-          <p style={subtitle}>{t.chooseTpl}</p>
+          <h1 style={{ ...h1, fontSize: isMobile ? 22 : 30 }}>{t.heading}</h1>
+          <p style={{ ...subtitle, fontSize: isMobile ? 13.5 : 15 }}>{t.chooseTpl}</p>
 
-          <div style={tplGrid}>
+          <div style={{ ...tplGrid, gridTemplateColumns: isMobile ? "repeat(auto-fill, minmax(140px, 1fr))" : "repeat(auto-fill, minmax(220px, 1fr))" }}>
             {TEMPLATES.map((tp) => (
               <button key={tp.id} onClick={() => { setTpl(tp); setStep("form"); }} style={tplCard}>
                 <ThumbPreview tp={tp} />
-                <div style={{ padding: "12px 14px", textAlign: rtl ? "right" : "left" }}>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "#f5f8fc" }}>{tp.name}</div>
-                  <div style={{ fontSize: 12.5, color: "#8a98a8", marginTop: 2 }}>{tp.tag}</div>
+                <div style={{ padding: isMobile ? "8px 10px" : "12px 14px", textAlign: rtl ? "right" : "left" }}>
+                  <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: "#f5f8fc" }}>{tp.name}</div>
+                  <div style={{ fontSize: isMobile ? 11 : 12.5, color: "#8a98a8", marginTop: 2 }}>{tp.tag}</div>
                 </div>
               </button>
             ))}
@@ -195,20 +208,21 @@ Skills: ${form.skills}`;
     );
 
   return (
-    <div dir={rtl ? "rtl" : "ltr"} style={page}>
-      <div style={{ ...shell, maxWidth: 1080 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 12 }}>
+    <div dir={rtl ? "rtl" : "ltr"} style={rPage}>
+      <div style={{ ...rShell, maxWidth: 1080 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+          marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
           <button onClick={() => setStep("templates")} style={backBtn}>← {t.back}</button>
           <div style={{ fontSize: 13.5, color: "#8a98a8" }}>
             {t.chooseTpl}: <strong style={{ color: tpl.accent }}>{tpl.name}</strong>
           </div>
         </div>
 
-        <div style={splitGrid}>
+        <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
           <div>
             <label style={lbl}>{t.name}</label>{field("name")}
             <label style={lbl}>{t.title}</label>{field("title")}
-            <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1 }}><label style={lbl}>{t.email}</label>{field("email")}</div>
               <div style={{ flex: 1 }}><label style={lbl}>{t.phone}</label>{field("phone")}</div>
             </div>
@@ -223,15 +237,16 @@ Skills: ${form.skills}`;
             {error && <p style={{ color: "#f87171", fontSize: 14, marginTop: 12 }}>{error}</p>}
           </div>
 
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
+              marginTop: isMobile ? 24 : 0 }}>
               <span style={{ ...badge, ...(result ? badgePolished : badgeLive),
                 background: result ? `${tpl.accent}22` : "#1f2937",
                 color: result ? tpl.accent : "#9fb0c2" }}>
                 {result ? "✦ AI-polished" : "● Live preview"}
               </span>
             </div>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", overflowX: "auto" }}>
               {result && <button onClick={copyOut} style={copyBtn}>{copied ? t.copied : t.copy}</button>}
               <ResumePaper tpl={tpl} result={result || liveData} rtl={rtl} placeholder={false} />
             </div>
@@ -345,7 +360,8 @@ function ResumePaper({ tpl, result, rtl, placeholder = true }) {
   const empty = placeholder && !hasContent;
   const data = result || { name: "—", title: "", contact: [], summary: "", sections: [] };
   const paper = { background: "#fff", color: "#1a1a1a", borderRadius: 8, minHeight: 420,
-    fontFamily: tpl.font, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.35)" };
+    fontFamily: tpl.font, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
+    width: "100%", boxSizing: "border-box" };
 
   if (empty) {
     return <div style={{ ...paper, display: "flex", alignItems: "center", justifyContent: "center",
