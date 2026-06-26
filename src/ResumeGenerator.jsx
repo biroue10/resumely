@@ -1213,16 +1213,30 @@ function LanguageDropdown({ selected, onSelect }) {
 }
 
 function ThumbPreview({ tp, isMobile }) {
+  const H = isMobile ? 140 : 200;
+
+  if (tp.blank) {
+    return (
+      <div style={{ height: H, background: "#f3f4f6", display: "flex",
+        alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8,
+        borderBottom: "1px dashed #d1d5db" }}>
+        <div style={{ fontSize: 26, opacity: 0.18, lineHeight: 1 }}>∅</div>
+        <div style={{ fontSize: 10.5, color: "#9ca3af", fontWeight: 600,
+          textTransform: "uppercase", letterSpacing: "0.6px" }}>No template</div>
+      </div>
+    );
+  }
+
+  // Scale so the header is readable; center horizontally so centered layouts stay visible
   const INNER_W = 700;
-  const SCALE   = isMobile ? 0.22 : 0.345;
-  const H       = isMobile ? 200  : 310;
+  const SCALE   = isMobile ? 0.36 : 0.6;
 
   return (
     <div style={{ height: H, overflow: "hidden", position: "relative",
-      background: tp.id === "tech" ? "#0B1120" : tp.blank ? "#f9fafb" : "#fff",
-      borderBottom: tp.blank ? `1px dashed #d1d5db` : "none" }}>
+      background: tp.id === "tech" ? "#0B1120" : "#fff" }}>
       <div style={{ width: INNER_W, transform: `scale(${SCALE})`,
-        transformOrigin: "top left", position: "absolute", top: 0, left: 0,
+        transformOrigin: "top center",
+        position: "absolute", top: 0, left: "50%", marginLeft: `-${INNER_W / 2}px`,
         pointerEvents: "none", userSelect: "none" }}>
         <ResumePaper tpl={tp} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
       </div>
