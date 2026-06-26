@@ -17,7 +17,7 @@ const UI = {
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
     placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
     emailError: "Please enter a valid email address",
-    phoneError: "Enter a valid local number (e.g. 7911 123456)" },
+    phoneError: "Invalid number", phoneDigits: "digits required" },
   fr: { name: "Nom complet", title: "Titre professionnel", email: "E-mail", phone: "Téléphone",
     location: "Localisation", summary: "À propos de vous", experience: "Expérience", education: "Formation",
     skills: "Compétences (séparées par des virgules)", generate: "Générer le CV", generating: "Génération…",
@@ -25,7 +25,7 @@ const UI = {
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
     placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
     emailError: "Veuillez saisir une adresse e-mail valide",
-    phoneError: "Numéro invalide (ex. 06 12 34 56 78)" },
+    phoneError: "Numéro invalide", phoneDigits: "chiffres requis" },
   es: { name: "Nombre completo", title: "Título profesional", email: "Correo", phone: "Teléfono",
     location: "Ubicación", summary: "Sobre ti", experience: "Experiencia", education: "Educación",
     skills: "Habilidades (separadas por comas)", generate: "Generar currículum", generating: "Generando…",
@@ -33,7 +33,7 @@ const UI = {
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
     placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
     emailError: "Introduce un correo electrónico válido",
-    phoneError: "Número inválido (ej. 612 345 678)" },
+    phoneError: "Número inválido", phoneDigits: "dígitos requeridos" },
   ar: { name: "الاسم الكامل", title: "المسمى الوظيفي", email: "البريد", phone: "الهاتف",
     location: "الموقع", summary: "نبذة عنك", experience: "الخبرة", education: "التعليم",
     skills: "المهارات (مفصولة بفواصل)", generate: "إنشاء السيرة الذاتية", generating: "جارٍ الإنشاء…",
@@ -41,7 +41,7 @@ const UI = {
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
     placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
     emailError: "يرجى إدخال عنوان بريد إلكتروني صحيح",
-    phoneError: "رقم غير صحيح (مثال: 06 12 34 56 78)" },
+    phoneError: "رقم غير صحيح", phoneDigits: "أرقام مطلوبة" },
   de: { name: "Vollständiger Name", title: "Berufsbezeichnung", email: "E-Mail", phone: "Telefon",
     location: "Standort", summary: "Über dich", experience: "Erfahrung", education: "Ausbildung",
     skills: "Fähigkeiten (durch Kommas getrennt)", generate: "Lebenslauf erstellen", generating: "Wird erstellt…",
@@ -49,7 +49,7 @@ const UI = {
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
     placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
     emailError: "Bitte eine gültige E-Mail-Adresse eingeben",
-    phoneError: "Ungültige Nummer (z.B. 170 1234567)" },
+    phoneError: "Ungültige Nummer", phoneDigits: "Ziffern erforderlich" },
 };
 
 // ── Templates ─────────────────────────────────────────────────────
@@ -74,64 +74,65 @@ const AUTHOR = {
 
 const LANG_CODE = { en: "+1", fr: "+33", es: "+34", ar: "+212", de: "+49" };
 
+// digits: [min, max] local digits the user types (with or without leading 0)
 const COUNTRIES = [
-  { flag: "🇩🇿", name: "Algeria",        code: "+213" },
-  { flag: "🇦🇷", name: "Argentina",      code: "+54"  },
-  { flag: "🇦🇺", name: "Australia",      code: "+61"  },
-  { flag: "🇦🇹", name: "Austria",        code: "+43"  },
-  { flag: "🇧🇪", name: "Belgium",        code: "+32"  },
-  { flag: "🇧🇷", name: "Brazil",         code: "+55"  },
-  { flag: "🇨🇲", name: "Cameroon",       code: "+237" },
-  { flag: "🇨🇦", name: "Canada",         code: "+1"   },
-  { flag: "🇨🇱", name: "Chile",          code: "+56"  },
-  { flag: "🇨🇳", name: "China",          code: "+86"  },
-  { flag: "🇨🇴", name: "Colombia",       code: "+57"  },
-  { flag: "🇨🇩", name: "Congo (DRC)",    code: "+243" },
-  { flag: "🇨🇮", name: "Côte d'Ivoire",  code: "+225" },
-  { flag: "🇩🇰", name: "Denmark",        code: "+45"  },
-  { flag: "🇪🇬", name: "Egypt",          code: "+20"  },
-  { flag: "🇫🇷", name: "France",         code: "+33"  },
-  { flag: "🇩🇪", name: "Germany",        code: "+49"  },
-  { flag: "🇬🇭", name: "Ghana",          code: "+233" },
-  { flag: "🇬🇷", name: "Greece",         code: "+30"  },
-  { flag: "🇮🇳", name: "India",          code: "+91"  },
-  { flag: "🇮🇩", name: "Indonesia",      code: "+62"  },
-  { flag: "🇮🇶", name: "Iraq",           code: "+964" },
-  { flag: "🇮🇪", name: "Ireland",        code: "+353" },
-  { flag: "🇮🇱", name: "Israel",         code: "+972" },
-  { flag: "🇮🇹", name: "Italy",          code: "+39"  },
-  { flag: "🇯🇵", name: "Japan",          code: "+81"  },
-  { flag: "🇯🇴", name: "Jordan",         code: "+962" },
-  { flag: "🇰🇪", name: "Kenya",          code: "+254" },
-  { flag: "🇰🇼", name: "Kuwait",         code: "+965" },
-  { flag: "🇱🇧", name: "Lebanon",        code: "+961" },
-  { flag: "🇱🇾", name: "Libya",          code: "+218" },
-  { flag: "🇲🇾", name: "Malaysia",       code: "+60"  },
-  { flag: "🇲🇦", name: "Morocco",        code: "+212" },
-  { flag: "🇲🇽", name: "Mexico",         code: "+52"  },
-  { flag: "🇳🇱", name: "Netherlands",    code: "+31"  },
-  { flag: "🇳🇬", name: "Nigeria",        code: "+234" },
-  { flag: "🇳🇴", name: "Norway",         code: "+47"  },
-  { flag: "🇵🇰", name: "Pakistan",       code: "+92"  },
-  { flag: "🇵🇱", name: "Poland",         code: "+48"  },
-  { flag: "🇵🇹", name: "Portugal",       code: "+351" },
-  { flag: "🇶🇦", name: "Qatar",          code: "+974" },
-  { flag: "🇷🇺", name: "Russia",         code: "+7"   },
-  { flag: "🇸🇦", name: "Saudi Arabia",   code: "+966" },
-  { flag: "🇸🇳", name: "Senegal",        code: "+221" },
-  { flag: "🇿🇦", name: "South Africa",   code: "+27"  },
-  { flag: "🇰🇷", name: "South Korea",    code: "+82"  },
-  { flag: "🇪🇸", name: "Spain",          code: "+34"  },
-  { flag: "🇸🇩", name: "Sudan",          code: "+249" },
-  { flag: "🇸🇪", name: "Sweden",         code: "+46"  },
-  { flag: "🇨🇭", name: "Switzerland",    code: "+41"  },
-  { flag: "🇸🇾", name: "Syria",          code: "+963" },
-  { flag: "🇹🇳", name: "Tunisia",        code: "+216" },
-  { flag: "🇹🇷", name: "Turkey",         code: "+90"  },
-  { flag: "🇦🇪", name: "UAE",            code: "+971" },
-  { flag: "🇬🇧", name: "United Kingdom", code: "+44"  },
-  { flag: "🇺🇸", name: "United States",  code: "+1"   },
-  { flag: "🇾🇪", name: "Yemen",          code: "+967" },
+  { flag: "🇩🇿", name: "Algeria",        code: "+213", digits: [9,  10] },
+  { flag: "🇦🇷", name: "Argentina",      code: "+54",  digits: [10, 10] },
+  { flag: "🇦🇺", name: "Australia",      code: "+61",  digits: [9,  10] },
+  { flag: "🇦🇹", name: "Austria",        code: "+43",  digits: [7,  11] },
+  { flag: "🇧🇪", name: "Belgium",        code: "+32",  digits: [9,   9] },
+  { flag: "🇧🇷", name: "Brazil",         code: "+55",  digits: [10, 11] },
+  { flag: "🇨🇲", name: "Cameroon",       code: "+237", digits: [9,   9] },
+  { flag: "🇨🇦", name: "Canada",         code: "+1",   digits: [10, 10] },
+  { flag: "🇨🇱", name: "Chile",          code: "+56",  digits: [9,   9] },
+  { flag: "🇨🇳", name: "China",          code: "+86",  digits: [11, 11] },
+  { flag: "🇨🇴", name: "Colombia",       code: "+57",  digits: [10, 10] },
+  { flag: "🇨🇩", name: "Congo (DRC)",    code: "+243", digits: [9,  10] },
+  { flag: "🇨🇮", name: "Côte d'Ivoire",  code: "+225", digits: [10, 10] },
+  { flag: "🇩🇰", name: "Denmark",        code: "+45",  digits: [8,   8] },
+  { flag: "🇪🇬", name: "Egypt",          code: "+20",  digits: [10, 11] },
+  { flag: "🇫🇷", name: "France",         code: "+33",  digits: [9,  10] },
+  { flag: "🇩🇪", name: "Germany",        code: "+49",  digits: [7,  11] },
+  { flag: "🇬🇭", name: "Ghana",          code: "+233", digits: [9,  10] },
+  { flag: "🇬🇷", name: "Greece",         code: "+30",  digits: [10, 10] },
+  { flag: "🇮🇳", name: "India",          code: "+91",  digits: [10, 10] },
+  { flag: "🇮🇩", name: "Indonesia",      code: "+62",  digits: [9,  12] },
+  { flag: "🇮🇶", name: "Iraq",           code: "+964", digits: [10, 10] },
+  { flag: "🇮🇪", name: "Ireland",        code: "+353", digits: [9,  10] },
+  { flag: "🇮🇱", name: "Israel",         code: "+972", digits: [9,   9] },
+  { flag: "🇮🇹", name: "Italy",          code: "+39",  digits: [9,  11] },
+  { flag: "🇯🇵", name: "Japan",          code: "+81",  digits: [10, 11] },
+  { flag: "🇯🇴", name: "Jordan",         code: "+962", digits: [9,  10] },
+  { flag: "🇰🇪", name: "Kenya",          code: "+254", digits: [9,  10] },
+  { flag: "🇰🇼", name: "Kuwait",         code: "+965", digits: [8,   8] },
+  { flag: "🇱🇧", name: "Lebanon",        code: "+961", digits: [7,   8] },
+  { flag: "🇱🇾", name: "Libya",          code: "+218", digits: [9,  10] },
+  { flag: "🇲🇾", name: "Malaysia",       code: "+60",  digits: [9,  10] },
+  { flag: "🇲🇦", name: "Morocco",        code: "+212", digits: [9,  10] },
+  { flag: "🇲🇽", name: "Mexico",         code: "+52",  digits: [10, 10] },
+  { flag: "🇳🇱", name: "Netherlands",    code: "+31",  digits: [9,  10] },
+  { flag: "🇳🇬", name: "Nigeria",        code: "+234", digits: [10, 11] },
+  { flag: "🇳🇴", name: "Norway",         code: "+47",  digits: [8,   8] },
+  { flag: "🇵🇰", name: "Pakistan",       code: "+92",  digits: [10, 11] },
+  { flag: "🇵🇱", name: "Poland",         code: "+48",  digits: [9,   9] },
+  { flag: "🇵🇹", name: "Portugal",       code: "+351", digits: [9,   9] },
+  { flag: "🇶🇦", name: "Qatar",          code: "+974", digits: [8,   8] },
+  { flag: "🇷🇺", name: "Russia",         code: "+7",   digits: [10, 10] },
+  { flag: "🇸🇦", name: "Saudi Arabia",   code: "+966", digits: [9,   9] },
+  { flag: "🇸🇳", name: "Senegal",        code: "+221", digits: [9,   9] },
+  { flag: "🇿🇦", name: "South Africa",   code: "+27",  digits: [9,  10] },
+  { flag: "🇰🇷", name: "South Korea",    code: "+82",  digits: [9,  10] },
+  { flag: "🇪🇸", name: "Spain",          code: "+34",  digits: [9,   9] },
+  { flag: "🇸🇩", name: "Sudan",          code: "+249", digits: [9,   9] },
+  { flag: "🇸🇪", name: "Sweden",         code: "+46",  digits: [9,   9] },
+  { flag: "🇨🇭", name: "Switzerland",    code: "+41",  digits: [9,   9] },
+  { flag: "🇸🇾", name: "Syria",          code: "+963", digits: [9,   9] },
+  { flag: "🇹🇳", name: "Tunisia",        code: "+216", digits: [8,   8] },
+  { flag: "🇹🇷", name: "Turkey",         code: "+90",  digits: [10, 10] },
+  { flag: "🇦🇪", name: "UAE",            code: "+971", digits: [9,   9] },
+  { flag: "🇬🇧", name: "United Kingdom", code: "+44",  digits: [10, 10] },
+  { flag: "🇺🇸", name: "United States",  code: "+1",   digits: [10, 10] },
+  { flag: "🇾🇪", name: "Yemen",          code: "+967", digits: [9,   9] },
 ];
 
 function useIsMobile(bp = 768) {
@@ -190,10 +191,16 @@ export default function ResumeGenerator() {
     if (!val.trim()) return "";
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()) ? "" : t.emailError;
   }
-  function validatePhone(val) {
+  function validatePhone(val, code = phoneCode) {
     if (!val.trim()) return "";
-    const digits = val.replace(/\D/g, "");
-    return digits.length >= 4 && digits.length <= 15 ? "" : t.phoneError;
+    const country = COUNTRIES.find(c => c.code === code);
+    const [min, max] = country ? country.digits : [4, 15];
+    const n = val.replace(/\D/g, "").length;
+    if (n < min || n > max) {
+      const range = min === max ? `${min}` : `${min}–${max}`;
+      return `${t.phoneError} — ${range} ${t.phoneDigits}`;
+    }
+    return "";
   }
   function onEmailChange(e) {
     setForm({ ...form, email: e.target.value });
@@ -331,7 +338,11 @@ Skills: ${form.skills}`;
               <div style={{ flex: 1 }}>
                 <label style={lbl}>{t.phone}</label>
                 <div style={{ display: "flex", gap: 6 }}>
-                  <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)} style={codeSelect}>
+                  <select value={phoneCode} onChange={(e) => {
+                    const newCode = e.target.value;
+                    setPhoneCode(newCode);
+                    if (form.phone.trim()) setPhoneError(validatePhone(form.phone, newCode));
+                  }} style={codeSelect}>
                     {COUNTRIES.map((c) => (
                       <option key={c.name} value={c.code}>{c.flag} {c.code}</option>
                     ))}
