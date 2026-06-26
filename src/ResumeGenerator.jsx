@@ -1127,7 +1127,7 @@ Awards: ${form.awards}`;
               <div style={{ overflow: "hidden", whiteSpace: "nowrap" }}>
                 <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.5px",
                   background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Resumely
+                  ApplyCraft
                 </div>
                 <div style={{ fontSize: 10.5, color: C.text3, marginTop: 1 }}>Career toolkit</div>
               </div>
@@ -1259,7 +1259,7 @@ Awards: ${form.awards}`;
                 <div>
                   <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.5px",
                     background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    Resumely
+                    ApplyCraft
                   </div>
                   <div style={{ fontSize: 10.5, color: C.text3, marginTop: 1 }}>Career toolkit</div>
                 </div>
