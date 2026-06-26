@@ -17,7 +17,7 @@ const UI = {
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
     placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
     emailError: "Please enter a valid email address",
-    phoneError: "Invalid number (e.g. +44 7911 123456)" },
+    phoneError: "Enter a valid local number (e.g. 7911 123456)" },
   fr: { name: "Nom complet", title: "Titre professionnel", email: "E-mail", phone: "Téléphone",
     location: "Localisation", summary: "À propos de vous", experience: "Expérience", education: "Formation",
     skills: "Compétences (séparées par des virgules)", generate: "Générer le CV", generating: "Génération…",
@@ -25,7 +25,7 @@ const UI = {
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
     placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
     emailError: "Veuillez saisir une adresse e-mail valide",
-    phoneError: "Numéro invalide (ex. +33 6 12 34 56 78)" },
+    phoneError: "Numéro invalide (ex. 06 12 34 56 78)" },
   es: { name: "Nombre completo", title: "Título profesional", email: "Correo", phone: "Teléfono",
     location: "Ubicación", summary: "Sobre ti", experience: "Experiencia", education: "Educación",
     skills: "Habilidades (separadas por comas)", generate: "Generar currículum", generating: "Generando…",
@@ -33,7 +33,7 @@ const UI = {
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
     placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
     emailError: "Introduce un correo electrónico válido",
-    phoneError: "Número inválido (ej. +34 612 345 678)" },
+    phoneError: "Número inválido (ej. 612 345 678)" },
   ar: { name: "الاسم الكامل", title: "المسمى الوظيفي", email: "البريد", phone: "الهاتف",
     location: "الموقع", summary: "نبذة عنك", experience: "الخبرة", education: "التعليم",
     skills: "المهارات (مفصولة بفواصل)", generate: "إنشاء السيرة الذاتية", generating: "جارٍ الإنشاء…",
@@ -41,7 +41,7 @@ const UI = {
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
     placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
     emailError: "يرجى إدخال عنوان بريد إلكتروني صحيح",
-    phoneError: "رقم غير صحيح (مثال: +212 6 12 34 56 78)" },
+    phoneError: "رقم غير صحيح (مثال: 06 12 34 56 78)" },
   de: { name: "Vollständiger Name", title: "Berufsbezeichnung", email: "E-Mail", phone: "Telefon",
     location: "Standort", summary: "Über dich", experience: "Erfahrung", education: "Ausbildung",
     skills: "Fähigkeiten (durch Kommas getrennt)", generate: "Lebenslauf erstellen", generating: "Wird erstellt…",
@@ -49,7 +49,7 @@ const UI = {
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
     placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
     emailError: "Bitte eine gültige E-Mail-Adresse eingeben",
-    phoneError: "Ungültige Nummer (z.B. +49 170 1234567)" },
+    phoneError: "Ungültige Nummer (z.B. 170 1234567)" },
 };
 
 // ── Templates ─────────────────────────────────────────────────────
@@ -71,6 +71,68 @@ const AUTHOR = {
   github: "https://github.com/biroue10",
   linkedin: "", // paste your LinkedIn URL here, e.g. "https://linkedin.com/in/yourname"
 };
+
+const LANG_CODE = { en: "+1", fr: "+33", es: "+34", ar: "+212", de: "+49" };
+
+const COUNTRIES = [
+  { flag: "🇩🇿", name: "Algeria",        code: "+213" },
+  { flag: "🇦🇷", name: "Argentina",      code: "+54"  },
+  { flag: "🇦🇺", name: "Australia",      code: "+61"  },
+  { flag: "🇦🇹", name: "Austria",        code: "+43"  },
+  { flag: "🇧🇪", name: "Belgium",        code: "+32"  },
+  { flag: "🇧🇷", name: "Brazil",         code: "+55"  },
+  { flag: "🇨🇲", name: "Cameroon",       code: "+237" },
+  { flag: "🇨🇦", name: "Canada",         code: "+1"   },
+  { flag: "🇨🇱", name: "Chile",          code: "+56"  },
+  { flag: "🇨🇳", name: "China",          code: "+86"  },
+  { flag: "🇨🇴", name: "Colombia",       code: "+57"  },
+  { flag: "🇨🇩", name: "Congo (DRC)",    code: "+243" },
+  { flag: "🇨🇮", name: "Côte d'Ivoire",  code: "+225" },
+  { flag: "🇩🇰", name: "Denmark",        code: "+45"  },
+  { flag: "🇪🇬", name: "Egypt",          code: "+20"  },
+  { flag: "🇫🇷", name: "France",         code: "+33"  },
+  { flag: "🇩🇪", name: "Germany",        code: "+49"  },
+  { flag: "🇬🇭", name: "Ghana",          code: "+233" },
+  { flag: "🇬🇷", name: "Greece",         code: "+30"  },
+  { flag: "🇮🇳", name: "India",          code: "+91"  },
+  { flag: "🇮🇩", name: "Indonesia",      code: "+62"  },
+  { flag: "🇮🇶", name: "Iraq",           code: "+964" },
+  { flag: "🇮🇪", name: "Ireland",        code: "+353" },
+  { flag: "🇮🇱", name: "Israel",         code: "+972" },
+  { flag: "🇮🇹", name: "Italy",          code: "+39"  },
+  { flag: "🇯🇵", name: "Japan",          code: "+81"  },
+  { flag: "🇯🇴", name: "Jordan",         code: "+962" },
+  { flag: "🇰🇪", name: "Kenya",          code: "+254" },
+  { flag: "🇰🇼", name: "Kuwait",         code: "+965" },
+  { flag: "🇱🇧", name: "Lebanon",        code: "+961" },
+  { flag: "🇱🇾", name: "Libya",          code: "+218" },
+  { flag: "🇲🇾", name: "Malaysia",       code: "+60"  },
+  { flag: "🇲🇦", name: "Morocco",        code: "+212" },
+  { flag: "🇲🇽", name: "Mexico",         code: "+52"  },
+  { flag: "🇳🇱", name: "Netherlands",    code: "+31"  },
+  { flag: "🇳🇬", name: "Nigeria",        code: "+234" },
+  { flag: "🇳🇴", name: "Norway",         code: "+47"  },
+  { flag: "🇵🇰", name: "Pakistan",       code: "+92"  },
+  { flag: "🇵🇱", name: "Poland",         code: "+48"  },
+  { flag: "🇵🇹", name: "Portugal",       code: "+351" },
+  { flag: "🇶🇦", name: "Qatar",          code: "+974" },
+  { flag: "🇷🇺", name: "Russia",         code: "+7"   },
+  { flag: "🇸🇦", name: "Saudi Arabia",   code: "+966" },
+  { flag: "🇸🇳", name: "Senegal",        code: "+221" },
+  { flag: "🇿🇦", name: "South Africa",   code: "+27"  },
+  { flag: "🇰🇷", name: "South Korea",    code: "+82"  },
+  { flag: "🇪🇸", name: "Spain",          code: "+34"  },
+  { flag: "🇸🇩", name: "Sudan",          code: "+249" },
+  { flag: "🇸🇪", name: "Sweden",         code: "+46"  },
+  { flag: "🇨🇭", name: "Switzerland",    code: "+41"  },
+  { flag: "🇸🇾", name: "Syria",          code: "+963" },
+  { flag: "🇹🇳", name: "Tunisia",        code: "+216" },
+  { flag: "🇹🇷", name: "Turkey",         code: "+90"  },
+  { flag: "🇦🇪", name: "UAE",            code: "+971" },
+  { flag: "🇬🇧", name: "United Kingdom", code: "+44"  },
+  { flag: "🇺🇸", name: "United States",  code: "+1"   },
+  { flag: "🇾🇪", name: "Yemen",          code: "+967" },
+];
 
 function useIsMobile(bp = 768) {
   const [mobile, setMobile] = useState(() => window.innerWidth < bp);
@@ -113,11 +175,13 @@ export default function ResumeGenerator() {
   const [copied, setCopied] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [phoneCode, setPhoneCode] = useState(() => LANG_CODE[lang] || "+1");
 
   const t = UI[lang];
   const rtl = LANGUAGES.find((l) => l.code === lang)?.rtl;
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-  const liveData = buildLiveData(form, t);
+  const fullPhone = form.phone.trim() ? `${phoneCode} ${form.phone.trim()}` : "";
+  const liveData = buildLiveData({ ...form, phone: fullPhone }, t);
   const isMobile = useIsMobile();
   const rPage  = { ...page,  padding: isMobile ? "16px 10px" : "32px 16px", overflowX: "hidden" };
   const rShell = { ...shell, padding: isMobile ? 16 : 32 };
@@ -129,7 +193,7 @@ export default function ResumeGenerator() {
   function validatePhone(val) {
     if (!val.trim()) return "";
     const digits = val.replace(/\D/g, "");
-    return /^\+?[\d\s\-().]{7,20}$/.test(val.trim()) && digits.length >= 7 ? "" : t.phoneError;
+    return digits.length >= 4 && digits.length <= 15 ? "" : t.phoneError;
   }
   function onEmailChange(e) {
     setForm({ ...form, email: e.target.value });
@@ -158,7 +222,7 @@ Candidate details:
 Name: ${form.name}
 Title: ${form.title}
 Email: ${form.email}
-Phone: ${form.phone}
+Phone: ${fullPhone}
 Location: ${form.location}
 About: ${form.summary}
 Experience: ${form.experience}
@@ -183,7 +247,7 @@ Skills: ${form.skills}`;
     } catch (err) {
       // No AI backend (e.g. running locally or on static hosting):
       // fall back to the live form data so the preview still renders.
-      setResult(buildLiveData(form, t));
+      setResult(buildLiveData({ ...form, phone: fullPhone }, t));
       setError("AI polish needs a backend with an API key — showing your raw entries instead.");
     } finally {
       setLoading(false);
@@ -266,9 +330,16 @@ Skills: ${form.skills}`;
               </div>
               <div style={{ flex: 1 }}>
                 <label style={lbl}>{t.phone}</label>
-                <input value={form.phone} onChange={onPhoneChange}
-                  onBlur={() => setPhoneError(validatePhone(form.phone))}
-                  style={{ ...inputStyle, ...(phoneError ? { borderColor: "#f87171" } : {}) }} />
+                <div style={{ display: "flex", gap: 6 }}>
+                  <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)} style={codeSelect}>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.name} value={c.code}>{c.flag} {c.code}</option>
+                    ))}
+                  </select>
+                  <input value={form.phone} onChange={onPhoneChange}
+                    onBlur={() => setPhoneError(validatePhone(form.phone))}
+                    style={{ ...inputStyle, flex: 1, ...(phoneError ? { borderColor: "#f87171" } : {}) }} />
+                </div>
                 {phoneError && <p style={fieldErr}>{phoneError}</p>}
               </div>
             </div>
@@ -633,7 +704,10 @@ const copyBtn = { position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, 
 const badge = { fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.3px" };
 const badgeLive = { border: "1px solid #2a3441" };
 const badgePolished = { border: "1px solid transparent" };
-const fieldErr = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
+const fieldErr  = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
+const codeSelect = { boxSizing: "border-box", padding: "10px 8px", background: "#0f1419",
+  border: "1px solid #2a3441", borderRadius: 9, color: "#e7ecf2", fontSize: 14, outline: "none",
+  cursor: "pointer", minWidth: 82, flexShrink: 0 };
 const footerWrap = { marginTop: 36, paddingTop: 20, borderTop: "1px solid #232c38",
   display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center",
   gap: "6px 4px", fontSize: 13, color: "#5a6880" };
