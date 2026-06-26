@@ -1353,6 +1353,29 @@ Awards: ${form.awards}`;
           </div>
         </div>
 
+        {/* Stats strip */}
+        <div style={{ borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`,
+          background: C.surface, padding: "28px 24px" }}>
+          <div style={{ maxWidth: 900, margin: "0 auto",
+            display: "flex", justifyContent: "space-around", alignItems: "center",
+            flexWrap: "wrap", gap: "16px 32px" }}>
+            {[
+              { n: "12", label: "Templates" },
+              { n: "6", label: "Cover letter styles" },
+              { n: "50+", label: "Languages" },
+              { n: "0", label: "Watermarks" },
+              { n: "∞", label: "Free downloads" },
+            ].map(s => (
+              <div key={s.label} style={{ textAlign: "center", minWidth: 80 }}>
+                <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1,
+                  background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{s.n}</div>
+                <div style={{ fontSize: 11.5, color: C.text3, marginTop: 5, textTransform: "uppercase",
+                  letterSpacing: "0.8px", fontWeight: 600 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* How it works */}
         <div style={{ padding: "72px 24px 80px", borderTop: `1px solid ${C.border}` }}>
           <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -1426,6 +1449,34 @@ Awards: ${form.awards}`;
           </div>
         </div>
 
+        {/* Free pledge */}
+        <FadeIn>
+          <div style={{ margin: "0 24px 80px", borderRadius: 18,
+            background: `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent2}08 100%)`,
+            border: `1px solid ${C.accent}30`, padding: "56px 40px", textAlign: "center" }}>
+            <div style={{ maxWidth: 680, margin: "0 auto" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, textTransform: "uppercase",
+                letterSpacing: "2.5px", color: C.accent2, marginBottom: 16 }}>Our commitment</div>
+              <h2 style={{ fontSize: "clamp(26px, 3.5vw, 44px)", fontWeight: 800,
+                letterSpacing: "-1px", color: C.text1, margin: "0 0 16px", lineHeight: 1.15 }}>
+                Free means <span style={{ background: C.grad,
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>actually free.</span>
+              </h2>
+              <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.8, margin: "0 auto 36px", maxWidth: 500 }}>
+                No paid tier. No watermarks. No account ever. Every template, every language,
+                every download — included for everyone, permanently.
+              </p>
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                {["✓ No watermarks", "✓ No account", "✓ No credit card", "✓ No data stored", "✓ Unlimited downloads"].map(t => (
+                  <span key={t} style={{ fontSize: 12.5, fontWeight: 600, padding: "7px 16px",
+                    borderRadius: 999, border: `1.5px solid ${C.accent}44`,
+                    color: C.accent2, background: `${C.accent}12` }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+
         {/* Multilingual superpowers */}
         <div style={{ borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`,
           background: C.surface, padding: "72px 24px 80px" }}>
@@ -1472,6 +1523,32 @@ Awards: ${form.awards}`;
                 </FadeIn>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div style={{ padding: "80px 24px 80px", borderTop: `1px solid ${C.border}` }}>
+          <div style={{ maxWidth: 760, margin: "0 auto" }}>
+            <FadeIn style={{ textAlign: "center", marginBottom: 52 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase",
+                letterSpacing: "2px", color: C.accent2, marginBottom: 14 }}>FAQ</p>
+              <h2 style={{ fontSize: "clamp(22px, 3vw, 38px)", fontWeight: 800,
+                letterSpacing: "-0.8px", color: C.text1, margin: 0 }}>Common questions</h2>
+            </FadeIn>
+            {[
+              { q: "Is ApplyCraft really free?",
+                a: "Yes — completely. Every template, every language, every download is free. There are no paid plans, no premium tiers, no watermarks. Download as many resumes and cover letters as you need." },
+              { q: "Do you store or sell my data?",
+                a: "No. Everything you type lives only in your browser. ApplyCraft has no backend, no database, and no account system. Nothing leaves your device. When you close the tab, your data is gone." },
+              { q: "Are the templates ATS-compatible?",
+                a: "Yes. All 12 resume templates are built with clean, linear HTML that applicant tracking systems can parse without issues — no multi-column hacks, no images replacing text." },
+              { q: "Can I really use 50+ languages?",
+                a: "Yes. Type directly in any language, switch document labels and date formats, and use the Translate button to convert an existing CV to a different language without rebuilding from scratch. RTL languages like Arabic are fully supported." },
+              { q: "What download formats are available?",
+                a: "PDF and DOCX. PDF is ideal for most applications. DOCX is available for recruiters or employers who need an editable file." },
+              { q: "Do I need to create an account?",
+                a: "No. There is no sign-up, no login, no email address required. Open the app and start building immediately." },
+            ].map((item, i) => <FAQItem key={i} item={item} C={C} />)}
           </div>
         </div>
 
@@ -1861,6 +1938,33 @@ function FadeIn({ children, delay = 0, style = {}, as: Tag = "div" }) {
       willChange: "opacity, transform",
       ...style
     }}>{children}</Tag>
+  );
+}
+
+function FAQItem({ item, C }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <FadeIn>
+      <div style={{ borderBottom: `1px solid ${C.border}` }}>
+        <button onClick={() => setOpen(o => !o)}
+          style={{ width: "100%", display: "flex", justifyContent: "space-between",
+            alignItems: "center", padding: "20px 0", background: "none", border: "none",
+            cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+            fontSize: 15, fontWeight: 600, color: C.text1 }}>
+          <span>{item.q}</span>
+          <span style={{ fontSize: 22, color: C.accent2, flexShrink: 0, marginLeft: 16,
+            display: "inline-block",
+            transition: "transform 0.28s cubic-bezier(0.22,1,0.36,1)",
+            transform: open ? "rotate(45deg)" : "none" }}>+</span>
+        </button>
+        <div style={{ maxHeight: open ? 220 : 0, overflow: "hidden",
+          transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
+          <p style={{ margin: "0 0 20px", fontSize: 14, color: C.text2, lineHeight: 1.8 }}>
+            {item.a}
+          </p>
+        </div>
+      </div>
+    </FadeIn>
   );
 }
 
