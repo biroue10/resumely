@@ -694,7 +694,6 @@ Awards: ${form.awards}`;
           </button>
         ))}
       </div>
-      <PageFooter t={t} />
     </div>
   ) : null;
 
@@ -836,7 +835,6 @@ Awards: ${form.awards}`;
             </div>
           </div>
         </div>
-        <PageFooter t={t} />
       </div>
   ) : null;
 
@@ -1226,9 +1224,7 @@ function ThumbPreview({ tp, isMobile }) {
         <div style={{ height: H, background: "#f3f4f6", display: "flex",
           alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8,
           border: "1px dashed #d1d5db" }}>
-          <div style={{ fontSize: 28, opacity: 0.15, lineHeight: 1 }}>∅</div>
-          <div style={{ fontSize: 10.5, color: "#9ca3af", fontWeight: 600,
-            textTransform: "uppercase", letterSpacing: "0.6px" }}>No template</div>
+          <div style={{ fontSize: 72, color: "#9ca3af", fontWeight: 300, lineHeight: 1 }}>+</div>
         </div>
       </div>
     );
