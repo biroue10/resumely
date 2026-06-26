@@ -16,6 +16,12 @@ const UI = {
     heading: "Resume generator", sub: "Choose a language and template, add your details, get a polished resume.",
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
     placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
+    placeholderName: "e.g. Jane Doe", placeholderTitle: "e.g. Software Engineer",
+    placeholderEmail: "you@example.com", placeholderPhone: "e.g. 712 345 678",
+    placeholderLocation: "e.g. London, UK",
+    placeholderSummary: "A short paragraph about your background and goals…",
+    placeholderEducation: "Degree, institution, year — one per line",
+    placeholderSkills: "JavaScript, React, Node.js, …",
     emailError: "Please enter a valid email address",
     phoneError: "Invalid number", phoneDigits: "digits required" },
   fr: { name: "Nom complet", title: "Titre professionnel", email: "E-mail", phone: "Téléphone",
@@ -24,6 +30,12 @@ const UI = {
     heading: "Générateur de CV", sub: "Choisissez une langue et un modèle, ajoutez vos infos, obtenez un CV soigné.",
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
     placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
+    placeholderName: "ex. Jean Dupont", placeholderTitle: "ex. Ingénieur logiciel",
+    placeholderEmail: "vous@exemple.com", placeholderPhone: "ex. 06 12 34 56 78",
+    placeholderLocation: "ex. Paris, France",
+    placeholderSummary: "Un court paragraphe sur votre parcours et vos objectifs…",
+    placeholderEducation: "Diplôme, établissement, année — un par ligne",
+    placeholderSkills: "JavaScript, React, Node.js, …",
     emailError: "Veuillez saisir une adresse e-mail valide",
     phoneError: "Numéro invalide", phoneDigits: "chiffres requis" },
   es: { name: "Nombre completo", title: "Título profesional", email: "Correo", phone: "Teléfono",
@@ -32,6 +44,12 @@ const UI = {
     heading: "Generador de currículums", sub: "Elige idioma y plantilla, añade tus datos y obtén un currículum pulido.",
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
     placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
+    placeholderName: "ej. Juan García", placeholderTitle: "ej. Ingeniero de software",
+    placeholderEmail: "tu@ejemplo.com", placeholderPhone: "ej. 612 345 678",
+    placeholderLocation: "ej. Madrid, España",
+    placeholderSummary: "Un breve párrafo sobre tu trayectoria y objetivos…",
+    placeholderEducation: "Título, institución, año — uno por línea",
+    placeholderSkills: "JavaScript, React, Node.js, …",
     emailError: "Introduce un correo electrónico válido",
     phoneError: "Número inválido", phoneDigits: "dígitos requeridos" },
   ar: { name: "الاسم الكامل", title: "المسمى الوظيفي", email: "البريد", phone: "الهاتف",
@@ -40,6 +58,12 @@ const UI = {
     heading: "منشئ السيرة الذاتية", sub: "اختر لغة وقالباً، أضف بياناتك، واحصل على سيرة ذاتية متقنة.",
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
     placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
+    placeholderName: "مثال: أحمد محمد", placeholderTitle: "مثال: مهندس برمجيات",
+    placeholderEmail: "you@example.com", placeholderPhone: "مثال: 06 12 34 56 78",
+    placeholderLocation: "مثال: الرياض، السعودية",
+    placeholderSummary: "فقرة قصيرة عن خلفيتك وأهدافك المهنية…",
+    placeholderEducation: "الدرجة العلمية، المؤسسة، السنة — سطر لكل إدخال",
+    placeholderSkills: "جافاسكريبت، رياكت، نود.جي إس، …",
     emailError: "يرجى إدخال عنوان بريد إلكتروني صحيح",
     phoneError: "رقم غير صحيح", phoneDigits: "أرقام مطلوبة" },
   de: { name: "Vollständiger Name", title: "Berufsbezeichnung", email: "E-Mail", phone: "Telefon",
@@ -48,6 +72,12 @@ const UI = {
     heading: "Lebenslauf-Generator", sub: "Sprache und Vorlage wählen, Daten eingeben, gepflegten Lebenslauf erhalten.",
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
     placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
+    placeholderName: "z.B. Hans Müller", placeholderTitle: "z.B. Softwareentwickler",
+    placeholderEmail: "du@beispiel.de", placeholderPhone: "z.B. 170 1234567",
+    placeholderLocation: "z.B. Berlin, Deutschland",
+    placeholderSummary: "Ein kurzer Absatz über deinen Werdegang und deine Ziele…",
+    placeholderEducation: "Abschluss, Einrichtung, Jahr — eine pro Zeile",
+    placeholderSkills: "JavaScript, React, Node.js, …",
     emailError: "Bitte eine gültige E-Mail-Adresse eingeben",
     phoneError: "Ungültige Nummer", phoneDigits: "Ziffern erforderlich" },
 };
@@ -177,6 +207,7 @@ export default function ResumeGenerator() {
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [phoneCode, setPhoneCode] = useState(() => LANG_CODE[lang] || "+1");
+  const [zoomed, setZoomed] = useState(false);
 
   const t = UI[lang];
   const rtl = LANGUAGES.find((l) => l.code === lang)?.rtl;
@@ -309,7 +340,7 @@ Skills: ${form.skills}`;
       <textarea value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={4}
         style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
     ) : (
-      <input value={form[key]} onChange={set(key)} style={inputStyle} />
+      <input value={form[key]} onChange={set(key)} placeholder={ph || ""} style={inputStyle} />
     );
 
   return (
@@ -325,13 +356,14 @@ Skills: ${form.skills}`;
 
         <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
           <div>
-            <label style={lbl}>{t.name}</label>{field("name")}
-            <label style={lbl}>{t.title}</label>{field("title")}
+            <label style={lbl}>{t.name}</label>{field("name", false, t.placeholderName)}
+            <label style={lbl}>{t.title}</label>{field("title", false, t.placeholderTitle)}
             <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
               <div style={{ flex: 1 }}>
                 <label style={lbl}>{t.email}</label>
                 <input value={form.email} onChange={onEmailChange}
                   onBlur={() => setEmailError(validateEmail(form.email))}
+                  placeholder={t.placeholderEmail}
                   style={{ ...inputStyle, ...(emailError ? { borderColor: "#f87171" } : {}) }} />
                 {emailError && <p style={fieldErr}>{emailError}</p>}
               </div>
@@ -349,16 +381,17 @@ Skills: ${form.skills}`;
                   </select>
                   <input value={form.phone} onChange={onPhoneChange}
                     onBlur={() => setPhoneError(validatePhone(form.phone))}
+                    placeholder={t.placeholderPhone}
                     style={{ ...inputStyle, flex: 1, ...(phoneError ? { borderColor: "#f87171" } : {}) }} />
                 </div>
                 {phoneError && <p style={fieldErr}>{phoneError}</p>}
               </div>
             </div>
-            <label style={lbl}>{t.location}</label>{field("location")}
-            <label style={lbl}>{t.summary}</label>{field("summary", true)}
+            <label style={lbl}>{t.location}</label>{field("location", false, t.placeholderLocation)}
+            <label style={lbl}>{t.summary}</label>{field("summary", true, t.placeholderSummary)}
             <label style={lbl}>{t.experience}</label>{field("experience", true, t.placeholderEx)}
-            <label style={lbl}>{t.education}</label>{field("education", true)}
-            <label style={lbl}>{t.skills}</label>{field("skills")}
+            <label style={lbl}>{t.education}</label>{field("education", true, t.placeholderEducation)}
+            <label style={lbl}>{t.skills}</label>{field("skills", false, t.placeholderSkills)}
             <button onClick={generate} disabled={loading || !form.name} style={{ ...cta, background: tpl.accent }}>
               {loading ? t.generating : t.generate}
             </button>
@@ -374,9 +407,37 @@ Skills: ${form.skills}`;
                 {result ? "✦ AI-polished" : "● Live preview"}
               </span>
             </div>
-            <div style={{ position: "relative", overflowX: "auto" }}>
-              {result && <button onClick={copyOut} style={copyBtn}>{copied ? t.copied : t.copy}</button>}
-              <ResumePaper tpl={tpl} result={result || liveData} rtl={rtl} placeholder={false} />
+            <div
+              onClick={() => setZoomed(z => !z)}
+              title={zoomed ? undefined : "Click to enlarge"}
+              style={{
+                cursor: zoomed ? "zoom-out" : "zoom-in",
+                ...(zoomed ? {
+                  position: "fixed", inset: 0, zIndex: 9000,
+                  background: "rgba(0,0,0,0.88)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  padding: "20px", overflowY: "auto",
+                } : { position: "relative", overflowX: "auto" }),
+              }}
+            >
+              {!zoomed && result && (
+                <button onClick={(e) => { e.stopPropagation(); copyOut(); }} style={copyBtn}>
+                  {copied ? t.copied : t.copy}
+                </button>
+              )}
+              <div style={zoomed ? { width: "min(780px, 94vw)", maxHeight: "94vh", overflowY: "auto", borderRadius: 8 } : {}}>
+                <ResumePaper tpl={tpl} result={result || liveData} rtl={rtl} placeholder={false} />
+              </div>
+              {zoomed && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setZoomed(false); }}
+                  style={{ position: "fixed", top: 14, right: 14, zIndex: 9001,
+                    width: 34, height: 34, borderRadius: "50%", border: "1px solid #555",
+                    background: "#1a1a1a", color: "#ccc", fontSize: 16,
+                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  ✕
+                </button>
+              )}
             </div>
           </div>
         </div>
