@@ -1255,8 +1255,8 @@ Awards: ${form.awards}`;
     return (
       <div style={{ background: C.bg, color: C.text1, minHeight: "100vh", fontFamily: "'Inter', system-ui, sans-serif", overflowX: "hidden" }}>
         {/* Nav */}
-        <nav style={{ borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0,
-          zIndex: 100, background: C.bg + "ee", backdropFilter: "blur(12px)" }}>
+        <nav style={{ borderBottom: `1px solid ${C.border}`, position: "fixed", top: 0,
+          left: 0, right: 0, zIndex: 100, background: C.bg + "ee", backdropFilter: "blur(12px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 64,
             display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setAppView("landing")}
@@ -1275,7 +1275,7 @@ Awards: ${form.awards}`;
 
         {/* Hero */}
         <div style={{ background: `radial-gradient(ellipse 80% 50% at 50% -10%, ${C.glow} 0%, transparent 70%)` }}>
-          <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center", padding: "90px 24px 80px" }}>
+          <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center", padding: "154px 24px 80px" }}>
             <div style={{ display: "inline-block", fontSize: 12, fontWeight: 600, letterSpacing: "2px",
               textTransform: "uppercase", color: C.accent2, background: `${C.accent}18`,
               border: `1px solid ${C.accent}44`, borderRadius: 999, padding: "4px 14px", marginBottom: 28 }}>
