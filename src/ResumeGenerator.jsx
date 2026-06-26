@@ -1046,6 +1046,7 @@ Awards: ${form.awards}`;
     { id: "tracker",   icon: "📋", label: "Job Tracker" },
     { id: "signature", icon: "✍️",  label: "Email Signature" },
     { id: "website",   icon: "🌐", label: "Personal Website" },
+    { id: "about",     icon: "ℹ️",  label: "About" },
   ];
 
   const ComingSoon = ({ label }) => (
@@ -1119,10 +1120,125 @@ Awards: ${form.awards}`;
     </div>
   );
 
+  const AboutPage = () => (
+    <div style={{ padding: isMobile ? 20 : 40, maxWidth: 720 }}>
+      {/* Hero */}
+      <div style={{ marginBottom: 40 }}>
+        <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 800, letterSpacing: "-1px",
+          background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          marginBottom: 12 }}>
+          ApplyCraft
+        </div>
+        <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.75, margin: 0, maxWidth: 560 }}>
+          A free, privacy-first tool for building professional resumes and cover letters —
+          no account required, no data stored, no paywalls.
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: C.border, marginBottom: 36 }} />
+
+      {/* Mission */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>Mission</div>
+        <p style={{ fontSize: 14.5, color: C.text1, lineHeight: 1.8, margin: 0 }}>
+          Getting a job is hard enough without fighting the tools that are supposed to help you.
+          ApplyCraft exists to give every job seeker — regardless of budget or background — access
+          to polished, ATS-friendly documents in 50+ languages.
+        </p>
+      </div>
+
+      {/* What you can do */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: "2px", color: C.accent2, marginBottom: 16 }}>What you can do</div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+          {[
+            ["📄", "Build a resume", "Choose from 13 professional templates with live preview."],
+            ["✉️", "Write a cover letter", "6 matching cover letter styles with full customisation."],
+            ["🌍", "50+ languages", "Full RTL support for Arabic, Hebrew and more."],
+            ["⬇️", "PDF & DOCX export", "Download in the format any employer expects."],
+            ["🔒", "100% private", "Everything stays in your browser. Nothing is ever uploaded."],
+            ["✦", "AI suggestions", "Optional AI polish to sharpen your wording instantly."],
+          ].map(([icon, title, desc]) => (
+            <div key={title} style={{ background: C.elevated, border: `1px solid ${C.border}`,
+              borderRadius: 12, padding: "16px 18px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 4 }}>{title}</div>
+                <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: C.border, marginBottom: 36 }} />
+
+      {/* Built by */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>Built by</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ width: 48, height: 48, borderRadius: "50%",
+            background: C.grad, display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+            IB
+          </div>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.text1 }}>Isaac Biroue</div>
+            <div style={{ fontSize: 13, color: C.text2, marginTop: 3 }}>
+              Developer & designer — building tools that make job seekers' lives easier.
+            </div>
+            {AUTHOR.github && (
+              <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: 12.5, color: C.accent2, textDecoration: "none", marginTop: 4, display: "inline-block" }}>
+                GitHub →
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Stack */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>Tech stack</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {["React 18", "Vite 6", "jsPDF", "docx.js", "Cloudflare Pages"].map(t => (
+            <span key={t} style={{ fontSize: 12.5, padding: "4px 12px", borderRadius: 999,
+              background: C.elevated, border: `1px solid ${C.border}`, color: C.text2 }}>{t}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: C.border, marginBottom: 28 }} />
+
+      {/* Footer links */}
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        <button onClick={() => setAppView("landing")}
+          style={{ fontSize: 13.5, color: C.accent2, background: "none", border: "none",
+            cursor: "pointer", padding: 0, fontFamily: "inherit" }}>
+          ← Back to landing page
+        </button>
+        {AUTHOR.github && (
+          <a href={`${AUTHOR.github}/applycraft`} target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 13.5, color: C.text2, textDecoration: "none" }}>
+            View source on GitHub
+          </a>
+        )}
+      </div>
+    </div>
+  );
+
   let pageBody;
   if (navPage === "resume") pageBody = step === "form" ? (formContent || mainContent) : mainContent;
   else if (navPage === "cover") pageBody = coverStep === "form" ? (coverFormContent || coverTemplatesContent) : coverTemplatesContent;
   else if (navPage === "pricing") pageBody = <PricingPage />;
+  else if (navPage === "about") pageBody = <AboutPage />;
   else pageBody = <ComingSoon label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
   // ── Landing page ──────────────────────────────────────────────────
