@@ -905,7 +905,8 @@ Awards: ${form.awards}`;
   );
 
   const formContent = tpl ? (
-    <div style={rShell}>
+    <div style={{ ...rShell, display: "flex", flexDirection: "column", height: "100%",
+      boxSizing: "border-box" }}>
 
       {/* ── Form header ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -933,8 +934,10 @@ Awards: ${form.awards}`;
         </div>
       </div>
 
-      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
-        <div>
+      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+        flex: 1, minHeight: 0, overflow: "hidden", alignItems: "start" }}>
+        <div style={isMobile ? {} : { overflowY: "auto", height: "100%", paddingRight: 6,
+          paddingBottom: 32, scrollbarWidth: "thin" }}>
 
           {/* ── SECTION: Personal Info ── */}
           <SectionHeader icon="👤" title="Personal Info" filled={!!(form.name && form.email)} />
@@ -1115,7 +1118,8 @@ Awards: ${form.awards}`;
         </div>
 
         {/* ── Preview column ── */}
-        <div style={{ minWidth: 0 }}>
+        <div style={{ minWidth: 0, ...(isMobile ? {} : { overflowY: "auto", height: "100%",
+          paddingBottom: 32, scrollbarWidth: "thin" }) }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
             marginTop: isMobile ? 24 : 0, flexWrap: "wrap" }}>
             <span style={{ ...badge, ...(aiPolished ? badgePolished : badgeLive),
@@ -2101,8 +2105,14 @@ Awards: ${form.awards}`;
       )}
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, minWidth: 0, overflowY: "auto", padding: isMobile ? "8px 4px" : "16px 24px" }}>
-        <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+      {(() => {
+        const isFormView = !isMobile && navPage === "resume" && step === "form" && !!tpl;
+        return (
+      <div style={{ flex: 1, minWidth: 0, overflow: isFormView ? "hidden" : "auto",
+        padding: isMobile ? "8px 4px" : "16px 24px",
+        display: isFormView ? "flex" : undefined, flexDirection: isFormView ? "column" : undefined }}>
+        <div style={{ maxWidth: 1320, margin: "0 auto", width: "100%",
+          ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } : {}) }}>
 
         {/* Persistent top bar: language picker + auth */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center",
@@ -2242,9 +2252,13 @@ Awards: ${form.awards}`;
           </>
         )}
 
-        {pageBody}
+        {isFormView
+          ? <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{pageBody}</div>
+          : pageBody}
         </div>
       </div>
+        );
+      })()}
     </div>
   );
 }
