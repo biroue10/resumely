@@ -247,6 +247,33 @@ const TEMPLATES = [
   { id: "tech",      name: "Tech",      tag: "Dark terminal style, monospace, green", accent: "#10b981", font: "'Courier New', 'Courier', monospace" },
 ];
 
+// ── Sample data used in template thumbnail previews ───────────────
+const SAMPLE_RESUME = {
+  name: "Alexandra Johnson",
+  title: "Senior Product Designer",
+  contact: ["alex.johnson@email.com", "+1 (415) 555-0192", "San Francisco, CA", "linkedin.com/in/alexjohnson"],
+  summary: "Creative product designer with 8+ years crafting intuitive digital experiences for SaaS and consumer apps. Passionate about human-centered design and cross-functional collaboration.",
+  sections: [
+    { heading: "Experience", items: [
+      "Lead Product Designer — Stripe (2021–Present)",
+      "Redesigned onboarding, reducing drop-off by 34%",
+      "Built new dashboard used by 2M+ merchants globally",
+      "Senior UX Designer — Figma (2018–2021)",
+      "Created design system adopted by 200+ engineers",
+      "Shipped 12 major features across the core platform",
+    ]},
+    { heading: "Education", items: [
+      "B.S. Human-Computer Interaction — Stanford, 2016",
+      "Minor in Computer Science",
+    ]},
+    { heading: "Skills", items: ["Figma", "Prototyping", "User Research", "Design Systems", "React", "TypeScript"] },
+    { heading: "Certifications", items: [
+      "Google UX Design Certificate, 2022",
+      "AWS Cloud Practitioner, 2023",
+    ]},
+  ],
+};
+
 // ── Author info (edit here to update the footer) ─────────────────
 const AUTHOR = {
   name: "Isaac Biroue",
@@ -648,7 +675,7 @@ Awards: ${form.awards}`;
     <div style={{ ...rShell }}>
       <h1 style={{ ...h1, fontSize: isMobile ? 22 : 30 }}>{t.heading}</h1>
       <p style={{ ...subtitle, fontSize: isMobile ? 13.5 : 15 }}>{t.chooseTpl}</p>
-      <div style={{ ...tplGrid, gridTemplateColumns: isMobile ? "repeat(auto-fill, minmax(140px, 1fr))" : "repeat(auto-fill, minmax(200px, 1fr))" }}>
+      <div style={{ ...tplGrid, gridTemplateColumns: isMobile ? "repeat(auto-fill, minmax(160px, 1fr))" : "repeat(auto-fill, minmax(240px, 1fr))" }}>
         {TEMPLATES.map((tp) => (
           <button key={tp.id} onClick={() => { setTpl(tp); setStep("form"); }}
             style={tp.blank ? {
@@ -657,7 +684,7 @@ Awards: ${form.awards}`;
               background: "transparent",
               boxShadow: "none",
             } : tplCard}>
-            <ThumbPreview tp={tp} />
+            <ThumbPreview tp={tp} isMobile={isMobile} />
             <div style={{ padding: isMobile ? "8px 10px" : "12px 14px", textAlign: rtl ? "right" : "left" }}>
               <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: tp.blank ? C.text2 : C.text1 }}>
                 {tp.blank ? "✕  " : ""}{tp.name}
@@ -1185,126 +1212,32 @@ function LanguageDropdown({ selected, onSelect }) {
   );
 }
 
-function ThumbPreview({ tp }) {
-  const bar = (w, c = "#cbd5e1") => ({ height: 4, borderRadius: 2, background: c, width: w });
+function ThumbPreview({ tp, isMobile }) {
+  const INNER_W = 700;
+  const SCALE   = isMobile ? 0.22 : 0.345;
+  const H       = isMobile ? 200  : 310;
 
-  if (tp.id === "blank") {
-    const line = (w) => ({ height: 3, borderRadius: 2, background: "#d1d5db", width: w, marginBottom: 5 });
-    return (
-      <div style={{ height: 120, background: "#f9fafb", display: "flex", alignItems: "center",
-        justifyContent: "center", flexDirection: "column", gap: 0, padding: "16px 20px",
-        borderBottom: `1px dashed #d1d5db` }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", letterSpacing: "0.5px",
-          marginBottom: 10, textTransform: "uppercase" }}>No Template</div>
-        <div style={line("80%")} />
-        <div style={line("60%")} />
-        <div style={line("70%")} />
-        <div style={line("50%")} />
-      </div>
-    );
-  }
-
-  if (tp.id === "modern" || tp.id === "elegant") {
-    return (
-      <div style={{ height: 120, background: "#fff", display: "flex", padding: 10, gap: 8 }}>
-        <div style={{ width: "32%", background: tp.id === "elegant" ? "#f3f0fb" : tp.accent, borderRadius: 4, padding: 8 }}>
-          <div style={{ ...bar("70%", tp.id === "elegant" ? "#c4b5fd" : "rgba(255,255,255,0.8)"), marginBottom: 6 }} />
-          <div style={{ ...bar("90%", tp.id === "elegant" ? "#ddd6fe" : "rgba(255,255,255,0.5)"), marginBottom: 4 }} />
-          <div style={bar("60%", tp.id === "elegant" ? "#ddd6fe" : "rgba(255,255,255,0.5)")} />
-        </div>
-        <div style={{ flex: 1, paddingTop: 4 }}>
-          <div style={{ ...bar("55%", tp.accent), height: 6, marginBottom: 8 }} />
-          <div style={{ ...bar("100%"), marginBottom: 4 }} />
-          <div style={{ ...bar("85%"), marginBottom: 4 }} />
-          <div style={{ ...bar("92%") }} />
-        </div>
-      </div>
-    );
-  }
-  if (tp.id === "bold") {
-    return (
-      <div style={{ height: 120, background: "#fff" }}>
-        <div style={{ background: tp.accent, padding: "10px 12px" }}>
-          <div style={{ ...bar("50%", "rgba(255,255,255,0.95)"), height: 7, marginBottom: 5 }} />
-          <div style={bar("30%", "rgba(255,255,255,0.6)")} />
-        </div>
-        <div style={{ padding: 12 }}>
-          <div style={{ ...bar("100%"), marginBottom: 5 }} />
-          <div style={{ ...bar("88%"), marginBottom: 5 }} />
-          <div style={bar("94%")} />
-        </div>
-      </div>
-    );
-  }
-  if (tp.id === "executive") {
-    return (
-      <div style={{ height: 120, background: "#fff", padding: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-          <div>
-            <div style={{ ...bar("80px", "#1a1a1a"), height: 6, marginBottom: 4 }} />
-            <div style={{ ...bar("55px", tp.accent), height: 3 }} />
-          </div>
-          <div>
-            <div style={{ ...bar("45px"), marginBottom: 3 }} />
-            <div style={{ ...bar("38px"), marginBottom: 3 }} />
-            <div style={bar("42px")} />
-          </div>
-        </div>
-        <div style={{ height: 2, background: `linear-gradient(to right, ${tp.accent}, ${tp.accent}33)`, marginBottom: 8 }} />
-        <div style={{ ...bar("100%"), marginBottom: 4 }} />
-        <div style={{ ...bar("88%"), marginBottom: 4 }} />
-        <div style={bar("94%")} />
-      </div>
-    );
-  }
-  if (tp.id === "creative") {
-    return (
-      <div style={{ height: 120, background: "#fff", display: "flex", overflow: "hidden" }}>
-        <div style={{ flex: 1, padding: "12px 10px" }}>
-          <div style={{ ...bar("100%"), marginBottom: 4 }} />
-          <div style={{ ...bar("88%"), marginBottom: 4 }} />
-          <div style={{ ...bar("95%"), marginBottom: 4 }} />
-          <div style={bar("80%")} />
-        </div>
-        <div style={{ width: "36%", background: tp.accent, padding: "12px 10px" }}>
-          <div style={{ ...bar("80%", "rgba(255,255,255,0.9)"), height: 5, marginBottom: 5 }} />
-          <div style={{ ...bar("60%", "rgba(255,255,255,0.6)"), marginBottom: 4 }} />
-          <div style={{ ...bar("70%", "rgba(255,255,255,0.45)"), marginBottom: 4 }} />
-          <div style={bar("50%", "rgba(255,255,255,0.45)")} />
-        </div>
-      </div>
-    );
-  }
-  if (tp.id === "tech") {
-    return (
-      <div style={{ height: 120, background: "#0B1120", padding: 12 }}>
-        <div style={{ ...bar("65%", tp.accent), height: 5, marginBottom: 4 }} />
-        <div style={{ ...bar("42%", "#8b949e"), height: 3, marginBottom: 10 }} />
-        <div style={{ ...bar("100%", "#30363d"), marginBottom: 4 }} />
-        <div style={{ ...bar("88%", "#30363d"), marginBottom: 4 }} />
-        <div style={{ ...bar("94%", "#30363d"), marginBottom: 4 }} />
-        <div style={bar("75%", "#30363d")} />
-      </div>
-    );
-  }
   return (
-    <div style={{ height: 120, background: "#fff", padding: 14, textAlign: "center" }}>
-      <div style={{ ...bar("50%", tp.accent), height: 7, margin: "0 auto 6px" }} />
-      <div style={{ ...bar("34%"), margin: "0 auto 12px" }} />
-      <div style={{ height: 1, background: "#e5e7eb", margin: "0 0 10px" }} />
-      <div style={{ ...bar("100%"), marginBottom: 5 }} />
-      <div style={{ ...bar("90%"), marginBottom: 5 }} />
-      <div style={bar("96%")} />
+    <div style={{ height: H, overflow: "hidden", position: "relative",
+      background: tp.id === "tech" ? "#0B1120" : tp.blank ? "#f9fafb" : "#fff",
+      borderBottom: tp.blank ? `1px dashed #d1d5db` : "none" }}>
+      <div style={{ width: INNER_W, transform: `scale(${SCALE})`,
+        transformOrigin: "top left", position: "absolute", top: 0, left: 0,
+        pointerEvents: "none", userSelect: "none" }}>
+        <ResumePaper tpl={tp} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
+      </div>
     </div>
   );
 }
 
-function ResumePaper({ tpl, result, rtl, placeholder = true }) {
+function ResumePaper({ tpl, result, rtl, placeholder = true, preview = false }) {
   const hasContent = result && (result.name !== "—" || result.summary || (result.sections && result.sections.length));
   const empty = placeholder && !hasContent;
   const data = result || { name: "—", title: "", contact: [], summary: "", sections: [] };
-  const paper = { background: "#fff", color: "#1a1a1a", borderRadius: 8, minHeight: 420,
-    fontFamily: tpl.font, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
+  const paper = { background: "#fff", color: "#1a1a1a",
+    borderRadius: preview ? 0 : 8, minHeight: preview ? 0 : 420,
+    fontFamily: tpl.font, overflow: "hidden",
+    boxShadow: preview ? "none" : "0 8px 30px rgba(0,0,0,0.35)",
     width: "100%", boxSizing: "border-box" };
 
   if (empty) {
