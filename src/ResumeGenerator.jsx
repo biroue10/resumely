@@ -434,6 +434,8 @@ function buildLiveData(form, t) {
 export default function ResumeGenerator() {
   const [navPage, setNavPage] = useState("resume");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sideSearch, setSideSearch] = useState("");
+  const [tplSearch, setTplSearch] = useState("");
   const [step, setStep] = useState("templates");
   const [selectedLang, setSelectedLang] = useState(() => WORLD_LANGUAGES.find(l => l.code === "en"));
   const [tpl, setTpl] = useState(null);
@@ -1301,13 +1303,39 @@ Awards: ${form.awards}`;
             display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setAppView("landing")}
             style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              border: "none", cursor: "pointer", padding: 0,
+              border: "none", cursor: "pointer", padding: 0, flexShrink: 0,
               fontSize: 20, fontWeight: 800, letterSpacing: "-0.5px", fontFamily: "inherit" }}>
             ApplyCraft
           </button>
+
+          {/* Nav search */}
+          <div style={{ flex: 1, maxWidth: 340, margin: "0 24px" }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                color: C.text3, fontSize: 14, pointerEvents: "none" }}>🔍</span>
+              <input
+                value={tplSearch}
+                onChange={e => setTplSearch(e.target.value)}
+                placeholder="Search 22 templates..."
+                style={{ width: "100%", background: C.surface, border: `1px solid ${C.border}`,
+                  borderRadius: 8, padding: "8px 32px 8px 38px", fontSize: 13, color: C.text1,
+                  fontFamily: "inherit", outline: "none", boxSizing: "border-box",
+                  transition: "border-color 0.2s" }}
+                onFocus={e => { e.target.style.borderColor = C.accent; }}
+                onBlur={e => { e.target.style.borderColor = C.border; }}
+              />
+              {tplSearch && (
+                <button onClick={() => setTplSearch("")}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", color: C.text3, cursor: "pointer",
+                    fontSize: 14, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
+              )}
+            </div>
+          </div>
+
           <button onClick={() => enter("resume")}
             style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 8,
-              padding: "8px 20px", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
+              padding: "8px 20px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
             Get Started — Free
           </button>
           </div>
@@ -1433,8 +1461,25 @@ Awards: ${form.awards}`;
               <p style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase",
                 letterSpacing: "2px", color: C.text3, marginBottom: 40 }}>22 professional templates</p>
             </FadeIn>
+            {(() => {
+              const q = tplSearch.trim().toLowerCase();
+              const visible = TEMPLATES.filter(t => !t.blank).slice(0, 22).filter(t =>
+                !q || t.name.toLowerCase().includes(q) || t.tag.toLowerCase().includes(q)
+              );
+              if (visible.length === 0) return (
+                <div style={{ textAlign: "center", padding: "60px 0", color: C.text3 }}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: C.text2 }}>No templates match "{tplSearch}"</div>
+                  <button onClick={() => setTplSearch("")}
+                    style={{ marginTop: 12, fontSize: 13, color: C.accent2, background: "none",
+                      border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit" }}>
+                    Clear search
+                  </button>
+                </div>
+              );
+              return (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 32 }}>
-              {TEMPLATES.filter(t => !t.blank).slice(0, 22).map((tp, i) => (
+              {visible.map((tp, i) => (
                 <FadeIn key={tp.id} delay={i * 60}>
                   <button onClick={() => enter("resume")}
                     style={{ background: "transparent", border: "none", borderRadius: 10,
@@ -1456,6 +1501,8 @@ Awards: ${form.awards}`;
                 </FadeIn>
               ))}
             </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -1678,9 +1725,36 @@ Awards: ${form.awards}`;
             </button>
           </div>
 
+          {/* Sidebar search */}
+          {sidebarOpen && (
+            <div style={{ padding: "10px 12px 4px" }}>
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
+                  color: C.text3, fontSize: 13, pointerEvents: "none" }}>🔍</span>
+                <input
+                  value={sideSearch}
+                  onChange={e => setSideSearch(e.target.value)}
+                  placeholder="Search features..."
+                  style={{ width: "100%", background: C.elevated, border: `1px solid ${C.border}`,
+                    borderRadius: 8, padding: "7px 28px 7px 32px", fontSize: 12.5, color: C.text1,
+                    fontFamily: "inherit", outline: "none", boxSizing: "border-box",
+                    transition: "border-color 0.2s" }}
+                  onFocus={e => { e.target.style.borderColor = C.accent; }}
+                  onBlur={e => { e.target.style.borderColor = C.border; }}
+                />
+                {sideSearch && (
+                  <button onClick={() => setSideSearch("")}
+                    style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                      background: "none", border: "none", color: C.text3, cursor: "pointer",
+                      fontSize: 13, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Main nav */}
           <nav style={{ padding: "10px 8px", flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-            {NAV.map((item) => (
+            {(sideSearch ? NAV.filter(n => n.label.toLowerCase().includes(sideSearch.toLowerCase())) : NAV).map((item) => (
               <button key={item.id} onClick={() => setNavPage(item.id)}
                 title={!sidebarOpen ? item.label : undefined}
                 style={{ display: "flex", alignItems: "center", gap: 10,
