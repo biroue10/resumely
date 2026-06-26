@@ -44,11 +44,14 @@ const UI = {
 
 // ── Templates ─────────────────────────────────────────────────────
 const TEMPLATES = [
-  { id: "classic",   name: "Classic",   tag: "Timeless, serif, single column",   accent: "#1f2937", font: "Georgia, serif" },
-  { id: "modern",    name: "Modern",    tag: "Clean sans-serif with sidebar",     accent: "#2563eb", font: "'Segoe UI', sans-serif" },
-  { id: "minimal",   name: "Minimal",   tag: "Lots of whitespace, understated",   accent: "#0f766e", font: "'Helvetica Neue', sans-serif" },
-  { id: "bold",      name: "Bold",      tag: "Strong header band, high contrast", accent: "#b91c1c", font: "'Segoe UI', sans-serif" },
-  { id: "elegant",   name: "Elegant",   tag: "Refined, thin rules, light weight", accent: "#7c3aed", font: "'Palatino Linotype', serif" },
+  { id: "classic",   name: "Classic",   tag: "Timeless, serif, single column",      accent: "#1f2937", font: "Georgia, serif" },
+  { id: "modern",    name: "Modern",    tag: "Clean sans-serif with sidebar",        accent: "#2563eb", font: "'Segoe UI', sans-serif" },
+  { id: "minimal",   name: "Minimal",   tag: "Lots of whitespace, understated",      accent: "#0f766e", font: "'Helvetica Neue', sans-serif" },
+  { id: "bold",      name: "Bold",      tag: "Strong header band, high contrast",    accent: "#b91c1c", font: "'Segoe UI', sans-serif" },
+  { id: "elegant",   name: "Elegant",   tag: "Refined, thin rules, light weight",    accent: "#7c3aed", font: "'Palatino Linotype', serif" },
+  { id: "executive", name: "Executive", tag: "Split header, left-bar sections, gold",accent: "#d97706", font: "Georgia, serif" },
+  { id: "creative",  name: "Creative",  tag: "Right colour panel, bold & expressive",accent: "#db2777", font: "'Segoe UI', sans-serif" },
+  { id: "tech",      name: "Tech",      tag: "Dark terminal style, monospace, green",accent: "#10b981", font: "'Courier New', monospace" },
 ];
 
 // Build resume data straight from the form so the preview updates as the user types.
@@ -264,6 +267,57 @@ function ThumbPreview({ tp }) {
       </div>
     );
   }
+  if (tp.id === "executive") {
+    return (
+      <div style={{ height: 120, background: "#fff", padding: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+          <div>
+            <div style={{ ...bar("80px", "#1a1a1a"), height: 6, marginBottom: 4 }} />
+            <div style={{ ...bar("55px", tp.accent), height: 3 }} />
+          </div>
+          <div>
+            <div style={{ ...bar("45px"), marginBottom: 3 }} />
+            <div style={{ ...bar("38px"), marginBottom: 3 }} />
+            <div style={bar("42px")} />
+          </div>
+        </div>
+        <div style={{ height: 2, background: `linear-gradient(to right, ${tp.accent}, ${tp.accent}33)`, marginBottom: 8 }} />
+        <div style={{ ...bar("100%"), marginBottom: 4 }} />
+        <div style={{ ...bar("88%"), marginBottom: 4 }} />
+        <div style={bar("94%")} />
+      </div>
+    );
+  }
+  if (tp.id === "creative") {
+    return (
+      <div style={{ height: 120, background: "#fff", display: "flex", overflow: "hidden" }}>
+        <div style={{ flex: 1, padding: "12px 10px" }}>
+          <div style={{ ...bar("100%"), marginBottom: 4 }} />
+          <div style={{ ...bar("88%"), marginBottom: 4 }} />
+          <div style={{ ...bar("95%"), marginBottom: 4 }} />
+          <div style={bar("80%")} />
+        </div>
+        <div style={{ width: "36%", background: tp.accent, padding: "12px 10px" }}>
+          <div style={{ ...bar("80%", "rgba(255,255,255,0.9)"), height: 5, marginBottom: 5 }} />
+          <div style={{ ...bar("60%", "rgba(255,255,255,0.6)"), marginBottom: 4 }} />
+          <div style={{ ...bar("70%", "rgba(255,255,255,0.45)"), marginBottom: 4 }} />
+          <div style={bar("50%", "rgba(255,255,255,0.45)")} />
+        </div>
+      </div>
+    );
+  }
+  if (tp.id === "tech") {
+    return (
+      <div style={{ height: 120, background: "#0d1117", padding: 12 }}>
+        <div style={{ ...bar("65%", tp.accent), height: 5, marginBottom: 4 }} />
+        <div style={{ ...bar("42%", "#8b949e"), height: 3, marginBottom: 10 }} />
+        <div style={{ ...bar("100%", "#30363d"), marginBottom: 4 }} />
+        <div style={{ ...bar("88%", "#30363d"), marginBottom: 4 }} />
+        <div style={{ ...bar("94%", "#30363d"), marginBottom: 4 }} />
+        <div style={bar("75%", "#30363d")} />
+      </div>
+    );
+  }
   return (
     <div style={{ height: 120, background: "#fff", padding: 14, textAlign: "center" }}>
       <div style={{ ...bar("50%", tp.accent), height: 7, margin: "0 auto 6px" }} />
@@ -349,6 +403,101 @@ function ResumePaper({ tpl, result, rtl, placeholder = true }) {
         <div style={{ padding: "20px 24px" }}>
           {data.summary && <p style={{ fontSize: 13, lineHeight: 1.55, marginTop: 0, marginBottom: 16, color: "#444" }}>{data.summary}</p>}
           {data.sections.map((s, i) => <Section key={i} s={s} />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (tpl.id === "executive") {
+    return (
+      <div style={paper}>
+        <div style={{ padding: "26px 28px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 24, color: "#1a1a1a" }}>{data.name}</div>
+              <div style={{ fontSize: 13.5, color: tpl.accent, marginTop: 3, fontStyle: "italic" }}>{data.title}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              {data.contact.map((c, i) => (
+                <div key={i} style={{ fontSize: 11.5, color: "#555", marginBottom: 3 }}>{c}</div>
+              ))}
+            </div>
+          </div>
+          <div style={{ height: 3, background: `linear-gradient(to right, ${tpl.accent}, ${tpl.accent}22)`, marginBottom: 18 }} />
+          {data.summary && <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 18, color: "#444", fontStyle: "italic" }}>{data.summary}</p>}
+          {data.sections.map((s, i) => (
+            <div key={i} style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 12.5, textTransform: "uppercase", letterSpacing: "1.5px", color: tpl.accent,
+                margin: "0 0 7px", fontWeight: 700, borderLeft: `3px solid ${tpl.accent}`, paddingLeft: 8 }}>
+                {s.heading}
+              </h3>
+              {s.items.map((it, j) => (
+                <div key={j} style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4, color: "#333" }}>• {it}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (tpl.id === "creative") {
+    return (
+      <div style={paper}>
+        <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+          <div style={{ width: "34%", background: tpl.accent, color: "#fff", padding: "22px 16px" }}>
+            <div style={{ fontWeight: 800, fontSize: 19, lineHeight: 1.2 }}>{data.name}</div>
+            <div style={{ fontSize: 12.5, opacity: 0.85, marginTop: 4, marginBottom: 16 }}>{data.title}</div>
+            {data.contact.map((c, i) => (
+              <div key={i} style={{ fontSize: 11.5, opacity: 0.8, marginBottom: 5, wordBreak: "break-word" }}>{c}</div>
+            ))}
+          </div>
+          <div style={{ flex: 1, padding: "22px 20px" }}>
+            {data.summary && <p style={{ fontSize: 13, lineHeight: 1.55, marginTop: 0, marginBottom: 16, color: "#444" }}>{data.summary}</p>}
+            {data.sections.map((s, i) => (
+              <div key={i} style={{ marginBottom: 16 }}>
+                <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "1px", color: tpl.accent,
+                  margin: "0 0 7px", fontWeight: 700, borderBottom: `2px solid ${tpl.accent}`, paddingBottom: 3 }}>
+                  {s.heading}
+                </h3>
+                {s.items.map((it, j) => (
+                  <div key={j} style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4, color: "#333" }}>• {it}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (tpl.id === "tech") {
+    return (
+      <div style={{ ...paper, background: "#0d1117", color: "#e6edf3", fontFamily: tpl.font }}>
+        <div style={{ padding: "24px 28px" }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, fontSize: 22, color: tpl.accent }}>{data.name}</div>
+            <div style={{ fontSize: 13, color: "#8b949e", marginTop: 3 }}>$ {data.title}</div>
+            <div style={{ fontSize: 11.5, color: "#8b949e", marginTop: 6 }}>{data.contact.join("  |  ")}</div>
+          </div>
+          {data.summary && (
+            <p style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 16, color: "#c9d1d9",
+              borderLeft: `2px solid ${tpl.accent}`, paddingLeft: 10, margin: "0 0 16px" }}>
+              {data.summary}
+            </p>
+          )}
+          {data.sections.map((s, i) => (
+            <div key={i} style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 12, color: tpl.accent, margin: "0 0 7px", fontWeight: 700 }}>
+                // {s.heading.toUpperCase()}
+              </h3>
+              {s.items.map((it, j) => (
+                <div key={j} style={{ fontSize: 12, lineHeight: 1.5, marginBottom: 4, color: "#c9d1d9" }}>
+                  &gt; {it}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     );
