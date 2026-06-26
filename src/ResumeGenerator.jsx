@@ -15,6 +15,7 @@ const UI = {
     skills: "Skills (comma separated)", generate: "Generate resume", generating: "Generating…",
     heading: "Resume generator", sub: "Choose a language and template, add your details, get a polished resume.",
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
+    dlPdf: "Download PDF", dlDocx: "Download DOCX",
     placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
     placeholderName: "e.g. Jane Doe", placeholderTitle: "e.g. Software Engineer",
     placeholderEmail: "you@example.com", placeholderPhone: "e.g. 712 345 678",
@@ -29,6 +30,7 @@ const UI = {
     skills: "Compétences (séparées par des virgules)", generate: "Générer le CV", generating: "Génération…",
     heading: "Générateur de CV", sub: "Choisissez une langue et un modèle, ajoutez vos infos, obtenez un CV soigné.",
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
+    dlPdf: "Télécharger PDF", dlDocx: "Télécharger DOCX",
     placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
     placeholderName: "ex. Jean Dupont", placeholderTitle: "ex. Ingénieur logiciel",
     placeholderEmail: "vous@exemple.com", placeholderPhone: "ex. 06 12 34 56 78",
@@ -43,6 +45,7 @@ const UI = {
     skills: "Habilidades (separadas por comas)", generate: "Generar currículum", generating: "Generando…",
     heading: "Generador de currículums", sub: "Elige idioma y plantilla, añade tus datos y obtén un currículum pulido.",
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
+    dlPdf: "Descargar PDF", dlDocx: "Descargar DOCX",
     placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
     placeholderName: "ej. Juan García", placeholderTitle: "ej. Ingeniero de software",
     placeholderEmail: "tu@ejemplo.com", placeholderPhone: "ej. 612 345 678",
@@ -57,6 +60,7 @@ const UI = {
     skills: "المهارات (مفصولة بفواصل)", generate: "إنشاء السيرة الذاتية", generating: "جارٍ الإنشاء…",
     heading: "منشئ السيرة الذاتية", sub: "اختر لغة وقالباً، أضف بياناتك، واحصل على سيرة ذاتية متقنة.",
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
+    dlPdf: "تحميل PDF", dlDocx: "تحميل DOCX",
     placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
     placeholderName: "مثال: أحمد محمد", placeholderTitle: "مثال: مهندس برمجيات",
     placeholderEmail: "you@example.com", placeholderPhone: "مثال: 06 12 34 56 78",
@@ -71,6 +75,7 @@ const UI = {
     skills: "Fähigkeiten (durch Kommas getrennt)", generate: "Lebenslauf erstellen", generating: "Wird erstellt…",
     heading: "Lebenslauf-Generator", sub: "Sprache und Vorlage wählen, Daten eingeben, gepflegten Lebenslauf erhalten.",
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
+    dlPdf: "PDF herunterladen", dlDocx: "DOCX herunterladen",
     placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
     placeholderName: "z.B. Hans Müller", placeholderTitle: "z.B. Softwareentwickler",
     placeholderEmail: "du@beispiel.de", placeholderPhone: "z.B. 170 1234567",
@@ -303,6 +308,168 @@ Skills: ${form.skills}`;
     setTimeout(() => setCopied(false), 1500);
   }
 
+  async function downloadPDF() {
+    const src = result || liveData;
+    if (!src) return;
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const pageW = 210;
+    const margin = 18;
+    const colW = pageW - margin * 2;
+    let y = margin;
+
+    const hex2rgb = (h) => [
+      parseInt(h.slice(1,3),16),
+      parseInt(h.slice(3,5),16),
+      parseInt(h.slice(5,7),16),
+    ];
+    const [ar, ag, ab] = hex2rgb(tpl.accent);
+
+    const addPage = () => { doc.addPage(); y = margin; };
+    const checkY = (need = 10) => { if (y + need > 280) addPage(); };
+
+    // Name
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(24);
+    doc.setTextColor(20, 20, 20);
+    doc.text(src.name || "", margin, y);
+    y += 9;
+
+    // Title
+    if (src.title) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(13);
+      doc.setTextColor(ar, ag, ab);
+      doc.text(src.title, margin, y);
+      y += 6;
+    }
+
+    // Contact line
+    const contact = (src.contact || []).filter(Boolean).join("   •   ");
+    if (contact) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(90, 90, 90);
+      doc.text(contact, margin, y);
+      y += 5;
+    }
+
+    // Accent rule
+    doc.setDrawColor(ar, ag, ab);
+    doc.setLineWidth(0.6);
+    doc.line(margin, y, pageW - margin, y);
+    y += 6;
+
+    // Summary
+    if (src.summary) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10.5);
+      doc.setTextColor(55, 55, 55);
+      const lines = doc.splitTextToSize(src.summary, colW);
+      checkY(lines.length * 5 + 4);
+      doc.text(lines, margin, y);
+      y += lines.length * 5 + 5;
+    }
+
+    // Sections
+    for (const section of (src.sections || [])) {
+      checkY(16);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(ar, ag, ab);
+      doc.text(section.heading.toUpperCase(), margin, y);
+      y += 2;
+      doc.setDrawColor(ar, ag, ab);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, pageW - margin, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(55, 55, 55);
+      for (const item of section.items) {
+        const lines = doc.splitTextToSize(`• ${item}`, colW - 3);
+        checkY(lines.length * 5 + 2);
+        doc.text(lines, margin, y);
+        y += lines.length * 5 + 1.5;
+      }
+      y += 4;
+    }
+
+    const fname = (src.name || "resume").replace(/\s+/g, "_").toLowerCase();
+    doc.save(`${fname}.pdf`);
+  }
+
+  async function downloadDOCX() {
+    const src = result || liveData;
+    if (!src) return;
+    const { Document, Packer, Paragraph, TextRun, BorderStyle, AlignmentType } = await import("docx");
+
+    const accent = tpl.accent.replace("#", "").toUpperCase();
+    const children = [];
+
+    // Name
+    children.push(new Paragraph({
+      children: [new TextRun({ text: src.name || "", bold: true, size: 44, color: "111111" })],
+      spacing: { after: 60 },
+    }));
+
+    // Title
+    if (src.title) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: src.title, size: 26, color: accent })],
+        spacing: { after: 60 },
+      }));
+    }
+
+    // Contact
+    const contact = (src.contact || []).filter(Boolean).join("   •   ");
+    if (contact) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: contact, size: 20, color: "666666" })],
+        spacing: { after: 120 },
+      }));
+    }
+
+    // Divider
+    children.push(new Paragraph({
+      border: { bottom: { color: accent, space: 1, style: BorderStyle.SINGLE, size: 8 } },
+      spacing: { after: 160 },
+    }));
+
+    // Summary
+    if (src.summary) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: src.summary, size: 21 })],
+        spacing: { after: 240 },
+      }));
+    }
+
+    // Sections
+    for (const section of (src.sections || [])) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: section.heading.toUpperCase(), bold: true, size: 22, color: accent })],
+        border: { bottom: { color: accent, space: 1, style: BorderStyle.SINGLE, size: 4 } },
+        spacing: { before: 240, after: 120 },
+      }));
+      for (const item of section.items) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: `• ${item}`, size: 20 })],
+          spacing: { after: 80 },
+        }));
+      }
+    }
+
+    const docFile = new Document({ sections: [{ properties: {}, children }] });
+    const blob = await Packer.toBlob(docFile);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(src.name || "resume").replace(/\s+/g, "_").toLowerCase()}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (step === "templates") {
     return (
       <div dir={rtl ? "rtl" : "ltr"} style={rPage}>
@@ -400,12 +567,22 @@ Skills: ${form.skills}`;
 
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
-              marginTop: isMobile ? 24 : 0 }}>
+              marginTop: isMobile ? 24 : 0, flexWrap: "wrap" }}>
               <span style={{ ...badge, ...(result ? badgePolished : badgeLive),
                 background: result ? `${tpl.accent}22` : "#1f2937",
                 color: result ? tpl.accent : "#9fb0c2" }}>
                 {result ? "✦ AI-polished" : "● Live preview"}
               </span>
+              {result && (
+                <>
+                  <button onClick={downloadPDF} style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent }}>
+                    ↓ {t.dlPdf}
+                  </button>
+                  <button onClick={downloadDOCX} style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent }}>
+                    ↓ {t.dlDocx}
+                  </button>
+                </>
+              )}
             </div>
             <div
               onClick={() => setZoomed(z => !z)}
@@ -776,6 +953,8 @@ const copyBtn = { position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, 
 const badge = { fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.3px" };
 const badgeLive = { border: "1px solid #2a3441" };
 const badgePolished = { border: "1px solid transparent" };
+const dlBtn = { padding: "4px 12px", background: "transparent", border: "1px solid", borderRadius: 7,
+  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "opacity .15s", opacity: 0.85 };
 const fieldErr  = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
 const codeSelect = { boxSizing: "border-box", padding: "10px 8px", background: "#0f1419",
   border: "1px solid #2a3441", borderRadius: 9, color: "#e7ecf2", fontSize: 14, outline: "none",
