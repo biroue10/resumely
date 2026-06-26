@@ -15,31 +15,31 @@ const UI = {
     skills: "Skills (comma separated)", generate: "Generate resume", generating: "Generating…",
     heading: "Resume generator", sub: "Choose a language and template, add your details, get a polished resume.",
     copy: "Copy", copied: "Copied", chooseTpl: "Choose a template", back: "Back",
-    placeholderEx: "Role, company, dates, what you did — one per line" },
+    placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by" },
   fr: { name: "Nom complet", title: "Titre professionnel", email: "E-mail", phone: "Téléphone",
     location: "Localisation", summary: "À propos de vous", experience: "Expérience", education: "Formation",
     skills: "Compétences (séparées par des virgules)", generate: "Générer le CV", generating: "Génération…",
     heading: "Générateur de CV", sub: "Choisissez une langue et un modèle, ajoutez vos infos, obtenez un CV soigné.",
     copy: "Copier", copied: "Copié", chooseTpl: "Choisissez un modèle", back: "Retour",
-    placeholderEx: "Poste, entreprise, dates, missions — une par ligne" },
+    placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par" },
   es: { name: "Nombre completo", title: "Título profesional", email: "Correo", phone: "Teléfono",
     location: "Ubicación", summary: "Sobre ti", experience: "Experiencia", education: "Educación",
     skills: "Habilidades (separadas por comas)", generate: "Generar currículum", generating: "Generando…",
     heading: "Generador de currículums", sub: "Elige idioma y plantilla, añade tus datos y obtén un currículum pulido.",
     copy: "Copiar", copied: "Copiado", chooseTpl: "Elige una plantilla", back: "Volver",
-    placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea" },
+    placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por" },
   ar: { name: "الاسم الكامل", title: "المسمى الوظيفي", email: "البريد", phone: "الهاتف",
     location: "الموقع", summary: "نبذة عنك", experience: "الخبرة", education: "التعليم",
     skills: "المهارات (مفصولة بفواصل)", generate: "إنشاء السيرة الذاتية", generating: "جارٍ الإنشاء…",
     heading: "منشئ السيرة الذاتية", sub: "اختر لغة وقالباً، أضف بياناتك، واحصل على سيرة ذاتية متقنة.",
     copy: "نسخ", copied: "تم النسخ", chooseTpl: "اختر قالباً", back: "رجوع",
-    placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر" },
+    placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع" },
   de: { name: "Vollständiger Name", title: "Berufsbezeichnung", email: "E-Mail", phone: "Telefon",
     location: "Standort", summary: "Über dich", experience: "Erfahrung", education: "Ausbildung",
     skills: "Fähigkeiten (durch Kommas getrennt)", generate: "Lebenslauf erstellen", generating: "Wird erstellt…",
     heading: "Lebenslauf-Generator", sub: "Sprache und Vorlage wählen, Daten eingeben, gepflegten Lebenslauf erhalten.",
     copy: "Kopieren", copied: "Kopiert", chooseTpl: "Vorlage wählen", back: "Zurück",
-    placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile" },
+    placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von" },
 };
 
 // ── Templates ─────────────────────────────────────────────────────
@@ -53,6 +53,14 @@ const TEMPLATES = [
   { id: "creative",  name: "Creative",  tag: "Right colour panel, bold & expressive",accent: "#db2777", font: "'Segoe UI', sans-serif" },
   { id: "tech",      name: "Tech",      tag: "Dark terminal style, monospace, green",accent: "#10b981", font: "'Courier New', monospace" },
 ];
+
+// ── Author info (edit here to update the footer) ─────────────────
+const AUTHOR = {
+  name: "Isaac Biroue",
+  email: "biroueisaac@gmail.com",
+  github: "https://github.com/biroue10",
+  linkedin: "", // paste your LinkedIn URL here, e.g. "https://linkedin.com/in/yourname"
+};
 
 // Build resume data straight from the form so the preview updates as the user types.
 function buildLiveData(form, t) {
@@ -172,6 +180,7 @@ Skills: ${form.skills}`;
               </button>
             ))}
           </div>
+          <PageFooter t={t} />
         </div>
       </div>
     );
@@ -228,6 +237,7 @@ Skills: ${form.skills}`;
             </div>
           </div>
         </div>
+        <PageFooter t={t} />
       </div>
     </div>
   );
@@ -519,6 +529,23 @@ function ResumePaper({ tpl, result, rtl, placeholder = true }) {
   );
 }
 
+function PageFooter({ t }) {
+  const year = new Date().getFullYear();
+  const dot = <span style={footerDot}>·</span>;
+  return (
+    <footer style={footerWrap}>
+      <span>{t.madeBy} <strong style={{ color: "#e7ecf2" }}>{AUTHOR.name}</strong></span>
+      {dot}
+      <span>© {year}</span>
+      {dot}
+      <a href={`mailto:${AUTHOR.email}`} style={footerLink}>{AUTHOR.email}</a>
+      {dot}
+      <a href={AUTHOR.github} target="_blank" rel="noreferrer" style={footerLink}>GitHub</a>
+      {AUTHOR.linkedin && <>{dot}<a href={AUTHOR.linkedin} target="_blank" rel="noreferrer" style={footerLink}>LinkedIn</a></>}
+    </footer>
+  );
+}
+
 const page = { minHeight: "100vh", background: "#0f1419", padding: "32px 16px",
   fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", color: "#e7ecf2" };
 const shell = { margin: "0 auto", background: "#161c24", borderRadius: 18, padding: 32, border: "1px solid #232c38" };
@@ -544,3 +571,8 @@ const copyBtn = { position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, 
 const badge = { fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.3px" };
 const badgeLive = { border: "1px solid #2a3441" };
 const badgePolished = { border: "1px solid transparent" };
+const footerWrap = { marginTop: 36, paddingTop: 20, borderTop: "1px solid #232c38",
+  display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center",
+  gap: "6px 4px", fontSize: 13, color: "#5a6880" };
+const footerDot = { color: "#2a3441", margin: "0 2px" };
+const footerLink = { color: "#6b7fa3", textDecoration: "none" };
