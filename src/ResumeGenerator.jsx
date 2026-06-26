@@ -278,8 +278,8 @@ export default function ResumeGenerator() {
   const fullPhone = form.phone.trim() ? `${phoneCode} ${form.phone.trim()}` : "";
   const liveData = buildLiveData({ ...form, phone: fullPhone }, t);
   const isMobile = useIsMobile();
-  const rPage  = { ...page,  padding: isMobile ? "16px 10px" : "32px 16px", overflowX: "hidden" };
-  const rShell = { ...shell, padding: isMobile ? 16 : 32 };
+  const rPage  = { ...page,  padding: isMobile ? "8px 4px" : "16px 8px", overflowX: "hidden" };
+  const rShell = { ...shell, padding: isMobile ? "16px 12px" : "28px 32px" };
 
   function validateEmail(val) {
     if (!val.trim()) return "";
@@ -536,7 +536,7 @@ Awards: ${form.awards}`;
   if (step === "templates") {
     return (
       <div dir={rtl ? "rtl" : "ltr"} style={rPage}>
-        <div style={{ ...rShell, maxWidth: 920 }}>
+        <div style={{ ...rShell, maxWidth: 1400 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 22 }}>
             {LANGUAGES.map((l) => (
               <button key={l.code} onClick={() => setLang(l.code)}
@@ -567,7 +567,7 @@ Awards: ${form.awards}`;
 
   const field = (key, multiline, ph) =>
     multiline ? (
-      <textarea value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={4}
+      <textarea value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={5}
         style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
     ) : (
       <input value={form[key]} onChange={set(key)} placeholder={ph || ""} style={inputStyle} />
@@ -575,7 +575,7 @@ Awards: ${form.awards}`;
 
   return (
     <div dir={rtl ? "rtl" : "ltr"} style={rPage}>
-      <div style={{ ...rShell, maxWidth: 1080 }}>
+      <div style={rShell}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
           marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
           <button onClick={() => setStep("templates")} style={backBtn}>← {t.back}</button>
@@ -1013,24 +1013,24 @@ function PageFooter({ t }) {
   );
 }
 
-const page = { minHeight: "100vh", background: "#0f1419", padding: "32px 16px",
+const page = { minHeight: "100vh", background: "#0f1419", padding: "16px 8px",
   fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", color: "#e7ecf2" };
-const shell = { margin: "0 auto", background: "#161c24", borderRadius: 18, padding: 32, border: "1px solid #232c38" };
+const shell = { margin: "0 auto", background: "#161c24", borderRadius: 14, padding: "28px 32px", border: "1px solid #232c38" };
 const h1 = { fontSize: 30, fontWeight: 700, margin: "0 0 6px", color: "#f5f8fc", letterSpacing: "-0.5px" };
 const subtitle = { color: "#8a98a8", fontSize: 15, margin: "0 0 22px", lineHeight: 1.5 };
 const tplGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 };
 const tplCard = { background: "#0f1419", border: "1px solid #2a3441", borderRadius: 12, overflow: "hidden",
   cursor: "pointer", padding: 0, textAlign: "left" };
-const splitGrid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 };
-const lbl = { display: "block", fontSize: 12.5, fontWeight: 600, color: "#9fb0c2",
-  margin: "14px 0 6px", textTransform: "uppercase", letterSpacing: "0.4px" };
-const inputStyle = { width: "100%", boxSizing: "border-box", padding: "10px 12px", background: "#0f1419",
-  border: "1px solid #2a3441", borderRadius: 9, color: "#e7ecf2", fontSize: 14.5, outline: "none" };
+const splitGrid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 };
+const lbl = { display: "block", fontSize: 13, fontWeight: 600, color: "#9fb0c2",
+  margin: "16px 0 7px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const inputStyle = { width: "100%", boxSizing: "border-box", padding: "11px 14px", background: "#0f1419",
+  border: "1px solid #2a3441", borderRadius: 10, color: "#e7ecf2", fontSize: 15, outline: "none" };
 const chip = { display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 13px", background: "#0f1419",
   border: "1px solid #2a3441", borderRadius: 999, color: "#9fb0c2", fontSize: 13.5, cursor: "pointer", fontWeight: 500 };
 const chipActive = { background: "#2563eb", borderColor: "#2563eb", color: "#fff" };
-const cta = { marginTop: 22, width: "100%", padding: "13px", color: "#fff", border: "none",
-  borderRadius: 10, fontSize: 15.5, fontWeight: 600, cursor: "pointer" };
+const cta = { marginTop: 26, width: "100%", padding: "15px", color: "#fff", border: "none",
+  borderRadius: 11, fontSize: 16, fontWeight: 700, cursor: "pointer" };
 const backBtn = { padding: "7px 14px", background: "#0f1419", border: "1px solid #2a3441", borderRadius: 8,
   color: "#cdd8e4", fontSize: 13.5, cursor: "pointer" };
 const copyBtn = { position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, padding: "6px 12px",
