@@ -139,14 +139,14 @@ const UI = {
 
 // ── Templates ─────────────────────────────────────────────────────
 const TEMPLATES = [
-  { id: "classic",   name: "Classic",   tag: "Timeless, serif, single column",      accent: "#1f2937", font: "Georgia, serif" },
-  { id: "modern",    name: "Modern",    tag: "Clean sans-serif with sidebar",        accent: "#2563eb", font: "'Segoe UI', sans-serif" },
-  { id: "minimal",   name: "Minimal",   tag: "Lots of whitespace, understated",      accent: "#0f766e", font: "'Helvetica Neue', sans-serif" },
-  { id: "bold",      name: "Bold",      tag: "Strong header band, high contrast",    accent: "#b91c1c", font: "'Segoe UI', sans-serif" },
-  { id: "elegant",   name: "Elegant",   tag: "Refined, thin rules, light weight",    accent: "#7c3aed", font: "'Palatino Linotype', serif" },
-  { id: "executive", name: "Executive", tag: "Split header, left-bar sections, gold",accent: "#d97706", font: "Georgia, serif" },
-  { id: "creative",  name: "Creative",  tag: "Right colour panel, bold & expressive",accent: "#db2777", font: "'Segoe UI', sans-serif" },
-  { id: "tech",      name: "Tech",      tag: "Dark terminal style, monospace, green",accent: "#10b981", font: "'Courier New', monospace" },
+  { id: "classic",   name: "Classic",   tag: "Timeless, serif, single column",       accent: "#1f2937", font: "'Georgia', 'Times New Roman', serif" },
+  { id: "modern",    name: "Modern",    tag: "Clean sans-serif with sidebar",         accent: "#2563eb", font: "'Inter', system-ui, sans-serif" },
+  { id: "minimal",   name: "Minimal",   tag: "Lots of whitespace, understated",       accent: "#0f766e", font: "'Inter', system-ui, sans-serif" },
+  { id: "bold",      name: "Bold",      tag: "Strong header band, high contrast",     accent: "#b91c1c", font: "'Plus Jakarta Sans', 'Inter', sans-serif" },
+  { id: "elegant",   name: "Elegant",   tag: "Refined, thin rules, light weight",     accent: "#7c3aed", font: "'Georgia', 'Palatino Linotype', serif" },
+  { id: "executive", name: "Executive", tag: "Split header, left-bar sections, gold", accent: "#d97706", font: "'Plus Jakarta Sans', 'Inter', sans-serif" },
+  { id: "creative",  name: "Creative",  tag: "Right colour panel, bold & expressive", accent: "#db2777", font: "'Plus Jakarta Sans', 'Inter', sans-serif" },
+  { id: "tech",      name: "Tech",      tag: "Dark terminal style, monospace, green", accent: "#10b981", font: "'Courier New', 'Courier', monospace" },
 ];
 
 // ── Author info (edit here to update the footer) ─────────────────
@@ -1064,7 +1064,7 @@ function ResumePaper({ tpl, result, rtl, placeholder = true }) {
 
   if (empty) {
     return <div style={{ ...paper, display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#9ca3af", fontFamily: "'Segoe UI', sans-serif", fontSize: 14, padding: 30, textAlign: "center" }}>
+      color: "#9ca3af", fontFamily: "'Inter', sans-serif", fontSize: 14, padding: 30, textAlign: "center" }}>
       Your resume will appear here in the <strong style={{ color: tpl.accent, margin: "0 4px" }}>{tpl.name}</strong> style.
     </div>;
   }
@@ -1262,10 +1262,12 @@ function PageFooter({ t }) {
 }
 
 const page = { minHeight: "100vh", background: "#0f1419", padding: "16px 8px",
-  fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", color: "#e7ecf2" };
+  fontFamily: "'Inter', system-ui, -apple-system, sans-serif", color: "#e7ecf2" };
 const shell = { margin: "0 auto", background: "#161c24", borderRadius: 14, padding: "28px 32px", border: "1px solid #232c38" };
-const h1 = { fontSize: 30, fontWeight: 700, margin: "0 0 6px", color: "#f5f8fc", letterSpacing: "-0.5px" };
-const subtitle = { color: "#8a98a8", fontSize: 15, margin: "0 0 22px", lineHeight: 1.5 };
+const h1 = { fontSize: 30, fontWeight: 800, margin: "0 0 6px", color: "#f5f8fc", letterSpacing: "-0.5px",
+  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" };
+const subtitle = { color: "#8a98a8", fontSize: 15, margin: "0 0 22px", lineHeight: 1.6,
+  fontFamily: "'Inter', sans-serif", fontWeight: 400 };
 const tplGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 };
 const tplCard = { background: "#0f1419", border: "1px solid #2a3441", borderRadius: 12, overflow: "hidden",
   cursor: "pointer", padding: 0, textAlign: "left" };
