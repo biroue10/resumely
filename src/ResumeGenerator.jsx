@@ -1707,11 +1707,11 @@ Awards: ${form.awards}`;
               <button onClick={() => setAppView("landing")}
                 style={{ overflow: "hidden", whiteSpace: "nowrap", background: "none",
                   border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
-                <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.5px",
+                <div style={{ fontSize: 21, fontWeight: 800, letterSpacing: "-0.5px",
                   background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   ApplyCraft
                 </div>
-                <div style={{ fontSize: 10.5, color: C.text3, marginTop: 1 }}>Career toolkit</div>
+                <div style={{ fontSize: 12, color: C.text3, marginTop: 2 }}>Career toolkit</div>
               </button>
             )}
             <button onClick={() => setSidebarOpen(o => !o)}
@@ -1736,7 +1736,7 @@ Awards: ${form.awards}`;
                   onChange={e => setSideSearch(e.target.value)}
                   placeholder="Search features..."
                   style={{ width: "100%", background: C.elevated, border: `1px solid ${C.border}`,
-                    borderRadius: 8, padding: "7px 28px 7px 32px", fontSize: 12.5, color: C.text1,
+                    borderRadius: 8, padding: "7px 28px 7px 32px", fontSize: 13.5, color: C.text1,
                     fontFamily: "inherit", outline: "none", boxSizing: "border-box",
                     transition: "border-color 0.2s" }}
                   onFocus={e => { e.target.style.borderColor = C.accent; }}
@@ -1761,13 +1761,13 @@ Awards: ${form.awards}`;
                   padding: sidebarOpen ? "9px 12px" : "9px 0",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   borderRadius: 9, border: "none", cursor: "pointer", width: "100%", fontFamily: "inherit",
-                  fontSize: 15, fontWeight: navPage === item.id ? 700 : 500,
+                  fontSize: 15.5, fontWeight: navPage === item.id ? 700 : 500,
                   background: navPage === item.id ? `${C.accent}18` : "transparent",
                   color: navPage === item.id ? C.accent2 : C.text2,
                   transition: "background .15s, color .15s, padding .22s", whiteSpace: "nowrap",
                   overflow: "hidden",
                   boxShadow: navPage === item.id ? `inset 2px 0 0 ${C.accent}` : "none" }}>
-                <span style={{ fontSize: 17, flexShrink: 0 }}>{item.icon}</span>
+                <span style={{ fontSize: 19, flexShrink: 0 }}>{item.icon}</span>
                 {sidebarOpen && <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>}
               </button>
             ))}
@@ -1781,23 +1781,23 @@ Awards: ${form.awards}`;
                 padding: sidebarOpen ? "9px 12px" : "9px 0",
                 justifyContent: sidebarOpen ? "flex-start" : "center",
                 borderRadius: 9, border: "none", cursor: "pointer", width: "100%", fontFamily: "inherit",
-                fontSize: 13.5, fontWeight: navPage === "pricing" ? 700 : 500,
+                fontSize: 15, fontWeight: navPage === "pricing" ? 700 : 500,
                 background: navPage === "pricing" ? `${C.blue}18` : "transparent",
                 color: navPage === "pricing" ? "#93C5FD" : C.text2,
                 transition: "background .15s, color .15s, padding .22s", whiteSpace: "nowrap", overflow: "hidden" }}>
-              <span style={{ fontSize: 17, flexShrink: 0 }}>💎</span>
+              <span style={{ fontSize: 19, flexShrink: 0 }}>💎</span>
               {sidebarOpen && "Plans & Pricing"}
             </button>
             {sidebarOpen && (
               <div style={{ margin: "8px 4px 0", padding: "10px 12px",
                 background: `${C.accent}0E`, border: `1px solid ${C.accent}30`,
                 borderRadius: 10 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: C.accent2, marginBottom: 4,
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent2, marginBottom: 4,
                   letterSpacing: "0.6px", textTransform: "uppercase" }}>Free Plan</div>
-                <div style={{ fontSize: 11, color: C.text3, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 12.5, color: C.text3, lineHeight: 1.5 }}>
                   Upgrade to Pro for AI polish, cover letters & more.
                 </div>
-                <button onClick={() => setNavPage("pricing")} style={{ marginTop: 8, fontSize: 11.5, fontWeight: 700,
+                <button onClick={() => setNavPage("pricing")} style={{ marginTop: 8, fontSize: 12.5, fontWeight: 700,
                   color: C.accent2, background: "none", border: "none", cursor: "pointer", padding: 0,
                   fontFamily: "inherit" }}>
                   View plans →
