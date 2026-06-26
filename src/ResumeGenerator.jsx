@@ -1529,6 +1529,9 @@ Awards: ${form.awards}`;
   else if (navPage === "about") pageBody = <AboutPage />;
   else pageBody = <ComingSoon label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
+  // Two-column independent scroll: only on desktop, resume form view
+  const isFormView = !isMobile && navPage === "resume" && step === "form" && !!tpl;
+
   // ── Landing page ──────────────────────────────────────────────────
   if (appView === "landing") {
     const enter = (page) => { setNavPage(page); setAppView("app"); };
@@ -2105,12 +2108,9 @@ Awards: ${form.awards}`;
       )}
 
       {/* ── Main content ── */}
-      {(() => {
-        const isFormView = !isMobile && navPage === "resume" && step === "form" && !!tpl;
-        return (
       <div style={{ flex: 1, minWidth: 0, overflow: isFormView ? "hidden" : "auto",
         padding: isMobile ? "8px 4px" : "16px 24px",
-        display: isFormView ? "flex" : undefined, flexDirection: isFormView ? "column" : undefined }}>
+        ...(isFormView ? { display: "flex", flexDirection: "column" } : {}) }}>
         <div style={{ maxWidth: 1320, margin: "0 auto", width: "100%",
           ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } : {}) }}>
 
@@ -2257,8 +2257,6 @@ Awards: ${form.awards}`;
           : pageBody}
         </div>
       </div>
-        );
-      })()}
     </div>
   );
 }
