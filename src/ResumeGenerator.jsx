@@ -2067,7 +2067,7 @@ Awards: ${form.awards}`;
     const editCard = trackerModal.card;
 
     return (
-      <div style={{ padding: isMobile ? "16px 8px" : "24px 20px", minHeight: "100%" }}>
+      <div style={{ padding: isMobile ? "16px 8px" : "24px 20px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
           marginBottom: 24, gap: 12, flexWrap: "wrap" }}>
@@ -3528,7 +3528,9 @@ Awards: ${form.awards}`;
 
         {isFormView
           ? <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{pageBody}</div>
-          : pageBody}
+          : navPage === "tracker"
+            ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden" }}>{pageBody}</div>
+            : pageBody}
         </div>
       </div>
     </div>
