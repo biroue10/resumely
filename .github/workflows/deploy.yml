@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Submit IndexNow
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
@@ -21,22 +19,9 @@ jobs:
       - run: npm ci
       - run: npm run seo:sitemap
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
 
   indexnow:
-    needs: deploy
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,17 +36,26 @@ jobs:
           key="91a714f93cc24a8c95f1efe0d9e9a914"
           key_url="https://applycraft.io/${key}.txt"
           sitemap_url="https://applycraft.io/sitemap.xml"
+          node -e "const fs=require('fs'); const urls=[...fs.readFileSync('public/sitemap.xml','utf8').matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m=>m[1]); fs.writeFileSync('/tmp/applycraft-urls.txt', urls.join('\n'));"
 
           for attempt in $(seq 1 20); do
             key_body="$(curl -fsS "$key_url" || true)"
             sitemap_status="$(curl -fsS -o /dev/null -w "%{http_code}" "$sitemap_url" || true)"
+            missing_count=0
 
-            if [ "$key_body" = "$key" ] && [ "$sitemap_status" = "200" ]; then
-              echo "Production IndexNow key and sitemap are live."
+            while IFS= read -r url; do
+              status="$(curl -fsS -o /dev/null -w "%{http_code}" "$url" || true)"
+              if [ "$status" != "200" ]; then
+                missing_count=$((missing_count + 1))
+              fi
+            done < /tmp/applycraft-urls.txt
+
+            if [ "$key_body" = "$key" ] && [ "$sitemap_status" = "200" ] && [ "$missing_count" = "0" ]; then
+              echo "Production IndexNow key, sitemap, and page URLs are live."
               exit 0
             fi
 
-            echo "Production SEO files are not ready yet; retry ${attempt}/20."
+            echo "Production SEO files are not ready yet; ${missing_count} sitemap URLs are not returning 200. Retry ${attempt}/20."
             sleep 15
           done
 
