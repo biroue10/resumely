@@ -822,6 +822,7 @@ export default function ResumeGenerator() {
   const [coachBulletIdx, setCoachBulletIdx] = useState(0);
   const [coachAnswers, setCoachAnswers] = useState({});
   const [coachResult, setCoachResult] = useState("");
+  const [coachLoading, setCoachLoading] = useState(false);
   const [atsOpen, setAtsOpen] = useState(false);
   const [master, setMaster] = useState(() => { try { return JSON.parse(localStorage.getItem("ac_master") || "null") || {...defaultMaster}; } catch { return {...defaultMaster}; } });
   const [masterTab, setMasterTab] = useState("personal");
@@ -899,25 +900,33 @@ export default function ResumeGenerator() {
 
   async function translateCV() {
     if (!form.name || translating) return;
+    const langName = selectedLang?.name || "English";
     const langCode = selectedLang?.code || "en";
     if (langCode === "en") return;
     setTranslating(true);
     try {
-      const tx = async (text) => {
-        if (!text?.trim()) return text;
-        const r = await fetch(
-          `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 500))}&langpair=en|${langCode}`
-        );
-        const d = await r.json();
-        return d.responseData?.translatedText || text;
-      };
-      const fields = ["jobTitle", "summary", "experience", "education", "skills",
+      const fieldKeys = ["title", "summary", "experience", "education", "skills",
         "certifications", "projects", "volunteer", "awards"];
-      const translated = { ...form };
-      for (const key of fields) {
-        if (form[key]?.trim()) translated[key] = await tx(form[key]);
-      }
-      setForm(translated);
+      const toTranslate = Object.fromEntries(
+        fieldKeys.filter(k => form[k]?.trim()).map(k => [k, form[k]])
+      );
+      if (Object.keys(toTranslate).length === 0) return;
+      const prompt = `Translate the following resume fields into ${langName}. Use professional resume language. Keep formatting (line breaks, bullet points) intact. Return ONLY valid JSON with the exact same keys.\n\n${JSON.stringify(toTranslate)}`;
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 2000,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+      if (!res.ok) throw new Error("api-error");
+      const data = await res.json();
+      const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+      const clean = text.replace(/```json|```/g, "").trim();
+      const translated = JSON.parse(clean);
+      setForm(f => ({ ...f, ...translated }));
     } catch {
       // silently fail — user keeps original
     } finally {
@@ -1812,14 +1821,41 @@ Awards: ${form.awards}`;
 
                 {/* Generate button */}
                 <button
-                  onClick={() => {
-                    const bullet = buildStrongBullet(coachBullet, coachAnswers, ctx);
-                    setCoachResult(bullet);
+                  disabled={coachLoading}
+                  onClick={async () => {
+                    setCoachLoading(true);
+                    setCoachResult("");
+                    try {
+                      const extras = Object.entries(coachAnswers)
+                        .filter(([, v]) => v?.trim())
+                        .map(([k, v]) => `${k}: ${v}`)
+                        .join("\n");
+                      const prompt = `You are an expert resume writer. Rewrite this weak job experience bullet into a single powerful, quantified achievement bullet using strong action verbs.\n\nOriginal bullet: "${coachBullet}"\n${extras ? `\nAdditional context:\n${extras}` : ""}\n\nReturn ONLY the single improved bullet as plain text. No explanation, no quotes, no punctuation outside the bullet.`;
+                      const res = await fetch("/api/ai", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          model: "claude-sonnet-4-6",
+                          max_tokens: 150,
+                          messages: [{ role: "user", content: prompt }],
+                        }),
+                      });
+                      if (!res.ok) throw new Error("api-error");
+                      const data = await res.json();
+                      const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+                      setCoachResult(text);
+                    } catch {
+                      const bullet = buildStrongBullet(coachBullet, coachAnswers, ctx);
+                      setCoachResult(bullet);
+                    } finally {
+                      setCoachLoading(false);
+                    }
                   }}
                   style={{ width: "100%", padding: "9px 0", background: C.grad, color: "#fff",
                     border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit", marginBottom: coachResult ? 12 : 0 }}>
-                  ✦ Generate strong bullet
+                    cursor: coachLoading ? "not-allowed" : "pointer", opacity: coachLoading ? 0.7 : 1,
+                    fontFamily: "inherit", marginBottom: coachResult ? 12 : 0 }}>
+                  {coachLoading ? "Generating…" : "✦ Generate strong bullet"}
                 </button>
 
                 {/* Result */}
