@@ -1,22 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- ── Core app ──────────────────────────────────────────────────── -->
   <url>
     <loc>https://applycraft.io/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- ── High-value SEO tools ──────────────────────────────────────── -->
   <url>
-    <loc>https://applycraft.io/resume-builder/</loc>
+    <loc>https://applycraft.io/ats-checker/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/resume-checker/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://applycraft.io/free-resume-builder/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/resume-builder/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/cover-letter-builder/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://applycraft.io/ats-resume-builder/</loc>
@@ -25,17 +47,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://applycraft.io/cover-letter-builder/</loc>
+    <loc>https://applycraft.io/student-resume-builder/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://applycraft.io/resume-checker/</loc>
+    <loc>https://applycraft.io/canadian-resume-builder/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- ── Multilingual landing pages ────────────────────────────────── -->
   <url>
     <loc>https://applycraft.io/resume-in-french/</loc>
     <lastmod>2026-06-27</lastmod>
@@ -48,18 +72,8 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://applycraft.io/canadian-resume-builder/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/student-resume-builder/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+
+  <!-- ── Role-specific resume pages ────────────────────────────────── -->
   <url>
     <loc>https://applycraft.io/customer-service-resume/</loc>
     <lastmod>2026-06-27</lastmod>
@@ -78,6 +92,20 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- ── Resume examples ───────────────────────────────────────────── -->
+  <url>
+    <loc>https://applycraft.io/examples/entry-level-resume/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/examples/customer-service-resume/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://applycraft.io/examples/it-support-technician-resume/</loc>
     <lastmod>2026-06-27</lastmod>
@@ -91,25 +119,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://applycraft.io/examples/customer-service-resume/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://applycraft.io/examples/linux-administrator-resume/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/examples/entry-level-resume/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/examples/french-cv-example/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -127,45 +137,54 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://applycraft.io/privacy/</loc>
+    <loc>https://applycraft.io/examples/french-cv-example/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
+
+  <!-- ── Support / info pages ──────────────────────────────────────── -->
   <url>
     <loc>https://applycraft.io/about/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://applycraft.io/help/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/changelog/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/roadmap/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://applycraft.io/status/</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://applycraft.io/contact/</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://applycraft.io/changelog/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/roadmap/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/status/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://applycraft.io/privacy/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>
