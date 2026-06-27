@@ -1,3 +1,2 @@
-# Let Cloudflare Pages return a real 404 for unknown URLs instead of serving
-# the app shell with a 200 status, which can create soft-404 SEO issues.
-/* /404.html 404
+# No catch-all SPA fallback.
+# Cloudflare Pages will serve /404.html for unknown URLs, avoiding soft-404s.
