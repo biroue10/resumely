@@ -839,6 +839,12 @@ export default function ResumeGenerator() {
   const [trackerDragId, setTrackerDragId] = useState(null);
   const [trackerDragOver, setTrackerDragOver] = useState(null);
   useEffect(() => { localStorage.setItem("ac_tracker", JSON.stringify(trackerCards)); }, [trackerCards]);
+  const [atsText, setAtsText] = useState("");
+  const [atsJd, setAtsJd] = useState("");
+  const [atsResult, setAtsResult] = useState(null);
+  const [atsFromChecker, setAtsFromChecker] = useState(() => {
+    try { return localStorage.getItem("ac_ats_text") || ""; } catch { return ""; }
+  });
   const [demoName, setDemoName] = useState("");
   const [demoTitle, setDemoTitle] = useState("");
   const [demoExp, setDemoExp] = useState("");
@@ -1485,6 +1491,63 @@ Awards: ${form.awards}`;
     });
 
     return issues;
+  };
+
+  // ── ATS text scorer (for standalone ATS page — works on raw pasted text) ──
+  const ATS_STOP = new Set(["and","or","the","a","an","in","on","to","for","of","with","at","by","from","as","is","are","was","were","be","been","have","has","had","do","does","did","will","would","can","could","should","may","might","must","shall","not","but","if","then","than","that","this","these","those","it","its","we","our","you","your","they","their","he","she","him","her","i","me","my","us","any","all","more","most","some","such","own","same","other","also","just","into","over","after","before","during","through","between","each","only","very","too","so","up","out","about","no","new","need","work","experience","years","year","role","team","company","skills","ability","strong","proven","excellent","good","great","well","using","use","used","including","include","within","across","multiple","various","key","core","day","days","time","high","low","able","ensure","provide","making","make","take","help","both","per","etc"]);
+  const atsTokenize = s => s.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !ATS_STOP.has(w) && isNaN(w));
+  const WEAK_ATS = /^(responsible for|helped?( to)?|assisted?( with)?|worked on|was part of|involved in|supported?|participated in|contributed to|did |handled |performed |undertook |was involved)/i;
+
+  const scoreRawResume = (text, jdText) => {
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    const issues = [];
+    const hasEmail    = /\b[\w.+%-]+@[\w.-]+\.[a-z]{2,}\b/i.test(text);
+    const hasPhone    = /(\+?\d[\d\s\-().]{6,14}\d)/.test(text);
+    const hasLinkedin = /linkedin\.com/i.test(text);
+    const hasExperience = /\b(experience|work history|employment)\b/i.test(text) || /\b(20\d{2}|19[89]\d)\b/.test(text);
+    const hasEducation  = /\b(education|degree|university|college|bachelor|master|phd|mba|diploma)\b/i.test(text);
+    const hasSkills     = /\b(skills|technologies|tools|expertise|proficient|competencies)\b/i.test(text);
+    const hasSummary    = /\b(summary|profile|objective|about me|professional)\b/i.test(text);
+    const hasDates      = /\b(20\d{2}|19[89]\d)\b/.test(text);
+    const bulletLines   = lines.filter(l => l.length > 15 && l.length < 220);
+    const hasNumbers    = bulletLines.some(l => /\d/.test(l));
+    const weakLines     = lines.filter(l => { const t = l.trim(); return t.length > 10 && WEAK_ATS.test(t); });
+    const longLines     = lines.filter(l => l.length > 180);
+    const wordCount     = text.split(/\s+/).filter(Boolean).length;
+
+    if (!hasEmail)      issues.push({ level:"critical", icon:"✉️", title:"No email address detected", detail:"ATS systems extract your email to create your candidate profile. Without it, your application cannot be processed." });
+    if (!hasExperience) issues.push({ level:"critical", icon:"📋", title:"No work experience section detected", detail:"Work experience is the most heavily weighted section in ATS ranking. Ensure your experience is clearly labeled." });
+    if (!hasSkills)     issues.push({ level:"critical", icon:"⚡", title:"No skills section detected", detail:"ATS systems scan skills for exact keyword matches against the job description. Add a Skills or Technologies section." });
+    if (!hasPhone)      issues.push({ level:"warning",  icon:"📞", title:"No phone number detected", detail:"Phone is extracted by ATS systems for your candidate profile." });
+    if (!hasLinkedin)   issues.push({ level:"warning",  icon:"🔗", title:"No LinkedIn URL", detail:"Many ATS systems score completeness partly on LinkedIn presence." });
+    if (!hasSummary)    issues.push({ level:"warning",  icon:"📝", title:"No professional summary detected", detail:"A 2–4 sentence summary increases keyword density and gives ATS immediate context before parsing experience." });
+    if (hasExperience && !hasNumbers) issues.push({ level:"warning", icon:"🔢", title:"No quantified achievements", detail:"Bullets without numbers (%, $, team size) score lower. Add at least one metric per role." });
+    if (hasExperience && !hasDates)   issues.push({ level:"warning", icon:"📅", title:"No dates found in experience", detail:"ATS systems calculate tenure from year ranges. Include start/end years on each role." });
+    if (weakLines.length > 0) issues.push({ level:"warning", icon:"✍️", title:`${weakLines.length} passive bullet opener${weakLines.length > 1 ? "s" : ""}`, detail:`Phrases like "Responsible for" or "Helped" are passive. Use "Led", "Built", "Reduced" instead.` });
+    if (longLines.length > 0) issues.push({ level:"warning", icon:"📏", title:`${longLines.length} line${longLines.length > 1 ? "s" : ""} over 180 characters`, detail:"Very long lines are truncated or misread by ATS parsers. Split into focused bullets under 160 characters." });
+    if (wordCount < 200) issues.push({ level:"warning", icon:"📄", title:`Resume too short (${wordCount} words)`, detail:"A strong resume has 350–800 words. Add detail: specific projects, technologies, and measurable outcomes." });
+    if (!hasEducation)  issues.push({ level:"info", icon:"🎓", title:"Education section not detected", detail:"Some ATS systems require at least one education entry to complete parsing." });
+    if (wordCount > 1200) issues.push({ level:"info", icon:"📏", title:`Resume may be too long (${wordCount} words)`, detail:"Most ATS systems prefer resumes under 2 pages (~800 words). Condense to recent, relevant experience." });
+
+    let kwGap = null;
+    if (jdText && jdText.trim().length > 30) {
+      const jdWords = new Set(atsTokenize(jdText));
+      const cvWords = new Set(atsTokenize(text));
+      if (jdWords.size > 3) {
+        const present = [...jdWords].filter(w => cvWords.has(w));
+        const missing = [...jdWords].filter(w => !cvWords.has(w));
+        const pct = Math.round((present.length / jdWords.size) * 100);
+        kwGap = { present: present.slice(0, 20), missing: missing.slice(0, 20), pct, total: jdWords.size };
+        if (pct < 30) issues.unshift({ level:"critical", icon:"🎯", title:`Low keyword match: ${pct}% vs. job description`, detail:`Only ${pct}% of the JD's keywords appear in your resume. Target 40%+ for strong ATS ranking.` });
+        else if (pct < 45) issues.unshift({ level:"warning", icon:"🎯", title:`Keyword match: ${pct}%`, detail:`You match ${pct}% of the JD's keywords. Strong candidates typically hit 45–70% for targeted roles.` });
+      }
+    }
+
+    const score = Math.max(0, 100
+      - issues.filter(i => i.level === "critical").length * 20
+      - issues.filter(i => i.level === "warning").length * 8
+      - issues.filter(i => i.level === "info").length * 3);
+    return { score, issues, kwGap, wordCount };
   };
 
   // Form completion tracker
@@ -2189,6 +2252,7 @@ Awards: ${form.awards}`;
     { id: "master",    icon: "⭐", label: "Master Profile" },
     { id: "cover",     icon: "✉️",  label: "Cover Letter" },
     { id: "tracker",   icon: "📋", label: "Job Tracker" },
+    { id: "ats",       icon: "🎯", label: "ATS Checker" },
     { id: "signature", icon: "✍️",  label: "Email Signature", soon: true },
     { id: "website",   icon: "🌐", label: "Personal Website", soon: true },
     { id: "about",     icon: "ℹ️",  label: "About" },
@@ -2223,6 +2287,215 @@ Awards: ${form.awards}`;
     );
   };
 
+
+  const ATSPage = () => {
+    const [localText, setLocalText] = useState(atsText || atsFromChecker || "");
+    const [localJd, setLocalJd] = useState(atsJd || "");
+    const [result, setResult] = useState(atsResult);
+    const [running, setRunning] = useState(false);
+
+    const check = () => {
+      if (localText.trim().length < 40) return;
+      setRunning(true);
+      setTimeout(() => {
+        const r = scoreRawResume(localText, localJd);
+        setResult(r);
+        setAtsResult(r);
+        setAtsText(localText);
+        setAtsJd(localJd);
+        if (atsFromChecker) {
+          try { localStorage.removeItem("ac_ats_text"); } catch {}
+          setAtsFromChecker("");
+        }
+        setRunning(false);
+      }, 150);
+    };
+
+    const importToBuilder = () => {
+      if (!localText.trim()) return;
+      setForm(f => ({ ...f, experience: localText }));
+      setNavPage("resume");
+      setStep("templates");
+    };
+
+    const scoreColor = !result ? C.accent2
+      : result.score >= 80 ? "#4ade80"
+      : result.score >= 60 ? "#fbbf24"
+      : result.score >= 40 ? "#fb923c" : "#f87171";
+
+    const scoreLabel = !result ? "" : result.score >= 80 ? "ATS Ready" : result.score >= 60 ? "Needs Work" : result.score >= 40 ? "Action Required" : "Critical Issues";
+
+    const IssueRow = ({ issue }) => {
+      const bColor = issue.level === "critical" ? "#f87171" : issue.level === "warning" ? "#fbbf24" : "#60a5fa";
+      const bBg    = issue.level === "critical" ? "#450a0a44" : issue.level === "warning" ? "#431407aa" : "#1e3a5f44";
+      return (
+        <div style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 10,
+          padding: "14px 16px", marginBottom: 10, display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>{issue.icon}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: C.text1, marginBottom: 4,
+              display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              {issue.title}
+              <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 999,
+                background: bBg, color: bColor, border: `1px solid ${bColor}22`,
+                textTransform: "uppercase", letterSpacing: ".8px", flexShrink: 0 }}>
+                {issue.level}
+              </span>
+            </div>
+            <div style={{ fontSize: 12.5, color: C.text2, lineHeight: 1.6 }}>{issue.detail}</div>
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div style={{ padding: isMobile ? 16 : 32, maxWidth: 900 }}>
+        <PageHeader eyebrow="Free Tool" icon="🎯" title="ATS Resume Checker"
+          sub="Paste your resume and get an instant ATS score, keyword gap analysis, and a prioritized fix list. Nothing is uploaded — runs entirely in your browser."
+          isMobile={isMobile} />
+
+        {atsFromChecker && (
+          <div style={{ background: `${C.accent}14`, border: `1.5px solid ${C.accent}40`,
+            borderRadius: 10, padding: "12px 16px", marginBottom: 20,
+            display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 14 }}>📋</span>
+            <span style={{ fontSize: 13.5, color: C.text1, flex: 1 }}>Resume text detected from the ATS Checker page.</span>
+            <button onClick={() => { setLocalText(atsFromChecker); setTimeout(check, 50); }}
+              style={{ fontSize: 12.5, fontWeight: 700, color: C.accent2, background: "none",
+                border: `1px solid ${C.accent}40`, borderRadius: 6, padding: "4px 12px", cursor: "pointer", fontFamily: "inherit" }}>
+              Load & check →
+            </button>
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, textTransform: "uppercase",
+              letterSpacing: "1px", marginBottom: 8 }}>Your resume</div>
+            <textarea value={localText} onChange={e => setLocalText(e.target.value)}
+              placeholder={"Paste your full resume here...\n\nJane Smith\njane@email.com | +1 555 000 0000\n\nEXPERIENCE\nSenior Engineer — Acme (2021–Present)\n• Led migration cutting deploy time 60%\n\nSKILLS\nPython, React, AWS"}
+              style={{ width: "100%", height: 240, resize: "vertical", background: C.elevated,
+                border: `1.5px solid ${C.border}`, borderRadius: 10, color: C.text1,
+                fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, lineHeight: 1.6,
+                padding: "12px 14px", outline: "none", fontWeight: 400 }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, textTransform: "uppercase",
+              letterSpacing: "1px", marginBottom: 8 }}>Job description <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>— optional</span></div>
+            <textarea value={localJd} onChange={e => setLocalJd(e.target.value)}
+              placeholder={"Paste the job description here to get a keyword gap analysis.\n\nWith it, you'll see:\n  • Which keywords you match ✓\n  • Which are missing ✗\n  • Your keyword match %\n\nWithout it, you still get a full ATS readiness score."}
+              style={{ width: "100%", height: 240, resize: "vertical", background: C.elevated,
+                border: `1.5px solid ${C.border}`, borderRadius: 10, color: C.text1,
+                fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, lineHeight: 1.6,
+                padding: "12px 14px", outline: "none", fontWeight: 400 }} />
+          </div>
+        </div>
+
+        <button onClick={check} disabled={running || localText.trim().length < 40}
+          style={{ width: "100%", padding: "14px", background: C.grad, border: "none",
+            borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer",
+            fontFamily: "inherit", opacity: (running || localText.trim().length < 40) ? 0.5 : 1,
+            marginBottom: 32 }}>
+          {running ? "Analysing…" : "Check My Resume →"}
+        </button>
+
+        {result && (<>
+          {/* Score */}
+          <div style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 14,
+            padding: "28px 24px", textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 64, fontWeight: 800, color: scoreColor, letterSpacing: "-2px", lineHeight: 1 }}>
+              {result.score}
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: scoreColor, marginTop: 6 }}>{scoreLabel}</div>
+            <div style={{ fontSize: 12.5, color: C.text3, marginTop: 8, maxWidth: 400, margin: "8px auto 0" }}>
+              ATS Readiness Score — reflects structure, completeness, and content quality.
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
+              {result.issues.filter(i => i.level === "critical").length > 0 && (
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
+                  background: "#450a0a44", color: "#f87171", border: "1px solid #7f1d1d44" }}>
+                  {result.issues.filter(i => i.level === "critical").length} Critical
+                </span>
+              )}
+              {result.issues.filter(i => i.level === "warning").length > 0 && (
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
+                  background: "#43140744", color: "#fbbf24", border: "1px solid #92400e44" }}>
+                  {result.issues.filter(i => i.level === "warning").length} Warning
+                </span>
+              )}
+              {result.issues.filter(i => i.level === "info").length > 0 && (
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
+                  background: "#1e3a5f44", color: "#60a5fa", border: "1px solid #1d4ed844" }}>
+                  {result.issues.filter(i => i.level === "info").length} Info
+                </span>
+              )}
+              {result.issues.length === 0 && (
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
+                  background: "#14532d44", color: "#4ade80", border: "1px solid #16a34a44" }}>All clear</span>
+              )}
+            </div>
+          </div>
+
+          {/* Keyword gap */}
+          {result.kwGap && (
+            <div style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 14, padding: "22px 24px", marginBottom: 24 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>Keyword Match</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                <div>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: C.text1 }}>{result.kwGap.pct}%</span>
+                  <span style={{ fontSize: 13, color: C.text2, marginLeft: 8 }}>keyword match with JD</span>
+                </div>
+                <div style={{ fontSize: 12, color: C.text3 }}>
+                  {result.kwGap.present.length} matched · {result.kwGap.missing.length} missing
+                </div>
+              </div>
+              <div style={{ height: 6, background: C.border, borderRadius: 999, overflow: "hidden", marginBottom: 16 }}>
+                <div style={{ height: "100%", width: `${result.kwGap.pct}%`, background: C.grad, borderRadius: 999, transition: "width .6s cubic-bezier(0.22,1,0.36,1)" }} />
+              </div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px" }}>Matched</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+                {result.kwGap.present.map(w => (
+                  <span key={w} style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 6, background: "#14532d44", color: "#4ade80", border: "1px solid #16a34a44" }}>✓ {w}</span>
+                ))}
+              </div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px" }}>Missing</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {result.kwGap.missing.length > 0
+                  ? result.kwGap.missing.map(w => <span key={w} style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 6, background: "#450a0a44", color: "#f87171", border: "1px solid #7f1d1d44" }}>✗ {w}</span>)
+                  : <span style={{ fontSize: 13, color: "#4ade80" }}>✓ No significant missing keywords!</span>
+                }
+              </div>
+            </div>
+          )}
+
+          {/* Issues */}
+          {result.issues.length === 0
+            ? <div style={{ background: "#14532d22", border: "1px solid #16a34a44", borderRadius: 12, padding: "20px 24px", color: "#4ade80", fontWeight: 600, textAlign: "center", marginBottom: 24 }}>
+                ✓ No significant issues — your resume is well-structured for ATS parsing.
+              </div>
+            : <>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "2px", color: C.accent2, marginBottom: 14 }}>Issues</div>
+                {result.issues.map((issue, i) => <IssueRow key={i} issue={issue} />)}
+              </>
+          }
+
+          {/* Fix CTA */}
+          <div style={{ background: `${C.accent}0E`, border: `1.5px solid ${C.accent}28`, borderRadius: 14, padding: "24px", textAlign: "center", marginTop: 28 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: C.text1, marginBottom: 8 }}>Fix these issues in the builder</div>
+            <div style={{ fontSize: 14, color: C.text2, marginBottom: 20, lineHeight: 1.6 }}>
+              ApplyCraft shows your live ATS score as you type. Pick a template, fill in the gaps, and export a polished PDF or DOCX — free, no account needed.
+            </div>
+            <button onClick={importToBuilder}
+              style={{ padding: "12px 28px", background: C.grad, border: "none", borderRadius: 9,
+                color: "#fff", fontSize: 14.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                boxShadow: `0 4px 20px ${C.accent}44` }}>
+              Open in Resume Builder →
+            </button>
+          </div>
+        </>)}
+      </div>
+    );
+  };
 
   const AboutPage = () => (
     <div style={{ padding: isMobile ? 20 : 40, maxWidth: 720 }}>
@@ -3057,6 +3330,7 @@ Awards: ${form.awards}`;
   else if (navPage === "cover") pageBody = coverStep === "form" ? (coverFormContent || coverTemplatesContent) : coverTemplatesContent;
   else if (navPage === "master") pageBody = masterContent;
   else if (navPage === "tracker") pageBody = trackerContent;
+  else if (navPage === "ats") pageBody = <ATSPage />;
   else if (navPage === "about") pageBody = <AboutPage />;
   else pageBody = <ComingSoon id={navPage} label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
@@ -3194,6 +3468,14 @@ Awards: ${form.awards}`;
                 onMouseEnter={e => { e.currentTarget.style.background = `${C.borderHi}18`; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                 Write Cover Letter
+              </button>
+              <button onClick={() => enter("ats")}
+                style={{ background: "transparent", color: C.text2, border: `1.5px solid ${C.border}`,
+                  borderRadius: 3, padding: "14px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                  transition: "border-color 0.2s, color 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent2; e.currentTarget.style.color = C.accent2; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.text2; }}>
+                🎯 Check ATS Score
               </button>
             </div>
             {/* Trust row */}
@@ -4251,7 +4533,7 @@ Awards: ${form.awards}`;
 
         {isFormView
           ? <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{pageBody}</div>
-          : (navPage === "tracker" || navPage === "master")
+          : (navPage === "tracker" || navPage === "master" || navPage === "ats")
             ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{pageBody}</div>
             : pageBody}
         </div>

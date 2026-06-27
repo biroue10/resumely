@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free ATS Resume Checker — Instant Score & Keyword Gap | ApplyCraft</title>
+<meta name="description" content="Paste your resume and get a free ATS score in seconds. See exactly which keywords are missing, what's hurting your score, and how to fix it. No sign-up, no email."/>
+<meta name="keywords" content="free ats resume checker, ats score checker, resume keyword scanner, ats resume test, free ats scan no signup, resume ats score, ats compatibility checker, keyword gap resume"/>
+<link rel="canonical" href="https://applycraft.io/ats-checker/"/>
+<meta property="og:title" content="Free ATS Resume Checker — Instant Score & Fixes"/>
+<meta property="og:description" content="Paste your resume and get a free ATS score instantly. Keyword gap analysis, formatting checks, and one-click fixes. No sign-up."/>
+<meta property="og:url" content="https://applycraft.io/ats-checker/"/>
+<meta property="og:image" content="https://applycraft.io/og.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Free ATS Resume Checker — Instant Score & Keyword Gap"/>
+<meta name="twitter:description" content="Paste your resume, get a free ATS score in seconds. See which keywords are missing. No sign-up required."/>
+<meta name="twitter:image" content="https://applycraft.io/og.png"/>
+<link rel="icon" href="/favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../_seo.css"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ApplyCraft ATS Resume Checker",
+  "url": "https://applycraft.io/ats-checker/",
+  "description": "Free ATS resume checker. Paste your resume, get an instant score and keyword gap analysis. No sign-up, no email, fully private.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "featureList": [
+    "Instant ATS score",
+    "Keyword gap analysis",
+    "Formatting issue detection",
+    "Quantification check",
+    "Contact info completeness",
+    "No sign-up required",
+    "100% private — runs in your browser"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an ATS resume checker?",
+      "acceptedAnswer": { "@type": "Answer", "text": "An ATS (Applicant Tracking System) checker analyzes your resume for the signals that automated hiring software uses to rank candidates: contact completeness, keyword density relative to the job description, quantified achievements, date formatting, and structural clarity. Most companies use ATS software to filter applications before a human ever reads them." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this ATS checker free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — completely free, no sign-up, no email, no credit card. Your resume text runs entirely in your browser and is never sent to a server." }
+    },
+    {
+      "@type": "Question",
+      "name": "What ATS score should I aim for?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A score of 80+ indicates a well-structured, ATS-ready resume. 60–79 means there are fixable issues. Below 60 indicates significant gaps that are likely costing you interviews. The keyword match score (when you paste a job description) is the most actionable number — aim for 40%+ for a strong match." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this checker guarantee ATS passage?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Every ATS system is different, and scoring criteria vary by company and software vendor. This checker identifies the most common patterns that hurt ATS performance. Improving your score here will meaningfully increase your chances, but there is no universal standard." }
+    }
+  ]
+}
+</script>
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+
+  /* ── Tool shell ── */
+  .tool-wrap{max-width:900px;margin:0 auto;padding:0 24px 100px}
+
+  /* ── Hero ── */
+  .ats-hero{padding:64px 0 48px;text-align:center}
+  .ats-hero h1{font-size:clamp(28px,4.5vw,52px);font-weight:800;letter-spacing:-1.5px;
+    margin:0 0 18px;line-height:1.1;
+    background:linear-gradient(135deg,#EEF2FF 0%,#94A3B8 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .ats-hero p{font-size:17px;color:#94A3B8;max-width:540px;margin:0 auto;line-height:1.65}
+  .trust-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .trust-row span{font-size:12px;color:#475569}
+
+  /* ── Input area ── */
+  .input-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+  @media(max-width:680px){.input-grid{grid-template-columns:1fr}}
+  .input-box{display:flex;flex-direction:column;gap:8px}
+  .input-label{font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px}
+  .input-label span{font-weight:400;color:#475569;margin-left:6px;text-transform:none;letter-spacing:0}
+  textarea{width:100%;background:#0D1117;border:1.5px solid #1A2740;border-radius:10px;
+    color:#E4EBF5;font-family:'Inter',system-ui,sans-serif;font-size:13.5px;
+    line-height:1.6;padding:14px 16px;resize:vertical;outline:none;transition:border-color .2s}
+  textarea:focus{border-color:#6366F1;box-shadow:0 0 0 3px #6366F120}
+  textarea::placeholder{color:#2D4060}
+  .check-btn{width:100%;padding:16px;background:linear-gradient(135deg,#6366F1,#3B82F6);
+    border:none;border-radius:10px;color:#fff;font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:-.2px}
+  .check-btn:hover{opacity:.88}
+  .check-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ── Results ── */
+  #results{display:none;margin-top:40px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── Score gauge ── */
+  .score-wrap{text-align:center;margin-bottom:40px;padding:36px 24px;
+    background:#0D1117;border:1px solid #1A2740;border-radius:16px}
+  .gauge-svg{display:block;margin:0 auto 12px}
+  .score-number{font-size:56px;font-weight:800;letter-spacing:-2px;line-height:1}
+  .score-label{font-size:14px;font-weight:600;margin-top:6px;letter-spacing:.3px}
+  .score-sub{font-size:12.5px;color:#475569;margin-top:8px;max-width:400px;margin-left:auto;margin-right:auto}
+
+  /* ── Summary pills ── */
+  .summary-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .pill{padding:6px 16px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid;white-space:nowrap}
+  .pill-red{background:#450a0a44;color:#f87171;border-color:#7f1d1d44}
+  .pill-amber{background:#431407aa;color:#fbbf24;border-color:#92400e44}
+  .pill-blue{background:#1e3a5f44;color:#60a5fa;border-color:#1d4ed844}
+
+  /* ── Issues list ── */
+  .section-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+    color:#6366F1;margin:36px 0 14px}
+  .issue-card{background:#0D1117;border:1px solid #1A2740;border-radius:10px;
+    padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
+  .issue-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+  .issue-body{flex:1;min-width:0}
+  .issue-title{font-size:13.5px;font-weight:700;color:#E4EBF5;margin-bottom:4px;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .issue-detail{font-size:12.5px;color:#64748B;line-height:1.6}
+  .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 8px;
+    border-radius:999px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+  .badge-critical{background:#450a0a55;color:#f87171;border:1px solid #7f1d1d44}
+  .badge-warning{background:#431407aa;color:#fbbf24;border:1px solid #92400e44}
+  .badge-info{background:#1e3a5f44;color:#60a5fa;border:1px solid #1d4ed844}
+
+  /* ── Keyword gap ── */
+  .kw-panel{background:#0D1117;border:1px solid #1A2740;border-radius:14px;padding:24px;margin-bottom:24px}
+  .kw-meter{height:8px;background:#1A2740;border-radius:999px;overflow:hidden;margin:12px 0}
+  .kw-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6366F1,#3B82F6);
+    transition:width .8s cubic-bezier(0.22,1,0.36,1)}
+  .kw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tag-present{background:#14532d44;color:#4ade80;border:1px solid #16a34a44;
+    border-radius:6px;padding:3px 10px;font-size:11.5px;font-weight:600}
+  .tag-missing{background:#450a0a44;color:#f87171;border:1px solid #7f1d1d44;
+    border-radius:6px;padding:3px 10px;font-size:11.5px;font-weight:600}
+
+  /* ── Fix CTA ── */
+  .fix-cta{background:linear-gradient(160deg,#6366F114,#3B82F614);
+    border:1.5px solid #6366F128;border-radius:14px;padding:28px 28px;
+    text-align:center;margin-top:36px}
+  .fix-cta h3{font-size:20px;font-weight:800;color:#EEF2FF;margin:0 0 10px;letter-spacing:-.4px}
+  .fix-cta p{font-size:14px;color:#94A3B8;margin:0 0 20px;line-height:1.6}
+  .fix-btn{display:inline-block;padding:13px 32px;background:linear-gradient(135deg,#6366F1,#3B82F6);
+    border:none;border-radius:8px;color:#fff;font-family:'Inter',system-ui,sans-serif;
+    font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .2s;
+    letter-spacing:-.2px}
+  .fix-btn:hover{opacity:.88;text-decoration:none}
+
+  /* ── How it works ── */
+  .how-section{margin-top:80px;padding-top:60px;border-top:1px solid #1A2740}
+  .how-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;margin-top:32px}
+  .how-card{background:#0D1117;border:1px solid #1A2740;border-radius:12px;padding:20px}
+  .how-num{font-size:12px;font-weight:800;color:#6366F1;margin-bottom:10px;
+    background:#6366F114;border:1px solid #6366F128;border-radius:999px;
+    display:inline-block;padding:2px 10px}
+  .how-card h3{font-size:15px;font-weight:700;color:#E4EBF5;margin:0 0 8px}
+  .how-card p{font-size:13px;color:#64748B;margin:0;line-height:1.6}
+
+  /* ── FAQ ── */
+  .faq-section{margin-top:60px;padding-top:48px;border-top:1px solid #1A2740}
+  .faq-section h2{font-size:24px;font-weight:800;color:#EEF2FF;margin:0 0 24px;letter-spacing:-.5px}
+
+  /* ── All-clear ── */
+  .all-clear{background:#14532d22;border:1px solid #16a34a44;border-radius:12px;
+    padding:20px 24px;color:#4ade80;font-size:14px;font-weight:600;text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">ApplyCraft</a>
+  <a href="/" class="nav-cta">Build My Resume Free →</a>
+</nav>
+
+<div class="tool-wrap">
+
+  <!-- Hero -->
+  <div class="ats-hero">
+    <p style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#6366F1;margin:0 0 16px">Free ATS Resume Checker</p>
+    <h1>See exactly how your resume<br>scores — and how to fix it</h1>
+    <p>Paste your resume below. Get an instant ATS score, a keyword gap analysis against any job description, and a prioritized fix list. Runs in your browser — nothing is ever uploaded.</p>
+    <div class="trust-row">
+      <span>✓ Free, no sign-up</span>
+      <span>✓ 100% private</span>
+      <span>✓ Results in under 5 seconds</span>
+      <span>✓ Works in any language</span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-grid">
+    <div class="input-box">
+      <label class="input-label" for="resume-text">Your resume <span>— paste as plain text</span></label>
+      <textarea id="resume-text" rows="18" placeholder="Paste your full resume here...
+
+Jane Smith
+jane@email.com | +1 555 000 0000 | linkedin.com/in/janesmith
+
+EXPERIENCE
+Senior Engineer — Acme Corp (2021–Present)
+• Led migration of legacy system, cutting deploy time by 60%
+• Built CI/CD pipeline adopted by 4 teams across 200+ services
+
+SKILLS
+Python, React, AWS, Terraform, PostgreSQL
+
+EDUCATION
+B.Sc. Computer Science — MIT, 2019"></textarea>
+    </div>
+    <div class="input-box">
+      <label class="input-label" for="jd-text">Job description <span>— optional, enables keyword match</span></label>
+      <textarea id="jd-text" rows="18" placeholder="Paste the job description here to get a keyword gap analysis.
+
+This is optional — without it, you'll still get a full ATS readiness score for formatting, structure, quantification, and completeness.
+
+With it, you'll also see:
+  • Which keywords you match ✓
+  • Which are missing ✗
+  • Your keyword match % vs. the role"></textarea>
+    </div>
+  </div>
+  <button class="check-btn" id="check-btn" onclick="runCheck()">Check My Resume →</button>
+
+  <!-- Results -->
+  <div id="results">
+
+    <!-- Score gauge -->
+    <div class="score-wrap">
+      <svg class="gauge-svg" id="gauge-svg" width="180" height="100" viewBox="0 0 180 100">
+        <path d="M20 90 A70 70 0 0 1 160 90" fill="none" stroke="#1A2740" stroke-width="12" stroke-linecap="round"/>
+        <path id="gauge-arc" d="M20 90 A70 70 0 0 1 160 90" fill="none" stroke="#6366F1" stroke-width="12"
+          stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220" style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1),stroke .4s"/>
+      </svg>
+      <div class="score-number" id="score-num" style="color:#6366F1">—</div>
+      <div class="score-label" id="score-label" style="color:#94A3B8">Checking…</div>
+      <div class="score-sub">ATS Readiness Score — reflects structure, completeness, and content quality. Not a guarantee of ATS passage, since every system differs.</div>
+      <div class="summary-pills" id="summary-pills"></div>
+    </div>
+
+    <!-- Keyword gap (shown only when JD provided) -->
+    <div id="kw-section" style="display:none">
+      <div class="section-head">Keyword Match</div>
+      <div class="kw-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:22px;font-weight:800;color:#E4EBF5" id="kw-pct">—%</div>
+            <div style="font-size:12px;color:#64748B;margin-top:2px">keyword match with job description</div>
+          </div>
+          <div style="font-size:12px;color:#64748B;text-align:right">
+            <span id="kw-present-count">0</span> keywords matched · <span id="kw-missing-count">0</span> missing
+          </div>
+        </div>
+        <div class="kw-meter"><div class="kw-fill" id="kw-fill" style="width:0%"></div></div>
+        <div id="kw-present-tags" class="kw-tags"></div>
+        <div style="margin-top:16px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px">Missing keywords</div>
+        <div id="kw-missing-tags" class="kw-tags" style="margin-top:8px"></div>
+        <p style="font-size:12px;color:#475569;margin:14px 0 0;line-height:1.6">
+          Add the missing keywords naturally in your experience and skills sections. Never force keywords that don't reflect your actual experience — tailor honestly.
+        </p>
+      </div>
+    </div>
+
+    <!-- Issues -->
+    <div class="section-head" id="issues-head">Issues</div>
+    <div id="issues-list"></div>
+    <div id="all-clear" class="all-clear" style="display:none">
+      ✓ No significant issues detected — your resume is well-structured for ATS parsing.
+    </div>
+
+    <!-- Fix CTA -->
+    <div class="fix-cta">
+      <h3>Fix these issues in the builder →</h3>
+      <p>ApplyCraft's guided editor shows your ATS score in real time as you type. Pick a template, fill in the gaps highlighted above, and download a polished PDF or DOCX — free, no account needed.</p>
+      <button class="fix-btn" onclick="openInBuilder()">Open ApplyCraft Builder — it's free →</button>
+    </div>
+
+  </div><!-- /results -->
+
+  <!-- How it works -->
+  <div class="how-section">
+    <p style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#6366F1;margin:0 0 12px">How it works</p>
+    <h2 style="font-size:28px;font-weight:800;color:#EEF2FF;margin:0 0 6px;letter-spacing:-.6px">What this checker actually measures</h2>
+    <p style="font-size:15px;color:#64748B;margin:0">Five categories that determine how well your resume performs with ATS software.</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">Contact</div>
+        <h3>Contact completeness</h3>
+        <p>Email, phone, and LinkedIn URL. ATS systems extract these to build your candidate profile — missing any reduces your parseable score.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Structure</div>
+        <h3>Section detection</h3>
+        <p>Experience, education, and skills sections must be clearly labeled so parsers can identify and rank them correctly.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Numbers</div>
+        <h3>Quantification</h3>
+        <p>Bullets with metrics (%, $, headcount, time) rank higher and signal impact. At least one number per role is the baseline.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Dates</div>
+        <h3>Date formatting</h3>
+        <p>ATS systems calculate tenure and flag gaps using year ranges. Roles without dates create parsing errors and reduce completeness score.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Keywords</div>
+        <h3>Keyword match</h3>
+        <p>When you paste a job description, we tokenize both documents and show the exact overlap and gaps. Target 40%+ for competitive roles.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <h2>Common questions</h2>
+    <details>
+      <summary>What is an ATS resume checker?</summary>
+      <p>An ATS (Applicant Tracking System) checker analyzes your resume for the signals automated hiring software uses to rank candidates — contact completeness, keyword density, quantified achievements, date formatting, and structural clarity. Most mid-to-large companies use ATS software to filter applications before a human ever reads them.</p>
+    </details>
+    <details>
+      <summary>Is this ATS checker really free?</summary>
+      <p>Yes — completely free, no sign-up, no email address, no credit card. Your resume text runs entirely in your browser using JavaScript. Nothing is ever sent to a server or stored anywhere.</p>
+    </details>
+    <details>
+      <summary>What ATS score should I aim for?</summary>
+      <p>A score of 80+ indicates a well-structured, ATS-ready resume. 60–79 means there are fixable issues. Below 60 indicates significant gaps that are likely costing you interviews. When you also paste a job description, the keyword match percentage is the most actionable number — aim for 40%+ for a strong match against a specific role.</p>
+    </details>
+    <details>
+      <summary>Does this tool guarantee I'll pass ATS?</summary>
+      <p>No. Every ATS system is different — Greenhouse, Lever, Workday, Taleo all use different scoring criteria. This checker identifies the most common patterns that hurt ATS performance across all major systems. Improving your score here will meaningfully increase your chances, but there is no universal guarantee.</p>
+    </details>
+    <details>
+      <summary>What's the best way to use the keyword gap feature?</summary>
+      <p>Paste the exact job posting — including the full description, not just the title. Then add the missing keywords naturally into your experience and skills sections, but only if they genuinely reflect your background. Never fabricate experience to hit keywords; a tailored resume that's honest is both more ethical and more effective when you reach the interview stage.</p>
+    </details>
+    <details>
+      <summary>Can I check a resume in French, Arabic, or Spanish?</summary>
+      <p>Yes. The structural and quantification checks work in any language. The keyword matching compares your resume against whatever job description you paste, so multilingual matching works automatically. ApplyCraft's full builder supports 50+ languages with live preview and PDF/DOCX export.</p>
+    </details>
+  </div>
+
+</div><!-- /tool-wrap -->
+
+<footer>
+  <div class="page">
+    <p>© 2026 ApplyCraft · <a href="/">Home</a> · <a href="/ats-checker/">ATS Checker</a> · <a href="/privacy/">Privacy</a> · <a href="/about/">About</a> · <a href="/help/">Help</a> · <a href="/contact/">Contact</a></p>
+  </div>
+</footer>
+
+<script>
+// ── Stopwords ──────────────────────────────────────────────────────
+const STOP = new Set(['and','or','the','a','an','in','on','to','for','of','with','at','by','from','as','is','are','was','were','be','been','have','has','had','do','does','did','will','would','can','could','should','may','might','must','shall','not','but','if','then','than','that','this','these','those','it','its','we','our','you','your','they','their','he','she','him','her','i','me','my','us','any','all','more','most','some','such','own','same','other','also','just','into','over','after','before','during','through','between','each','only','very','too','so','up','out','about','no','new','need','work','experience','years','year','role','team','company','skills','ability','strong','proven','excellent','good','great','well','using','use','used','including','include','includes','within','across','multiple','various','key','core','day','days','time','high','low','able','ensure','ensure','provide','provides','provided','making','make','take','takes','help','helps','both','per','etc']);
+
+function tokenize(text) {
+  return text.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !STOP.has(w) && isNaN(w));
+}
+
+// ── Weak bullet detection ──────────────────────────────────────────
+const WEAK_RE = /^(responsible for|helped?( to)?|assisted?( with)?|worked on|was part of|involved in|supported?|participated in|contributed to|did |handled |performed |undertook |was involved)/i;
+function isWeakBullet(line) {
+  const t = line.trim();
+  if (t.length < 10) return false;
+  return WEAK_RE.test(t);
+}
+
+// ── Main scoring engine ────────────────────────────────────────────
+function scoreResume(text, jdText) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const issues = [];
+
+  // Contact info
+  const hasEmail   = /\b[\w.+%-]+@[\w.-]+\.[a-z]{2,}\b/i.test(text);
+  const hasPhone   = /(\+?\d[\d\s\-().]{6,14}\d)/.test(text);
+  const hasLinkedin= /linkedin\.com/i.test(text);
+
+  // Sections
+  const hasExperience = /\b(experience|work history|employment|career history)\b/i.test(text) || /\b(20\d{2}|19[89]\d)\b/.test(text);
+  const hasEducation  = /\b(education|degree|university|college|bachelor|master|phd|mba|diploma|graduate|undergraduate)\b/i.test(text);
+  const hasSkills     = /\b(skills|technologies|tech stack|tools|expertise|proficient|competencies)\b/i.test(text);
+  const hasSummary    = /\b(summary|profile|objective|about me|professional)\b/i.test(text);
+
+  // Dates
+  const hasDates = /\b(20\d{2}|19[89]\d)\b/.test(text);
+
+  // Quantification
+  const bulletLines = lines.filter(l => /^[•\-\*▸›>]/.test(l) || (l.length > 20 && l.length < 220));
+  const hasNumbers  = bulletLines.some(l => /\d/.test(l));
+  const numberedCount = bulletLines.filter(l => /\d/.test(l)).length;
+  const totalBullets  = Math.max(bulletLines.length, 1);
+
+  // Passive bullets
+  const weakLines = lines.filter(isWeakBullet);
+
+  // Long lines
+  const longLines = lines.filter(l => l.length > 180);
+
+  // Word count
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+
+  // ── CRITICAL issues ──
+  if (!hasEmail)      issues.push({ level:'critical', icon:'✉️', title:'No email address detected', detail:'ATS systems extract your email to create your candidate profile. Without it, your application cannot be processed by most systems.' });
+  if (!hasExperience) issues.push({ level:'critical', icon:'📋', title:'No work experience section detected', detail:'Work experience is the most heavily weighted section in ATS ranking. Ensure your experience section is clearly labeled with a heading like "Experience" or "Work History."' });
+  if (!hasSkills)     issues.push({ level:'critical', icon:'⚡', title:'No skills section detected', detail:'ATS systems scan your skills section for exact keyword matches against the job description. This section has the highest keyword density impact. Add a "Skills" or "Technologies" section.' });
+
+  // ── WARNING issues ──
+  if (!hasPhone)     issues.push({ level:'warning', icon:'📞', title:'No phone number detected', detail:'Phone number is extracted by ATS systems for your candidate profile. Its absence may reduce completeness scoring in some systems.' });
+  if (!hasLinkedin)  issues.push({ level:'warning', icon:'🔗', title:'No LinkedIn URL', detail:'Many ATS systems auto-link your LinkedIn profile and score completeness partly on its presence. It also helps recruiters verify your background quickly.' });
+  if (!hasSummary)   issues.push({ level:'warning', icon:'📝', title:'No professional summary detected', detail:'A 2–4 sentence summary at the top increases keyword density and gives ATS systems immediate context about your profile before parsing experience.' });
+  if (hasExperience && !hasNumbers) issues.push({ level:'warning', icon:'🔢', title:'No quantified achievements detected', detail:'Bullets without numbers (%, $, team size, time saved, revenue) score lower in ATS ranking and are less compelling to human reviewers. Add at least one metric per role.' });
+  if (hasExperience && !hasDates) issues.push({ level:'warning', icon:'📅', title:'No dates found in experience', detail:'ATS systems calculate tenure and employment gaps from year ranges. Include start and end years on each role (e.g. Jan 2021 – Mar 2024).' });
+  if (weakLines.length > 0) issues.push({ level:'warning', icon:'✍️', title:`${weakLines.length} passive bullet opener${weakLines.length > 1 ? 's' : ''}`, detail:'Phrases like "Responsible for", "Helped", or "Assisted" are passive and keyword-poor. Use active-verb equivalents: "Led", "Built", "Reduced", "Grew". They also signal stronger impact to recruiters.' });
+  if (longLines.length > 0) issues.push({ level:'warning', icon:'📏', title:`${longLines.length} line${longLines.length > 1 ? 's' : ''} over 180 characters`, detail:'Very long lines are often truncated or misread by ATS parsers. Split each bullet into one focused sentence — aim for 80–140 characters per bullet.' });
+  if (wordCount < 200) issues.push({ level:'warning', icon:'📄', title:`Resume appears too short (${wordCount} words)`, detail:`A strong resume typically has 350–800 words. Add more detail to your experience section — specific projects, technologies used, and measurable outcomes.` });
+
+  // ── INFO issues ──
+  if (!hasEducation) issues.push({ level:'info', icon:'🎓', title:'Education section not detected', detail:'Some ATS systems require at least one education entry to complete parsing. Add your highest qualification at a minimum.' });
+  if (wordCount > 1200) issues.push({ level:'info', icon:'📏', title:`Resume may be too long (${wordCount} words)`, detail:`Most ATS systems and recruiters prefer resumes under 2 pages (~800 words). Consider condensing to the most relevant recent experience.` });
+
+  // ── Score calculation (matches React app logic) ──
+  const score = Math.max(0, 100
+    - issues.filter(i => i.level === 'critical').length * 20
+    - issues.filter(i => i.level === 'warning').length * 8
+    - issues.filter(i => i.level === 'info').length * 3);
+
+  // ── Keyword gap (only if JD provided) ──
+  let kwGap = null;
+  if (jdText && jdText.trim().length > 30) {
+    const jdWords  = new Set(tokenize(jdText));
+    const cvWords  = new Set(tokenize(text));
+    if (jdWords.size > 3) {
+      const present = [...jdWords].filter(w => cvWords.has(w));
+      const missing = [...jdWords].filter(w => !cvWords.has(w));
+      const pct = Math.round((present.length / jdWords.size) * 100);
+      kwGap = { present: present.slice(0, 20), missing: missing.slice(0, 20), pct, total: jdWords.size };
+
+      // Add keyword issue to list
+      if (pct < 30) issues.unshift({ level:'critical', icon:'🎯', title:`Low keyword match: ${pct}% vs. job description`, detail:`Your resume matches only ${pct}% of unique keywords in the job description. Most ATS systems rank candidates with 40%+ match significantly higher. See the Missing Keywords section below.` });
+      else if (pct < 45) issues.unshift({ level:'warning', icon:'🎯', title:`Keyword match: ${pct}% vs. job description`, detail:`You match ${pct}% of the job's unique keywords. Strong ATS candidates typically hit 45–70% for targeted roles. Add missing keywords naturally in your skills and experience.` });
+    }
+  }
+
+  return { score, issues, kwGap, wordCount };
+}
+
+// ── SVG gauge ─────────────────────────────────────────────────────
+function setGauge(score) {
+  const arc  = document.getElementById('gauge-arc');
+  const total = 220;
+  const fill  = total * (score / 100);
+  arc.style.strokeDashoffset = total - fill;
+  const color = score >= 80 ? '#4ade80' : score >= 60 ? '#fbbf24' : score >= 40 ? '#fb923c' : '#f87171';
+  arc.style.stroke = color;
+  document.getElementById('score-num').style.color  = color;
+  document.getElementById('score-label').style.color = color;
+  return color;
+}
+
+// ── Render results ────────────────────────────────────────────────
+function runCheck() {
+  const text   = document.getElementById('resume-text').value.trim();
+  const jdText = document.getElementById('jd-text').value.trim();
+
+  if (text.length < 40) {
+    alert('Please paste your resume text first (at least a few lines).');
+    return;
+  }
+
+  const btn = document.getElementById('check-btn');
+  btn.disabled = true;
+  btn.textContent = 'Analysing…';
+
+  setTimeout(() => {
+    const { score, issues, kwGap, wordCount } = scoreResume(text, jdText);
+
+    // Show results block
+    const results = document.getElementById('results');
+    results.style.display = 'block';
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Score
+    const color = setGauge(score);
+    const num = document.getElementById('score-num');
+    num.textContent = score;
+    const labelMap = { 80: 'ATS Ready', 60: 'Needs Work', 40: 'Action Required', 0: 'Critical Issues' };
+    const label = Object.entries(labelMap).reverse().find(([k]) => score >= +k)?.[1] || 'Critical Issues';
+    document.getElementById('score-label').textContent = label;
+
+    // Summary pills
+    const pills = document.getElementById('summary-pills');
+    const critCount = issues.filter(i => i.level === 'critical').length;
+    const warnCount = issues.filter(i => i.level === 'warning').length;
+    const infoCount = issues.filter(i => i.level === 'info').length;
+    pills.innerHTML = [
+      critCount ? `<span class="pill pill-red">${critCount} Critical</span>` : '',
+      warnCount ? `<span class="pill pill-amber">${warnCount} Warning</span>` : '',
+      infoCount ? `<span class="pill pill-blue">${infoCount} Info</span>` : '',
+      !critCount && !warnCount ? '<span class="pill" style="background:#14532d44;color:#4ade80;border-color:#16a34a44">All good</span>' : '',
+    ].join('');
+
+    // Keyword gap
+    if (kwGap) {
+      document.getElementById('kw-section').style.display = 'block';
+      document.getElementById('kw-pct').textContent = kwGap.pct + '%';
+      document.getElementById('kw-present-count').textContent = kwGap.present.length;
+      document.getElementById('kw-missing-count').textContent = kwGap.missing.length;
+      setTimeout(() => { document.getElementById('kw-fill').style.width = kwGap.pct + '%'; }, 100);
+      document.getElementById('kw-present-tags').innerHTML =
+        '<span style="font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px">Matched keywords</span>' +
+        kwGap.present.map(w => `<span class="tag-present">✓ ${w}</span>`).join('');
+      document.getElementById('kw-missing-tags').innerHTML =
+        kwGap.missing.map(w => `<span class="tag-missing">✗ ${w}</span>`).join('') ||
+        '<span style="color:#4ade80;font-size:13px">✓ No significant missing keywords!</span>';
+    } else {
+      document.getElementById('kw-section').style.display = 'none';
+    }
+
+    // Issues list
+    const nonKwIssues = issues.filter(i => !i.title.includes('keyword match') && !i.title.includes('Keyword match'));
+    const list = document.getElementById('issues-list');
+    if (nonKwIssues.length === 0) {
+      list.innerHTML = '';
+      document.getElementById('all-clear').style.display = 'block';
+    } else {
+      document.getElementById('all-clear').style.display = 'none';
+      list.innerHTML = nonKwIssues.map(issue => `
+        <div class="issue-card">
+          <div class="issue-icon">${issue.icon}</div>
+          <div class="issue-body">
+            <div class="issue-title">
+              <span>${issue.title}</span>
+              <span class="badge badge-${issue.level}">${issue.level}</span>
+            </div>
+            <div class="issue-detail">${issue.detail}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Save text for builder handoff
+    try { localStorage.setItem('ac_ats_text', text); } catch(e) {}
+
+    btn.disabled = false;
+    btn.textContent = 'Re-check →';
+  }, 320);
+}
+
+// ── Open in builder ───────────────────────────────────────────────
+function openInBuilder() {
+  try { localStorage.setItem('ac_ats_text', document.getElementById('resume-text').value.trim()); } catch(e) {}
+  window.location.href = '/';
+}
+
+// ── Enter key on textareas doesn't submit ──────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) { runCheck(); }
+});
+</script>
+</body>
+</html>
