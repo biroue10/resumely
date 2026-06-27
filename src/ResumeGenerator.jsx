@@ -2881,13 +2881,13 @@ Awards: ${form.awards}`;
               letterSpacing: "-2px", margin: "0 0 24px",
               background: "linear-gradient(135deg, #EEF2FF 0%, #94A3B8 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              Create a professional,<br />ATS-friendly CV in 50+ languages.
+              The CV builder that actually<br />works in Arabic, French, and 50+ languages.
             </h1>
             <p style={{ animation: "acFadeUp 0.65s ease 0.34s both",
               fontSize: "clamp(16px, 2vw, 20px)", color: C.text2, maxWidth: 520,
               margin: "0 auto 44px", lineHeight: 1.65 }}>
-              Build, translate, and tailor your CV for jobs worldwide using
-              professional templates and AI-powered suggestions.
+              ATS-friendly templates, live preview, PDF & DOCX export.
+              Free forever — no sign-up, no watermark, no data stored.
             </p>
             <div style={{ animation: "acFadeUp 0.65s ease 0.5s both",
               display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -3157,7 +3157,7 @@ Awards: ${form.awards}`;
                             {demoTitle || <span style={{ color: "#ddd" }}>Job Title</span>}
                           </div>
                           <div style={{ display: "flex", gap: 12, fontSize: 11, color: "#777", flexWrap: "wrap" }}>
-                            <span>biroueisaac@gmail.com</span>
+                            <span>you@email.com</span>
                             <span style={{ color: tpl.accent }}>·</span>
                             <span>linkedin.com/in/yourname</span>
                           </div>
@@ -3296,7 +3296,7 @@ Awards: ${form.awards}`;
             </FadeIn>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 0 }}>
               {[
-                { n: "1", title: "Pick a template", desc: "Choose from 12 professional designs — from minimal to bold. Every template is ATS-safe." },
+                { n: "1", title: "Pick a template", desc: "Choose from 22 professional designs — from minimal to bold. Every template is ATS-safe." },
                 { n: "2", title: "Fill in your details", desc: "Type directly into the live form. The preview updates in real time as you write." },
                 { n: "3", title: "Download & apply", desc: "Export as PDF or DOCX in your chosen language. Ready to send in under 5 minutes." },
               ].map((s, i) => (
@@ -3433,30 +3433,18 @@ Awards: ${form.awards}`;
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
               {[
-                { icon: "🌍", title: "Create a CV in 50+ languages", desc: "Switch the full interface and document language with one click. Every label, date format, and section adapts automatically.", live: true },
-                { icon: "🔄", title: "Translate an existing CV", desc: "Paste your CV and translate all content to a new language instantly — no rebuilding from scratch.", live: true },
-                { icon: "🖋️", title: "Preserve formatting during translation", desc: "Your layout, template, and design stay pixel-perfect after translation. Only the words change.", live: true },
-                { icon: "🗺️", title: "Adapt terminology to the target country", desc: "Job titles, section headings, and professional terms are localised to match expectations in the destination country.", soon: true },
-                { icon: "✨", title: "Localised titles & summaries", desc: "AI generates job-market-appropriate titles and professional summaries in the target language.", soon: true },
-                { icon: "↔️", title: "Full right-to-left support", desc: "Arabic, Hebrew, Farsi and other RTL languages render with correct alignment, mirroring, and typography.", live: true },
-                { icon: "✅", title: "Grammar & spelling check", desc: "Automatic grammar and spelling verification in the selected language before you download.", soon: true },
-                { icon: "📦", title: "Export in multiple languages", desc: "Download the same CV as separate PDFs in English, French, Spanish — one click per language.", soon: true },
-                { icon: "📝", title: "Multilingual cover letters", desc: "Generate a matching cover letter in any language with the same formatting as your resume.", live: true },
-                { icon: "🎯", title: "Tailor to a job description", desc: "Paste a job posting and the AI rewrites your CV to match keywords and requirements in any language.", soon: true },
+                { icon: "🌍", title: "Create a CV in 50+ languages", desc: "Switch the full interface and document language with one click. Every label, date format, and section adapts automatically." },
+                { icon: "↔️", title: "Full right-to-left support", desc: "Arabic, Hebrew, Farsi and other RTL languages render with correct alignment, mirroring, and typography." },
+                { icon: "🖋️", title: "Formatting survives translation", desc: "Your layout, template, and design stay pixel-perfect after translation. Only the words change." },
+                { icon: "📝", title: "Multilingual cover letters", desc: "Generate a matching cover letter in any language with the same formatting as your resume." },
+                { icon: "🔄", title: "Translate an existing CV", desc: "Paste your CV and translate all content to a new language instantly — no rebuilding from scratch." },
               ].map((f, i) => (
                 <FadeIn key={f.title} delay={i * 55}>
                   <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
-                    borderRadius: 3, padding: "22px 20px", position: "relative",
-                    opacity: f.soon ? 0.75 : 1,
+                    borderRadius: 3, padding: "22px 20px",
                     transition: "border-color 0.2s, transform 0.2s" }}
-                    onMouseEnter={e => { if (!f.soon) { e.currentTarget.style.borderColor = `${C.accent}66`; e.currentTarget.style.transform = "translateY(-2px)"; } }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.accent}66`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "none"; }}>
-                    {f.soon && (
-                      <span style={{ position: "absolute", top: 14, right: 14, fontSize: 9.5, fontWeight: 700,
-                        textTransform: "uppercase", letterSpacing: "1px", color: C.accent2,
-                        background: `${C.accent}22`, border: `1px solid ${C.accent}44`,
-                        borderRadius: 999, padding: "2px 8px" }}>Soon</span>
-                    )}
                     <div style={{ fontSize: 26, marginBottom: 10 }}>{f.icon}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 6 }}>{f.title}</div>
                     <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.65 }}>{f.desc}</div>
@@ -3484,7 +3472,7 @@ Awards: ${form.awards}`;
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16, marginBottom: 40 }}>
               {[
                 { icon: "🔒", title: "Nothing is ever stored", body: "ApplyCraft has no database. Your resume content lives only in your browser tab. Close it and it's gone — permanently." },
-                { icon: "🤖", title: "Never used to train AI", body: "Your data is never sent to any AI provider or used to train any model. The AI features run entirely on your device." },
+                { icon: "🤖", title: "Never used to train AI", body: "When you use AI polish, your text is processed and immediately discarded — never logged, never stored, never used to train any model." },
                 { icon: "🇪🇺", title: "GDPR compliant by design", body: "We don't set cookies, don't use analytics trackers, and don't process any personal data on a server — making GDPR compliance automatic." },
                 { icon: "🗑️", title: "Delete anytime, instantly", body: "Close the tab and everything disappears. No account to delete. No data deletion request form. No 30-day wait." },
                 { icon: "📍", title: "Data stays on your device", body: "PDF and DOCX generation happens in your browser using JavaScript. Your resume never travels through our servers." },
@@ -3512,52 +3500,31 @@ Awards: ${form.awards}`;
           </div>
         </div>
 
-        {/* Testimonials */}
-        <div style={{ borderTop: `1px solid ${C.border}`, padding: "80px 24px" }}>
-          <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-            <FadeIn style={{ textAlign: "center", marginBottom: 52 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase",
-                letterSpacing: "2px", color: C.accent2, marginBottom: 14 }}>What users say</p>
-              <h2 style={{ fontSize: "clamp(22px, 3vw, 38px)", fontWeight: 800,
-                letterSpacing: "-0.8px", color: C.text1, margin: 0 }}>
-                Real results from real job seekers
+        {/* Early adopter CTA — replaces fake testimonials */}
+        <div style={{ borderTop: `1px solid ${C.border}`, padding: "72px 24px" }}>
+          <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
+            <FadeIn>
+              <div style={{ fontSize: 36, marginBottom: 16 }}>🚀</div>
+              <h2 style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 800,
+                letterSpacing: "-0.6px", color: C.text1, margin: "0 0 14px" }}>
+                We're just getting started
               </h2>
+              <p style={{ fontSize: 15.5, color: C.text2, lineHeight: 1.7, margin: "0 0 12px" }}>
+                ApplyCraft is a new, independent tool built by one person who got tired of resume builders
+                that paywalled basic features, added watermarks, and stored personal data without consent.
+              </p>
+              <p style={{ fontSize: 14.5, color: C.text3, lineHeight: 1.7, margin: "0 0 32px" }}>
+                No fake reviews. No VC spin. If you use ApplyCraft and it helps you land an interview,
+                we'd genuinely love to hear about it — your feedback shapes what gets built next.
+              </p>
+              <a href="mailto:biroueisaac@gmail.com?subject=ApplyCraft feedback"
+                style={{ display: "inline-flex", alignItems: "center", gap: 8,
+                  background: C.grad, color: "#fff", borderRadius: 8,
+                  padding: "12px 28px", fontSize: 14.5, fontWeight: 700,
+                  textDecoration: "none" }}>
+                Share your experience →
+              </a>
             </FadeIn>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 20 }}>
-              {[
-                { name: "Sarah M.", role: "Software Engineer, Berlin", stars: 5, text: "I had been struggling with my resume for weeks. ApplyCraft let me build a clean, ATS-friendly version in 20 minutes. Got a callback from my top choice company two days later." },
-                { name: "Karim B.", role: "IT Support Technician, Dubai", stars: 5, text: "The Arabic RTL support is flawless. I've tried every free resume builder online — this is the only one that actually handles Arabic correctly and exports a proper PDF." },
-                { name: "Léa T.", role: "Marketing Manager, Paris", stars: 5, text: "Le fait qu'il n'y ait aucune inscription ni filigrane est incroyable. J'ai téléchargé mon CV en 10 minutes, en français, sans créer de compte." },
-                { name: "Tyler R.", role: "Recent Graduate, Toronto", stars: 5, text: "As a new grad with no money for paid tools, this was exactly what I needed. The student template helped me highlight my projects and internship. Landed 3 interviews in a week." },
-                { name: "Priya N.", role: "Linux Administrator, Austin", stars: 5, text: "I love that my data never leaves my browser. As a sysadmin I'm very cautious about where I put personal information. ApplyCraft is the only resume builder I trust." },
-                { name: "James W.", role: "Customer Service Lead, Manchester", stars: 5, text: "The UK CV template is perfect. Right length, right format, professional personal statement section. Saved me hours compared to formatting in Word." },
-              ].map((t, i) => (
-                <FadeIn key={t.name} delay={i * 70}>
-                  <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
-                    borderRadius: 12, padding: "24px 22px" }}>
-                    <div style={{ display: "flex", gap: 2, marginBottom: 14 }}>
-                      {Array.from({ length: t.stars }).map((_, si) => (
-                        <span key={si} style={{ color: "#F59E0B", fontSize: 14 }}>★</span>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13.5, color: C.text2, lineHeight: 1.7, margin: "0 0 18px" }}>
-                      "{t.text}"
-                    </p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.grad,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                        {t.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{t.name}</div>
-                        <div style={{ fontSize: 11.5, color: C.text3 }}>{t.role}</div>
-                      </div>
-                    </div>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
           </div>
         </div>
 
