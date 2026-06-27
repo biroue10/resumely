@@ -330,7 +330,7 @@ const SAMPLE_COVER = {
 // ── Author info (edit here to update the footer) ─────────────────
 const AUTHOR = {
   name: "Isaac Biroue",
-  email: "biroueisaac@gmail.com",
+  email: "hello@applycraft.io",
   github: "https://github.com/biroue10",
   linkedin: "", // paste your LinkedIn URL here, e.g. "https://linkedin.com/in/yourname"
 };
@@ -3517,7 +3517,7 @@ Awards: ${form.awards}`;
                 No fake reviews. No VC spin. If you use ApplyCraft and it helps you land an interview,
                 we'd genuinely love to hear about it — your feedback shapes what gets built next.
               </p>
-              <a href="mailto:biroueisaac@gmail.com?subject=ApplyCraft feedback"
+              <a href="mailto:hello@applycraft.io?subject=ApplyCraft feedback"
                 style={{ display: "inline-flex", alignItems: "center", gap: 8,
                   background: C.grad, color: "#fff", borderRadius: 8,
                   padding: "12px 28px", fontSize: 14.5, fontWeight: 700,
@@ -3543,7 +3543,7 @@ Awards: ${form.awards}`;
               { q: "Do you store or sell my data?",
                 a: "No. Everything you type lives only in your browser. ApplyCraft has no backend, no database, and no account system. Nothing leaves your device. When you close the tab, your data is gone." },
               { q: "Are the templates ATS-compatible?",
-                a: "Yes. All 12 resume templates are built with clean, linear HTML that applicant tracking systems can parse without issues — no multi-column hacks, no images replacing text." },
+                a: "Yes. All 22 resume templates are built with clean, linear HTML that applicant tracking systems can parse without issues — no multi-column hacks, no images replacing text." },
               { q: "Can I really use 50+ languages?",
                 a: "Yes. Type directly in any language, switch document labels and date formats, and use the Translate button to convert an existing CV to a different language without rebuilding from scratch. RTL languages like Arabic are fully supported." },
               { q: "What download formats are available?",
