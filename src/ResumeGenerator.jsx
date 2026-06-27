@@ -261,6 +261,134 @@ const TEMPLATES = [
   { id: "pulse",    name: "Pulse",    tag: "Gradient left bar, modern startup",      accent: "#8b5cf6", font: "'Inter', system-ui, sans-serif" },
 ];
 
+// ── Per-template thumbnail samples (6 visible slots on landing) ───
+const THUMB_SAMPLES = {
+  classic: {
+    rtl: true,
+    result: {
+      name: "يوسف الأمين",
+      title: "مهندس برمجيات أول",
+      contact: ["youssef@example.com", "+212 661 234 567", "الدار البيضاء، المغرب"],
+      summary: "مهندس برمجيات بخبرة تزيد عن عشر سنوات في تطوير تطبيقات الويب والأنظمة الموزعة. متخصص في هندسة الخدمات المصغرة وقواعد البيانات عالية الأداء.",
+      sections: [
+        { heading: "الخبرة المهنية", items: [
+          "كبير مهندسي البرمجيات — مجموعة OCP (2020–الحاضر)",
+          "قاد تطوير منصة إدارة البيانات الصناعية لأكثر من 3000 مستخدم",
+          "بنى نظام مراقبة في الوقت الفعلي خفّض الأعطال بنسبة 60٪",
+          "مهندس برمجيات — Inwi (2016–2020)",
+          "بنى نظام الفوترة في الوقت الفعلي لأكثر من 10 ملايين مشترك",
+        ]},
+        { heading: "المهارات", items: ["Python", "Node.js", "React", "PostgreSQL", "Docker", "Kubernetes"] },
+        { heading: "التعليم", items: ["ماجستير علوم الحاسوب — Université Mohammed V، الرباط — 2016"] },
+        { heading: "اللغات", items: ["العربية (اللغة الأم)", "الفرنسية (طليق)", "الإنجليزية (محترف)"] },
+      ],
+    },
+  },
+  modern: {
+    rtl: false,
+    result: {
+      name: "Léa Tremblay",
+      title: "Responsable Marketing Digital",
+      contact: ["lea.tremblay@example.com", "+33 6 12 34 56 78", "Paris, France", "linkedin.com/in/leatremblay"],
+      summary: "Responsable marketing digital avec 7 ans d'expérience en acquisition client, stratégie de contenu et gestion de campagnes multicanal. Spécialisée dans les startups SaaS B2B.",
+      sections: [
+        { heading: "Expérience", items: [
+          "Head of Marketing — Payfit (2021–présent)",
+          "Augmenté le trafic organique de 180 % en 18 mois",
+          "Géré un budget publicitaire annuel de 2 M€ sur Google, LinkedIn et Meta",
+          "Marketing Manager — Doctolib (2017–2021)",
+          "Lancé 4 nouveaux marchés européens en 2 ans",
+          "Constitué l'équipe marketing de 2 à 14 personnes",
+        ]},
+        { heading: "Compétences", items: ["SEO/SEA", "Google Analytics", "HubSpot", "Salesforce", "Copywriting", "AB Testing"] },
+        { heading: "Formation", items: ["Master Marketing Digital — ESCP Business School, Paris — 2017"] },
+        { heading: "Langues", items: ["Français (langue maternelle)", "Anglais (TOEFL 110)", "Espagnol (intermédiaire)"] },
+      ],
+    },
+  },
+  minimal: {
+    rtl: false,
+    result: {
+      name: "Sarah Okonkwo",
+      title: "Software Engineer",
+      contact: ["s.okonkwo@example.com", "+44 7700 900 142", "London, UK", "github.com/sokonkwo"],
+      summary: "Full-stack engineer with 5 years building scalable web apps for fintech and e-commerce. Strong in React, Python, and cloud infrastructure.",
+      sections: [
+        { heading: "Experience", items: [
+          "Software Engineer — Monzo Bank (2022–Present)",
+          "Built real-time fraud detection pipeline processing 1M+ daily transactions",
+          "Reduced API latency by 40% through Redis caching strategy",
+          "Junior Engineer — Jumia (2019–2022)",
+          "Developed seller portal used by 120,000 merchants across Africa",
+        ]},
+        { heading: "Skills", items: ["React", "TypeScript", "Python", "FastAPI", "PostgreSQL", "AWS", "Terraform"] },
+        { heading: "Education", items: ["B.Sc. Computer Science — University of Lagos, 2019"] },
+      ],
+    },
+  },
+  bold: {
+    rtl: false,
+    result: {
+      name: "Karim Benali",
+      title: "Ingénieur Génie Civil | BTP",
+      contact: ["k.benali@example.com", "+213 555 123 456", "Alger, Algérie"],
+      summary: "Ingénieur génie civil avec 9 ans d'expérience en gestion de projets d'infrastructure à grande échelle. Expert en calculs de structures et coordination de chantiers.",
+      sections: [
+        { heading: "Expérience", items: [
+          "Chef de Projet — Cosider Groupe (2018–présent)",
+          "Supervisé la construction d'un complexe résidentiel de 450 logements (120 M€)",
+          "Coordonné 60 sous-traitants sur un chantier de 4 ans",
+          "Ingénieur Structures — Colas Algérie (2015–2018)",
+          "Conçu les fondations de l'autoroute Est-Ouest, tronçon Sétif–Constantine",
+        ]},
+        { heading: "Compétences", items: ["AutoCAD", "Revit", "ETABS", "Béton précontraint", "Eurocodes", "MS Project"] },
+        { heading: "Formation", items: ["Diplôme d'ingénieur — École Nationale Polytechnique, Alger — 2015"] },
+      ],
+    },
+  },
+  elegant: {
+    rtl: false,
+    result: {
+      name: "María García López",
+      title: "Diseñadora UX Senior",
+      contact: ["maria.garcia@example.com", "+34 612 345 678", "Barcelona, España"],
+      summary: "Diseñadora UX con 6 años de experiencia creando productos digitales centrados en el usuario para empresas de retail, banca y salud digital.",
+      sections: [
+        { heading: "Experiencia", items: [
+          "UX Lead — Glovo (2021–actualidad)",
+          "Rediseñó el flujo de checkout, aumentando la conversión un 22%",
+          "Lideró equipo de 5 diseñadoras en 3 mercados simultáneos",
+          "Diseñadora UX — CaixaBank (2018–2021)",
+          "Dirigió el rediseño de la app móvil con 3M de usuarios activos",
+        ]},
+        { heading: "Habilidades", items: ["Figma", "Adobe XD", "Investigación de usuarios", "Sistemas de diseño", "HTML/CSS"] },
+        { heading: "Formación", items: ["Máster en Diseño de Interacción — IED Barcelona — 2018"] },
+        { heading: "Idiomas", items: ["Español (nativo)", "Catalán (nativo)", "Inglés (C1)", "Francés (B2)"] },
+      ],
+    },
+  },
+  executive: {
+    rtl: false,
+    result: {
+      name: "David Chen",
+      title: "Chief Financial Officer",
+      contact: ["d.chen@example.com", "+65 9123 4567", "Singapore", "linkedin.com/in/davidchen-cfo"],
+      summary: "CFO with 18 years leading finance at high-growth technology companies across APAC. Track record of IPO preparation, M&A, and scaling finance teams from 5 to 50+.",
+      sections: [
+        { heading: "Experience", items: [
+          "CFO — Sea Limited (2019–Present)",
+          "Managed $4.2B annual revenue across Shopee, Garena, and SeaMoney",
+          "Led Singapore Exchange dual listing, raising $2.1B in 2021",
+          "VP Finance — Grab (2015–2019)",
+          "Built financial infrastructure supporting expansion to 8 countries",
+        ]},
+        { heading: "Skills", items: ["Financial Modeling", "M&A Integration", "Investor Relations", "FP&A", "IFRS", "Power BI"] },
+        { heading: "Education", items: ["MBA — INSEAD (Fontainebleau) — 2007", "B.Com. Accounting — NUS Business School — 2003"] },
+      ],
+    },
+  },
+};
+
 // ── Sample data used in template thumbnail previews ───────────────
 const SAMPLE_RESUME = {
   name: "Alexandra Johnson",
@@ -2978,7 +3106,7 @@ Awards: ${form.awards}`;
               { n: "22", label: "Templates" },
               { n: "6", label: "Cover letter styles" },
               { n: "50+", label: "Languages" },
-              { n: "0", label: "Watermarks" },
+              { n: "2", label: "Export formats" },
               { n: "∞", label: "Free downloads" },
             ].map(s => (
               <div key={s.label} style={{ textAlign: "center", minWidth: 80 }}>
@@ -4537,7 +4665,10 @@ function ThumbPreview({ tp, isMobile }) {
         background: tp.id === "tech" ? "#0d1117" : tp.id === "dusk" ? "#1a1a1a" : "#fff" }}>
         <div style={{ width: INNER_W, transform: `scale(${scale})`, transformOrigin: "top left",
           position: "absolute", top: 0, left: 0, pointerEvents: "none", userSelect: "none" }}>
-          <ResumePaper tpl={tp} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
+          <ResumePaper tpl={tp}
+            result={THUMB_SAMPLES[tp.id]?.result || SAMPLE_RESUME}
+            rtl={THUMB_SAMPLES[tp.id]?.rtl || false}
+            placeholder={false} preview />
         </div>
       </div>
     </div>
