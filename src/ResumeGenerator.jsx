@@ -730,7 +730,7 @@ const COUNTRIES = [
 ];
 
 function useIsMobile(bp = 768) {
-  const [mobile, setMobile] = useState(() => window.innerWidth < bp);
+  const [mobile, setMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < bp : false);
   useEffect(() => {
     const h = () => setMobile(window.innerWidth < bp);
     window.addEventListener("resize", h);

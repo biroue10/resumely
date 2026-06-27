@@ -1,9 +1,4 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import ResumeGenerator from "./ResumeGenerator.jsx";
+import { ViteReactSSG } from "vite-react-ssg";
+import { routes } from "./routes.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ResumeGenerator />
-  </React.StrictMode>
-);
+export const createRoot = ViteReactSSG({ routes });
