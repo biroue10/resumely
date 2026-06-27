@@ -476,6 +476,8 @@ export default function ResumeGenerator() {
     reader.onload = (ev) => setPhotoUrl(ev.target.result);
     reader.readAsDataURL(file);
   };
+  const [uploadedResume, setUploadedResume] = useState(null);
+  const [uploadDragOver, setUploadDragOver] = useState(false);
   const [appView, setAppView] = useState("landing");
   const [coverStep, setCoverStep] = useState("templates");
   const [coverTpl, setCoverTpl] = useState(null);
@@ -933,6 +935,21 @@ Awards: ${form.awards}`;
             minWidth: 36 }}>{completion}%</span>
         </div>
       </div>
+
+      {/* Uploaded resume reference banner */}
+      {uploadedResume && (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+          background: `${C.accent}10`, border: `1px solid ${C.accent}30`, borderRadius: 8,
+          marginBottom: 14 }}>
+          <span style={{ fontSize: 15 }}>📂</span>
+          <span style={{ fontSize: 12.5, color: C.text2, flex: 1 }}>
+            Reference: <strong style={{ color: C.text1 }}>{uploadedResume.name}</strong>
+          </span>
+          <button onClick={() => setUploadedResume(null)}
+            style={{ fontSize: 11, color: C.text3, background: "none", border: "none",
+              cursor: "pointer", padding: 0, fontFamily: "inherit" }}>✕</button>
+        </div>
+      )}
 
       <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
         gap: 0, flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
@@ -1671,6 +1688,57 @@ Awards: ${form.awards}`;
               {["🔒 Nothing stored", "⚡ No sign-up", "💳 No credit card", "📄 PDF & DOCX"].map(t => (
                 <span key={t} style={{ fontSize: 12.5, color: C.text3, display: "flex", alignItems: "center", gap: 5 }}>{t}</span>
               ))}
+            </div>
+
+            {/* Upload existing resume */}
+            <div style={{ animation: "acFadeUp 0.5s ease 0.8s both", marginTop: 40, maxWidth: 420, margin: "40px auto 0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: C.text3, letterSpacing: "1px",
+                  textTransform: "uppercase", whiteSpace: "nowrap" }}>or improve an existing one</span>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+              </div>
+              <label
+                htmlFor="landing-resume-upload"
+                onDragOver={e => { e.preventDefault(); setUploadDragOver(true); }}
+                onDragLeave={() => setUploadDragOver(false)}
+                onDrop={e => {
+                  e.preventDefault();
+                  setUploadDragOver(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file && (file.name.endsWith(".pdf") || file.name.endsWith(".docx"))) {
+                    setUploadedResume(file);
+                    enter("resume");
+                  }
+                }}
+                style={{ display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
+                  border: `2px dashed ${uploadDragOver ? C.accent : C.border}`,
+                  borderRadius: 12, padding: "18px 24px",
+                  background: uploadDragOver ? `${C.accent}08` : C.surface,
+                  transition: "border-color 0.2s, background 0.2s" }}
+                onMouseEnter={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.borderHi; }}
+                onMouseLeave={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.border; }}>
+                <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                  background: `${C.accent}14`, border: `1px solid ${C.accent}30`,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                  📂
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 3 }}>
+                    Upload your resume
+                  </div>
+                  <div style={{ fontSize: 12, color: C.text3 }}>
+                    PDF or DOCX · drag & drop or click
+                  </div>
+                </div>
+                <div style={{ marginLeft: "auto", fontSize: 18, color: C.text3 }}>↑</div>
+                <input id="landing-resume-upload" type="file" accept=".pdf,.docx"
+                  style={{ display: "none" }}
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) { setUploadedResume(file); enter("resume"); }
+                  }} />
+              </label>
             </div>
           </div>
         </div>
