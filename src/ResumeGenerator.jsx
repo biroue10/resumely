@@ -2094,8 +2094,9 @@ Awards: ${form.awards}`;
         </div>
 
         {/* Kanban board */}
-        <div style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 16,
-          alignItems: "flex-start", minHeight: 400 }}>
+        <div style={{ overflowX: "auto", margin: isMobile ? "0 -8px" : "0 -20px" }}>
+        <div style={{ display: "flex", gap: 14, padding: isMobile ? "0 8px 16px" : "0 20px 16px",
+          alignItems: "flex-start", minHeight: 400, minWidth: "max-content" }}>
           {TRACKER_COLS.map(tcol => {
             const cards = trackerCards.filter(c => c.column === tcol.id);
             const isDragTarget = trackerDragOver === tcol.id;
@@ -2181,6 +2182,7 @@ Awards: ${form.awards}`;
               </div>
             );
           })}
+        </div>
         </div>
 
         {/* Add first application CTA */}
@@ -3529,7 +3531,7 @@ Awards: ${form.awards}`;
         {isFormView
           ? <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{pageBody}</div>
           : navPage === "tracker"
-            ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden" }}>{pageBody}</div>
+            ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{pageBody}</div>
             : pageBody}
         </div>
       </div>
