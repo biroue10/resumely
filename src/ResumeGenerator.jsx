@@ -484,6 +484,7 @@ export default function ResumeGenerator() {
   const [coachBulletIdx, setCoachBulletIdx] = useState(0);
   const [coachAnswers, setCoachAnswers] = useState({});
   const [coachResult, setCoachResult] = useState("");
+  const [atsOpen, setAtsOpen] = useState(false);
   const [coverStep, setCoverStep] = useState("templates");
   const [coverTpl, setCoverTpl] = useState(null);
   const [coverForm, setCoverForm] = useState({
@@ -897,12 +898,12 @@ Awards: ${form.awards}`;
     </div>
   ) : null;
 
-  const field = (key, multiline, ph) =>
+  const field = (key, multiline, ph, id) =>
     multiline ? (
-      <textarea value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={5}
+      <textarea id={id || `field-${key}`} value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={5}
         style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
     ) : (
-      <input value={form[key]} onChange={set(key)} placeholder={ph || ""} style={inputStyle} />
+      <input id={id || `field-${key}`} value={form[key]} onChange={set(key)} placeholder={ph || ""} style={inputStyle} />
     );
 
   // ── Achievement coach helpers ──────────────────────────────────────────────
@@ -1064,6 +1065,118 @@ Awards: ${form.awards}`;
     }
   };
 
+  // ── ATS checker ───────────────────────────────────────────────────────────
+  const computeATSIssues = () => {
+    const issues = [];
+    const expRaw  = form.experience.trim();
+    const expLines = expRaw ? expRaw.split("\n").filter(l => l.trim().length > 5) : [];
+
+    // ── CRITICAL ──
+    if (!form.email.trim()) issues.push({
+      level: "critical", icon: "✉️", title: "No email address",
+      detail: "ATS systems extract email from your resume to create your candidate profile. Without it, your application cannot be processed.",
+      fix: "Add email",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-email")?.focus(), 80); }
+    });
+    if (!form.title.trim()) issues.push({
+      level: "critical", icon: "💼", title: "No job title",
+      detail: "Your current or target job title is used for keyword matching and candidate ranking. Leaving it blank lowers your ATS score.",
+      fix: "Add title",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-title")?.focus(), 80); }
+    });
+    if (!expRaw) issues.push({
+      level: "critical", icon: "📋", title: "Experience section is empty",
+      detail: "Work experience is the most heavily weighted section in ATS ranking. An empty section will result in a very low match score.",
+      fix: "Add experience",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-experience")?.focus(), 80); }
+    });
+    if (!form.skills.trim()) issues.push({
+      level: "critical", icon: "⚡", title: "No skills listed",
+      detail: "ATS systems scan your skills section for exact keyword matches against the job description. This section has the highest keyword density impact.",
+      fix: "Add skills",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-skills")?.focus(), 80); }
+    });
+
+    // ── WARNING ──
+    if (!form.summary.trim()) issues.push({
+      level: "warning", icon: "📝", title: "No professional summary",
+      detail: "A 2–4 sentence summary at the top increases keyword density and gives ATS systems immediate context about your profile before parsing experience.",
+      fix: "Add summary",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-summary")?.focus(), 80); }
+    });
+
+    const hasNumbers = expLines.some(l => /\d/.test(l));
+    if (expRaw && !hasNumbers) issues.push({
+      level: "warning", icon: "🔢", title: "No quantified achievements",
+      detail: "Bullets without numbers (%, $, team size, time saved) score lower in ATS ranking and are less compelling to recruiters. Add at least one metric per role.",
+      fix: "Open Achievement Coach",
+      fixFn: () => { setAtsOpen(false); openCoach(0); }
+    });
+
+    const weakLines = expLines.filter(l => isWeakBullet(l));
+    if (weakLines.length > 0) issues.push({
+      level: "warning", icon: "✍️",
+      title: `${weakLines.length} passive bullet ${weakLines.length === 1 ? "opener" : "openers"}`,
+      detail: `Phrases like "Responsible for", "Helped", or "Assisted" are passive, keyword-poor, and score lower than active-verb equivalents ("Led", "Built", "Reduced"). They also signal weak impact to human reviewers.`,
+      fix: "Fix with Achievement Coach",
+      fixFn: () => { setAtsOpen(false); openCoach(0); }
+    });
+
+    const longLines = expLines.filter(l => l.trim().length > 160);
+    if (longLines.length > 0) issues.push({
+      level: "warning", icon: "📏",
+      title: `${longLines.length} line${longLines.length > 1 ? "s" : ""} over 160 characters`,
+      detail: "Very long single lines are often truncated or misread by ATS parsers. Each bullet point should be one clear, focused sentence — aim for 80–140 characters.",
+      fix: "Auto-split at sentence boundaries",
+      fixFn: () => {
+        const fixed = form.experience.split("\n").map(l => {
+          if (l.trim().length > 160) {
+            const mid = Math.floor(l.length / 2);
+            const idx = l.indexOf(". ", mid);
+            if (idx > 0) return l.slice(0, idx + 1) + "\n" + l.slice(idx + 2).trim();
+          }
+          return l;
+        }).join("\n");
+        setForm(f => ({ ...f, experience: fixed }));
+      }
+    });
+
+    const hasDates = expLines.some(l => /\b(19|20)\d{2}\b/.test(l));
+    if (expRaw && !hasDates) issues.push({
+      level: "warning", icon: "📅", title: "No dates found in experience",
+      detail: "ATS systems calculate tenure and employment gaps from year ranges. Include start and end years on each role line (e.g. Jan 2021 – Mar 2024).",
+      fix: null
+    });
+
+    if (!form.linkedin.trim()) issues.push({
+      level: "warning", icon: "🔗", title: "No LinkedIn URL",
+      detail: "Many ATS systems auto-link your LinkedIn profile and score completeness partly on its presence. It also helps recruiters verify your background.",
+      fix: "Add LinkedIn",
+      fixFn: () => { setAtsOpen(false); setTimeout(() => document.getElementById("field-linkedin")?.focus(), 80); }
+    });
+
+    // ── INFO ──
+    if (!form.education.trim()) issues.push({
+      level: "info", icon: "🎓", title: "Education section empty",
+      detail: "Some ATS systems require at least one education entry to process an application. Add your highest qualification at a minimum.",
+      fix: null
+    });
+    if (!form.phone.trim()) issues.push({
+      level: "info", icon: "📞", title: "No phone number",
+      detail: "Phone number is extracted by ATS systems for your candidate profile. Its absence may reduce completeness scoring.",
+      fix: null
+    });
+
+    const summaryLen = (form.summary.match(/[.!?]/g) || []).length;
+    if (summaryLen > 5) issues.push({
+      level: "info", icon: "📄", title: "Professional summary may be too long",
+      detail: `Your summary appears to have ${summaryLen} sentences. ATS systems prefer concise summaries of 2–4 sentences that are dense with relevant keywords.`,
+      fix: null
+    });
+
+    return issues;
+  };
+
   // Form completion tracker
   const trackFields = ["name","title","email","phone","location","linkedin","website","summary","experience","education","skills","languages","certifications","projects","volunteer","awards"];
   const filledCount = trackFields.filter(k => form[k]?.trim()).length + (photoUrl ? 1 : 0);
@@ -1088,15 +1201,35 @@ Awards: ${form.awards}`;
             Change
           </button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 160 }}>
-          <div style={{ flex: 1, height: 6, borderRadius: 999, background: C.elevated,
-            border: `1px solid ${C.border}`, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${completion}%`,
-              background: completion >= 80 ? "#4ade80" : completion >= 40 ? C.grad : `${tpl.accent}`,
-              borderRadius: 999, transition: "width 0.4s ease" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* ATS score chip */}
+          {(() => {
+            const issues = computeATSIssues();
+            const score = Math.max(0, 100
+              - issues.filter(i => i.level === "critical").length * 20
+              - issues.filter(i => i.level === "warning").length * 8
+              - issues.filter(i => i.level === "info").length * 3);
+            const color = score >= 90 ? "#4ade80" : score >= 70 ? "#fbbf24" : score >= 50 ? "#fb923c" : "#f87171";
+            return (
+              <button onClick={() => setAtsOpen(o => !o)}
+                style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px",
+                  background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 999,
+                  cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                <span style={{ fontSize: 10, fontWeight: 800, color, letterSpacing: "0.5px" }}>ATS</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color }}>{score}</span>
+              </button>
+            );
+          })()}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 120 }}>
+            <div style={{ flex: 1, height: 6, borderRadius: 999, background: C.elevated,
+              border: `1px solid ${C.border}`, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${completion}%`,
+                background: completion >= 80 ? "#4ade80" : completion >= 40 ? C.grad : `${tpl.accent}`,
+                borderRadius: 999, transition: "width 0.4s ease" }} />
+            </div>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, whiteSpace: "nowrap",
+              minWidth: 36 }}>{completion}%</span>
           </div>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, whiteSpace: "nowrap",
-            minWidth: 36 }}>{completion}%</span>
         </div>
       </div>
 
@@ -1380,6 +1513,106 @@ Awards: ${form.awards}`;
           <label style={lbl}>{t.projects}</label>{field("projects", true, t.placeholderProjects)}
           <label style={lbl}>{t.volunteer}</label>{field("volunteer", true, t.placeholderVolunteer)}
           <label style={lbl}>{t.awards}</label>{field("awards", true, t.placeholderAwards)}
+
+          {/* ── ATS Checker Panel ── */}
+          {atsOpen && (() => {
+            const issues = computeATSIssues();
+            const criticals = issues.filter(i => i.level === "critical");
+            const warnings  = issues.filter(i => i.level === "warning");
+            const infos     = issues.filter(i => i.level === "info");
+            const score = Math.max(0, 100 - criticals.length * 20 - warnings.length * 8 - infos.length * 3);
+            const scoreColor = score >= 90 ? "#4ade80" : score >= 70 ? "#fbbf24" : score >= 50 ? "#fb923c" : "#f87171";
+            const scoreLabel = score >= 90 ? "ATS Ready" : score >= 70 ? "Good" : score >= 50 ? "Needs attention" : "Action required";
+            const LEVEL_META = {
+              critical: { label: "Critical", color: "#f87171", bg: "#f8717110" },
+              warning:  { label: "Warning",  color: "#fbbf24", bg: "#fbbf2410" },
+              info:     { label: "Info",     color: "#60a5fa", bg: "#60a5fa10" },
+            };
+            return (
+              <div style={{ background: C.elevated, border: `1.5px solid ${scoreColor}44`,
+                borderRadius: 12, padding: "18px 20px", marginTop: 20, marginBottom: 4 }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: scoreColor, lineHeight: 1 }}>{score}</div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: scoreColor }}>{scoreLabel}</div>
+                        <div style={{ fontSize: 10.5, color: C.text3 }}>ATS Compatibility Score</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 11.5, color: C.text3, maxWidth: 360, lineHeight: 1.5 }}>
+                      Designed to improve readability and parsing across common applicant-tracking systems. Scores reflect form completeness and content quality — not a guarantee of ATS passage.
+                    </div>
+                  </div>
+                  <button onClick={() => setAtsOpen(false)}
+                    style={{ background: "none", border: "none", color: C.text3,
+                      cursor: "pointer", fontSize: 16, padding: "0 0 0 12px", lineHeight: 1 }}>✕</button>
+                </div>
+
+                {/* Score bar */}
+                <div style={{ height: 6, borderRadius: 999, background: C.bg, marginBottom: 16, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${score}%`, background: scoreColor,
+                    borderRadius: 999, transition: "width 0.5s ease" }} />
+                </div>
+
+                {issues.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "16px 0", color: "#4ade80", fontSize: 14, fontWeight: 700 }}>
+                    ✓ No issues detected — your resume is well-structured for ATS parsing.
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {issues.map((issue, idx) => {
+                      const meta = LEVEL_META[issue.level];
+                      return (
+                        <div key={idx} style={{ background: meta.bg, border: `1px solid ${meta.color}28`,
+                          borderRadius: 8, padding: "10px 12px" }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                            <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{issue.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                                <span style={{ fontSize: 10, fontWeight: 800, color: meta.color,
+                                  textTransform: "uppercase", letterSpacing: "0.8px",
+                                  background: `${meta.color}20`, borderRadius: 999, padding: "1px 6px" }}>
+                                  {meta.label}
+                                </span>
+                                <span style={{ fontSize: 12.5, fontWeight: 700, color: C.text1 }}>{issue.title}</span>
+                              </div>
+                              <p style={{ fontSize: 12, color: C.text3, lineHeight: 1.55, margin: "0 0 6px" }}>
+                                {issue.detail}
+                              </p>
+                              {issue.fix && issue.fixFn && (
+                                <button onClick={issue.fixFn}
+                                  style={{ fontSize: 11.5, fontWeight: 700, color: meta.color,
+                                    background: `${meta.color}18`, border: `1px solid ${meta.color}33`,
+                                    borderRadius: 6, padding: "3px 10px", cursor: "pointer",
+                                    fontFamily: "inherit" }}>
+                                  → {issue.fix}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Summary counts */}
+                {issues.length > 0 && (
+                  <div style={{ display: "flex", gap: 12, marginTop: 14, paddingTop: 12,
+                    borderTop: `1px solid ${C.border}`, flexWrap: "wrap" }}>
+                    {criticals.length > 0 && <span style={{ fontSize: 11.5, color: "#f87171", fontWeight: 700 }}>● {criticals.length} critical</span>}
+                    {warnings.length  > 0 && <span style={{ fontSize: 11.5, color: "#fbbf24", fontWeight: 700 }}>● {warnings.length} warnings</span>}
+                    {infos.length     > 0 && <span style={{ fontSize: 11.5, color: "#60a5fa", fontWeight: 700 }}>● {infos.length} info</span>}
+                    <span style={{ fontSize: 11.5, color: C.text3, marginLeft: "auto" }}>
+                      Fix all issues to reach 100
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* ── Actions ── */}
           <div style={{ marginTop: 28, padding: "18px 20px", background: C.elevated,
