@@ -935,9 +935,9 @@ Awards: ${form.awards}`;
       </div>
 
       <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-        flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
-        <div style={isMobile ? {} : { overflowY: "auto", height: "100%", paddingRight: 6,
-          paddingBottom: 32, scrollbarWidth: "thin" }}>
+        gap: 0, flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
+        <div style={isMobile ? {} : { overflowY: "auto", height: "100%", paddingRight: 24,
+          paddingBottom: 32, scrollbarWidth: "thin", borderRight: `1px solid ${C.border}` }}>
 
           {/* ── SECTION: Personal Info ── */}
           <SectionHeader icon="👤" title="Personal Info" filled={!!(form.name && form.email)} />
@@ -1119,7 +1119,7 @@ Awards: ${form.awards}`;
 
         {/* ── Preview column ── */}
         <div style={{ minWidth: 0, ...(isMobile ? {} : { overflowY: "auto", height: "100%",
-          paddingBottom: 32, scrollbarWidth: "thin" }) }}>
+          paddingLeft: 24, paddingBottom: 32, scrollbarWidth: "thin" }) }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
             marginTop: isMobile ? 24 : 0, flexWrap: "wrap" }}>
             <span style={{ ...badge, ...(aiPolished ? badgePolished : badgeLive),
@@ -1264,9 +1264,9 @@ Awards: ${form.awards}`;
           Template: <strong style={{ color: coverTpl.accent }}>{coverTpl.name}</strong>
         </div>
       </div>
-      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", alignItems: "stretch" }}>
+      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 0, alignItems: "stretch" }}>
         {/* Left: form */}
-        <div>
+        <div style={{ paddingRight: isMobile ? 0 : 24, borderRight: isMobile ? "none" : `1px solid ${C.border}` }}>
           {/* Section heading helper */}
           {(() => {
             const sh = (label) => (
@@ -1322,7 +1322,7 @@ Awards: ${form.awards}`;
           })()}
         </div>
         {/* Right: live preview */}
-        <div style={{ minWidth: 0, marginTop: isMobile ? 24 : 0 }}>
+        <div style={{ minWidth: 0, paddingLeft: isMobile ? 0 : 24, marginTop: isMobile ? 24 : 0 }}>
           <div style={{ fontSize: 12, color: C.text2, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ ...badge, ...badgeLive, background: C.elevated, color: C.text2 }}>● Live preview</span>
           </div>
