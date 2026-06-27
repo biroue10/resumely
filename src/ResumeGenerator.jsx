@@ -790,6 +790,12 @@ export default function ResumeGenerator() {
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [locationError, setLocationError] = useState("");
+  const [summaryError, setSummaryError] = useState("");
+  const [experienceError, setExperienceError] = useState("");
+  const [educationError, setEducationError] = useState("");
+  const [skillsError, setSkillsError] = useState("");
   const [shakeField, setShakeField] = useState("");
   const [phoneCode, setPhoneCode] = useState(() => LANG_CODE[selectedLang?.code] || "+1");
   const [zoomed, setZoomed] = useState(false);
@@ -949,19 +955,30 @@ export default function ResumeGenerator() {
     }, 280);
   }
 
+  const clearFieldError = (key) => {
+    ({ title: setTitleError, location: setLocationError, summary: setSummaryError,
+       experience: setExperienceError, education: setEducationError, skills: setSkillsError }[key] || (() => {}))("");
+  };
+
   async function generate() {
-    const nErr = !form.name.trim() ? "Full name is required." : "";
-    const eErr = validateEmail(form.email);
-    const pErr = validatePhone(form.phone);
-    setNameError(nErr);
-    setEmailError(eErr);
-    setPhoneError(pErr);
-    if (nErr || eErr || pErr) {
-      if (nErr)      scrollToError("field-name");
-      else if (eErr) scrollToError("field-email");
-      else           scrollToError("field-phone");
-      return;
-    }
+    const nErr  = !form.name.trim()       ? "Full name is required."           : "";
+    const eErr  = validateEmail(form.email);
+    const pErr  = validatePhone(form.phone);
+    const tErr  = !form.title.trim()      ? "Job title is required."           : "";
+    const lErr  = !form.location.trim()   ? "Location is required."            : "";
+    const sErr  = !form.summary.trim()    ? "Professional summary is required.": "";
+    const xErr  = !form.experience.trim() ? "Work experience is required."     : "";
+    const edErr = !form.education.trim()  ? "Education is required."           : "";
+    const skErr = !form.skills.trim()     ? "Skills are required."             : "";
+    setNameError(nErr); setEmailError(eErr); setPhoneError(pErr);
+    setTitleError(tErr); setLocationError(lErr); setSummaryError(sErr);
+    setExperienceError(xErr); setEducationError(edErr); setSkillsError(skErr);
+    const firstErr = [
+      [nErr, "field-name"], [tErr, "field-title"], [eErr, "field-email"],
+      [pErr, "field-phone"], [lErr, "field-location"], [sErr, "field-summary"],
+      [xErr, "field-experience"], [edErr, "field-education"], [skErr, "field-skills"],
+    ].find(([e]) => e);
+    if (firstErr) { scrollToError(firstErr[1]); return; }
     setLoading(true); setResult(null); setAiPolished(false);
     const langName = selectedLang.name;
     const prompt = `You are an expert resume writer. Using the candidate details below, write a polished, ATS-friendly resume entirely in ${langName} (every word, including section headings, in ${langName}). Improve weak phrasing and use strong action verbs.
@@ -1223,13 +1240,16 @@ Awards: ${form.awards}`;
     </div>
   ) : null;
 
-  const field = (key, multiline, ph, id) =>
-    multiline ? (
-      <textarea id={id || `field-${key}`} value={form[key]} onChange={set(key)} placeholder={ph || ""} rows={5}
-        style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
+  const field = (key, multiline, ph, id, error) => {
+    const errStyle = error ? { borderColor: "#f87171", boxShadow: "0 0 0 3px rgba(248,113,113,0.15)" } : {};
+    const onChange = (e) => { set(key)(e); if (error) clearFieldError(key); };
+    return multiline ? (
+      <textarea id={id || `field-${key}`} value={form[key]} onChange={onChange} placeholder={ph || ""} rows={5}
+        style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit", ...errStyle }} />
     ) : (
-      <input id={id || `field-${key}`} value={form[key]} onChange={set(key)} placeholder={ph || ""} style={inputStyle} />
+      <input id={id || `field-${key}`} value={form[key]} onChange={onChange} placeholder={ph || ""} style={{ ...inputStyle, ...errStyle }} />
     );
+  };
 
   // ── Achievement coach helpers ──────────────────────────────────────────────
   const WEAK_OPENERS = /^(responsible for|helped?( to)?|assisted?( with)?|worked on|was part of|involved in|supported?|participated in|contributed to|did |handled |performed |undertook |was involved)/i;
@@ -1689,7 +1709,8 @@ Awards: ${form.awards}`;
             {nameError && <p style={fieldErr}>{nameError}</p>}
           </div>
           <label style={lbl}>{t.title}</label>
-          <IconInput icon="💼">{field("title", false, t.placeholderTitle)}</IconInput>
+          <IconInput icon="💼">{field("title", false, t.placeholderTitle, undefined, titleError)}</IconInput>
+          {titleError && <p style={fieldErr}>{titleError}</p>}
 
           <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ flex: 1 }} data-field-wrap="">
@@ -1724,7 +1745,8 @@ Awards: ${form.awards}`;
           </div>
 
           <label style={lbl}>{t.location}</label>
-          <IconInput icon="📍">{field("location", false, t.placeholderLocation)}</IconInput>
+          <IconInput icon="📍">{field("location", false, t.placeholderLocation, undefined, locationError)}</IconInput>
+          {locationError && <p style={fieldErr}>{locationError}</p>}
 
           <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row", marginTop: 0 }}>
             <div style={{ flex: 1 }}>
@@ -1741,7 +1763,8 @@ Awards: ${form.awards}`;
           <SectionHeader icon="📝" title="Professional" filled={!!(form.summary && form.experience)} />
 
           <label style={lbl}>{t.summary}</label>
-          {field("summary", true, t.placeholderSummary)}
+          {field("summary", true, t.placeholderSummary, undefined, summaryError)}
+          {summaryError && <p style={fieldErr}>{summaryError}</p>}
           <Hint text="2–4 sentences. Who you are, your years of experience, and your biggest strength." />
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
@@ -1756,7 +1779,8 @@ Awards: ${form.awards}`;
               </button>
             )}
           </div>
-          {field("experience", true, t.placeholderEx)}
+          {field("experience", true, t.placeholderEx, undefined, experienceError)}
+          {experienceError && <p style={fieldErr}>{experienceError}</p>}
           <Hint text="One role per line. Format: Job Title — Company | Start – End" />
 
           {/* ── Achievement Coach Panel ── */}
@@ -1896,7 +1920,8 @@ Awards: ${form.awards}`;
           })()}
 
           <label style={lbl}>{t.education}</label>
-          {field("education", true, t.placeholderEducation)}
+          {field("education", true, t.placeholderEducation, undefined, educationError)}
+          {educationError && <p style={fieldErr}>{educationError}</p>}
           <Hint text="One entry per line. Format: Degree — Institution | Year" />
 
           {/* ── SECTION: Skills ── */}
@@ -1905,7 +1930,8 @@ Awards: ${form.awards}`;
           <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ flex: 1 }}>
               <label style={lbl}>{t.skills}</label>
-              {field("skills", false, t.placeholderSkills)}
+              {field("skills", false, t.placeholderSkills, undefined, skillsError)}
+              {skillsError && <p style={fieldErr}>{skillsError}</p>}
               <Hint text="Comma-separated: React, Node.js, SQL…" />
             </div>
             <div style={{ flex: 1 }}>
