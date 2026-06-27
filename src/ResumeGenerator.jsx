@@ -387,6 +387,146 @@ const THUMB_SAMPLES = {
       ],
     },
   },
+  creative: {
+    rtl: true,
+    result: {
+      name: "نادية مالك",
+      title: "مصممة تجربة مستخدم",
+      contact: ["nadia@example.com", "+213 770 123 456", "الجزائر العاصمة"],
+      summary: "مصممة تجربة مستخدم بخبرة 6 سنوات في تصميم واجهات المستخدم للتطبيقات المحمولة وتجارة التجزئة الرقمية. متخصصة في تصميم لغات العربية وتجربة المستخدم ثنائي الاتجاه.",
+      sections: [
+        { heading: "الخبرة", items: [
+          "مصممة رئيسية — Yassir (2022–الحاضر)",
+          "أعادت تصميم تطبيق المشاركة برمجيًا لزيادة التقييمات بنسبة 35٪",
+          "مصممة UI/UX — Algérie Télécom (2018–2022)",
+          "بنت نظام التصميم لتطبيق Idoom Fibre المستخدم من 2M مشترك",
+        ]},
+        { heading: "المهارات", items: ["Figma", "Illustrator", "UX Research", "تصميم RTL", "Prototyping"] },
+        { heading: "التعليم", items: ["بكالوريوس إعلام آلي — ESI Alger — 2018"] },
+      ],
+    },
+  },
+  tech: {
+    rtl: false,
+    result: {
+      name: "Ahmed El-Sayed",
+      title: "DevOps Engineer",
+      contact: ["ahmed@example.com", "+20 100 234 5678", "Cairo, Egypt", "github.com/aelsayed"],
+      summary: "DevOps engineer with 7 years automating infrastructure and CI/CD pipelines for fintech and e-commerce platforms across the MENA region.",
+      sections: [
+        { heading: "Experience", items: [
+          "Senior DevOps — Fawry (2021–Present)",
+          "Reduced deployment time from 4h to 18min via GitHub Actions + Terraform",
+          "Maintained 99.98% uptime for payment gateway processing $200M/month",
+          "DevOps Engineer — Souq.com/Amazon (2017–2021)",
+          "Migrated 140 microservices to Kubernetes on AWS EKS",
+        ]},
+        { heading: "Skills", items: ["Kubernetes", "Terraform", "AWS", "Docker", "GitHub Actions", "Prometheus", "Go", "Python"] },
+        { heading: "Education", items: ["B.Sc. Computer Engineering — Cairo University — 2017"] },
+      ],
+    },
+  },
+  sharp: {
+    rtl: false,
+    result: {
+      name: "Catherine Morrison",
+      title: "Corporate Solicitor",
+      contact: ["c.morrison@example.com", "+44 20 7946 0102", "London, UK"],
+      summary: "Corporate solicitor with 9 years advising on M&A, private equity, and commercial contracts. Qualified in England & Wales. Experience across UK, France, and UAE jurisdictions.",
+      sections: [
+        { heading: "Experience", items: [
+          "Senior Associate — Linklaters LLP (2019–Present)",
+          "Led legal due diligence on £1.2B acquisition of Aviva's Italian subsidiary",
+          "Drafted and negotiated 40+ SPAs in a single calendar year",
+          "Associate — Clifford Chance (2015–2019)",
+          "Advised GPs on fund formation for three private equity vehicles totalling £800M",
+        ]},
+        { heading: "Education", items: ["LPC — BPP University Law School — 2014", "LLB — University of Edinburgh — 2013"] },
+        { heading: "Admissions", items: ["Solicitor of England & Wales — 2015", "DIFC registered legal practitioner — 2020"] },
+      ],
+    },
+  },
+  nordic: {
+    rtl: false,
+    result: {
+      name: "Erik Lindström",
+      title: "Arkitekt | MNAL",
+      contact: ["erik@example.com", "+47 400 12 345", "Oslo, Norge"],
+      summary: "Arkitekt med 11 års erfaring innen bærekraftig boligbygging og offentlige bygg. Spesialist på passivhus-standarder og BREEAM-sertifisering.",
+      sections: [
+        { heading: "Erfaring", items: [
+          "Prosjektarkitekt — Snøhetta (2019–nå)",
+          "Ledet designteam for nytt kulturhus i Bergen (NOK 420M)",
+          "Arkitekt — Rambøll Norge (2013–2019)",
+          "Tegnet 14 BREEAM Excellent-sertifiserte kontorbygg",
+        ]},
+        { heading: "Ferdigheter", items: ["Revit", "ArchiCAD", "Rhino", "BREEAM", "Passivhus", "BIM"] },
+        { heading: "Utdanning", items: ["Master i arkitektur — NTNU, Trondheim — 2013"] },
+        { heading: "Språk", items: ["Norsk (morsmål)", "Engelsk (flytende)", "Svensk (funksjonelt)"] },
+      ],
+    },
+  },
+  slate: {
+    rtl: false,
+    result: {
+      name: "Chidinma Obi",
+      title: "Finance Manager",
+      contact: ["c.obi@example.com", "+33 6 78 90 12 34", "Paris, France"],
+      summary: "Finance manager with 8 years in investment banking and corporate finance across West Africa and France. CFA Charterholder. Fluent in English, French, and Igbo.",
+      sections: [
+        { heading: "Experience", items: [
+          "Finance Manager — Total Energies (2021–Present)",
+          "Managed $320M annual capex budget across 6 African subsidiaries",
+          "Led IFRS 16 transition project, restating 3 years of lease obligations",
+          "Associate — BNP Paribas (2016–2021)",
+          "Structured project finance deals totalling $1.8B in Sub-Saharan Africa",
+        ]},
+        { heading: "Skills", items: ["Financial Modeling", "IFRS", "Bloomberg", "SAP", "Power BI", "VBA"] },
+        { heading: "Education", items: ["MSc Finance — HEC Paris — 2016", "BSc Economics — University of Lagos — 2014"] },
+        { heading: "Certifications", items: ["CFA Charterholder — 2020"] },
+      ],
+    },
+  },
+  horizon: {
+    rtl: false,
+    result: {
+      name: "Aïsha Diallo",
+      title: "Directrice des Ressources Humaines",
+      contact: ["a.diallo@example.com", "+221 77 123 45 67", "Dakar, Sénégal"],
+      summary: "DRH avec 10 ans d'expérience dans les télécommunications et le secteur bancaire en Afrique subsaharienne. Spécialisée dans la transformation RH et la gestion des talents en contexte multiculturel.",
+      sections: [
+        { heading: "Expérience", items: [
+          "DRH — Wave Mobile Money (2021–présent)",
+          "Mis en place la politique RH pour 800 employés au Sénégal, Côte d'Ivoire et Mali",
+          "Responsable RH — Société Générale Sénégal (2014–2021)",
+          "Réduit le turnover de 28 % à 11 % en 3 ans via le programme de fidélisation",
+        ]},
+        { heading: "Compétences", items: ["SIRH (SAP HCM)", "Recrutement", "Formation", "Relations sociales", "Droit du travail OHADA"] },
+        { heading: "Formation", items: ["Master RH — Université Paris-Dauphine — 2013"] },
+        { heading: "Langues", items: ["Français (bilingue)", "Anglais (C1)", "Wolof (courant)"] },
+      ],
+    },
+  },
+  prism: {
+    rtl: false,
+    result: {
+      name: "Priya Sharma",
+      title: "Senior Product Manager",
+      contact: ["priya.sharma@example.com", "+91 98765 43210", "Bangalore, India", "linkedin.com/in/priyasharma-pm"],
+      summary: "Senior PM with 7 years building B2B SaaS products at scale. Led 0→1 launches for payments and analytics verticals, growing ARR from $2M to $28M in two product cycles.",
+      sections: [
+        { heading: "Experience", items: [
+          "Senior Product Manager — Razorpay (2021–Present)",
+          "Launched RazorpayX Payroll, onboarding 4,000+ businesses in year one",
+          "Reduced payment failure rate by 22% through ML-driven retry logic",
+          "Product Manager — Freshworks (2017–2021)",
+          "Owned Freshdesk's Analytics module, adding $4.2M in net-new ARR",
+        ]},
+        { heading: "Skills", items: ["Product Strategy", "SQL", "Mixpanel", "JIRA", "A/B Testing", "Go-to-market"] },
+        { heading: "Education", items: ["MBA — IIM Bangalore — 2017", "B.Tech CS — NIT Trichy — 2015"] },
+      ],
+    },
+  },
 };
 
 // ── Sample data used in template thumbnail previews ───────────────
@@ -453,6 +593,69 @@ const SAMPLE_COVER = {
   body: "I am writing to express my strong interest in the Senior Product Designer position at Stripe. With eight years of experience crafting intuitive digital experiences for high-growth SaaS companies, I am confident in my ability to contribute meaningfully to your team.\n\nAt Figma, I led the redesign of the core editor interface, shipping 12 major features that improved user satisfaction by 40%. I also established a company-wide design system adopted by 200+ engineers across 40 product squads. Prior to that, at Airbnb, I redesigned the host dashboard and reduced support tickets by 41% through research-driven iteration.\n\nStripe's commitment to making financial infrastructure simple and trustworthy resonates deeply with my design philosophy. I am excited by the challenge of bringing clarity to complex financial flows for millions of merchants worldwide.",
   closing: "Thank you sincerely for your time and consideration. I would welcome the opportunity to discuss how my background in design systems and cross-functional leadership can contribute to Stripe's mission.",
   signoff: "Sincerely",
+};
+
+const COVER_THUMB_SAMPLES = {
+  classic: {
+    name: "Léa Tremblay", jobTitle: "Responsable Marketing Digital",
+    email: "lea.tremblay@example.com", phone: "+33 6 12 34 56 78", location: "Paris, France",
+    date: "27 juin 2026",
+    recipientName: "Mme Dubois", recipientTitle: "Directrice Marketing",
+    company: "Payfit", companyAddress: "9 rue du Mail, 75002 Paris",
+    subject: "Candidature — Responsable Marketing Digital",
+    opening: "Madame Dubois",
+    body: "Je me permets de vous adresser ma candidature pour le poste de Responsable Marketing Digital chez Payfit. Fort de sept années d'expérience en acquisition client et gestion de campagnes multicanal pour des startups SaaS B2B, je suis convaincu de pouvoir contribuer significativement à vos objectifs de croissance.\n\nAu cours de mon expérience chez Doctolib, j'ai lancé quatre nouveaux marchés européens en deux ans et constitué une équipe marketing de deux à quatorze personnes. J'ai également géré un budget publicitaire annuel de deux millions d'euros sur Google, LinkedIn et Meta, avec un ROAS moyen de 4,2.\n\nLa vision de Payfit, simplifier la gestion RH et paie pour les PME européennes, rejoint pleinement ma conviction que la technologie doit libérer les équipes des tâches administratives à faible valeur ajoutée.",
+    closing: "Je serais ravi d'échanger avec vous sur la manière dont mon profil peut répondre aux enjeux de Payfit. Je reste disponible pour un entretien à votre convenance.",
+    signoff: "Cordialement",
+  },
+  modern: {
+    name: "Sarah Okonkwo", jobTitle: "Software Engineer",
+    email: "s.okonkwo@example.com", phone: "+44 7700 900 142", location: "London, UK",
+    date: "27 June 2026",
+    recipientName: "Ms Adeyemi", recipientTitle: "Engineering Manager",
+    company: "Monzo Bank", companyAddress: "Broadwalk House, 5 Appold St, London EC2A 2AG",
+    subject: "Software Engineer — Backend (Payments)",
+    opening: "Ms Adeyemi",
+    body: "I am writing to apply for the Backend Software Engineer role in the Payments team at Monzo. With five years of full-stack experience in fintech and e-commerce, and a proven track record of building resilient systems at scale, I am excited by the opportunity to work on infrastructure that millions of people rely on every day.\n\nIn my current role at Jumia, I built and maintained the seller portal used by 120,000 merchants across six African markets. I reduced average page load time by 58% and introduced an event-driven architecture that improved reliability during peak sale periods.\n\nMonzo's commitment to radical transparency and genuine financial wellbeing for its customers is exactly the culture I want to contribute to.",
+    closing: "I would welcome the chance to discuss how my background in distributed systems and payments aligns with the team's current priorities.",
+    signoff: "Best regards",
+  },
+  minimal: {
+    name: "Karim Benali", jobTitle: "Ingénieur Génie Civil",
+    email: "k.benali@example.com", phone: "+213 555 123 456", location: "Alger, Algérie",
+    date: "27 juin 2026",
+    recipientName: "M. Amrani", recipientTitle: "Directeur Technique",
+    company: "Cosider Groupe", companyAddress: "Route de Belouizdad, Alger",
+    subject: "Chef de Projet BTP — Complexe Résidentiel Ouest",
+    opening: "Monsieur Amrani",
+    body: "Je vous soumets ma candidature pour le poste de Chef de Projet sur le chantier du complexe résidentiel Ouest. Ingénieur génie civil depuis neuf ans, j'ai coordonné des projets d'infrastructure à grande échelle impliquant des dizaines de corps de métier et des budgets dépassant les cent millions d'euros.\n\nMon expérience la plus récente chez Colas Algérie m'a permis de maîtriser les fondations sur sols complexes et les bétons à haute performance, compétences directement applicables aux contraintes géotechniques de ce projet.\n\nJe suis convaincu que mon profil et ma connaissance du contexte réglementaire algérien constituent un atout solide pour tenir les délais et garantir la qualité.",
+    closing: "Je me tiens disponible pour toute discussion technique à votre convenance.",
+    signoff: "Respectueusement",
+  },
+  bold: {
+    name: "María García López", jobTitle: "Diseñadora UX Senior",
+    email: "maria.garcia@example.com", phone: "+34 612 345 678", location: "Barcelona, España",
+    date: "27 de junio de 2026",
+    recipientName: "Sr. Martínez", recipientTitle: "Director de Producto",
+    company: "Glovo", companyAddress: "Carrer de Pallars, 65, 08005 Barcelona",
+    subject: "UX Lead — Experiencia del usuario en marketplace",
+    opening: "Estimado Sr. Martínez",
+    body: "Me dirijo a usted para expresar mi interés en el puesto de UX Lead en el equipo de marketplace de Glovo. A lo largo de seis años diseñando productos digitales para empresas de retail, banca y salud, he desarrollado una metodología de diseño centrada en el usuario que equilibra la velocidad de entrega con la profundidad de la investigación.\n\nEn CaixaBank, lideré el rediseño de la aplicación móvil utilizada por tres millones de usuarios activos, logrando un aumento del 18 % en la puntuación NPS en seis meses. Anteriormente, rediseñé el flujo de pago de un e-commerce de moda, incrementando la conversión en un 22 %.\n\nGlovo representa para mí el reto ideal: escalar la experiencia de usuario en múltiples mercados con contextos culturales y de conectividad muy distintos.",
+    closing: "Quedo a su disposición para ampliar cualquier aspecto de mi candidatura en la entrevista que considere oportuno.",
+    signoff: "Atentamente",
+  },
+  elegant: {
+    name: "David Chen", jobTitle: "Chief Financial Officer",
+    email: "d.chen@example.com", phone: "+65 9123 4567", location: "Singapore",
+    date: "27 June 2026",
+    recipientName: "Mr. Tan", recipientTitle: "Chairman",
+    company: "Grab Holdings", companyAddress: "3 Media Close, Singapore 138498",
+    subject: "CFO — Grab Holdings",
+    opening: "Dear Mr. Tan",
+    body: "I write to express my interest in the Chief Financial Officer position at Grab. Over eighteen years in technology-led finance across APAC, I have led functions through hypergrowth, dual listings, and complex multi-jurisdiction regulatory environments — precisely the terrain Grab navigates every quarter.\n\nAs CFO at Sea Limited, I oversaw $4.2 billion in annual revenue across three distinct verticals and led our Singapore Exchange dual listing in 2021, raising $2.1 billion. Prior to that, at Grab, I built the financial infrastructure that supported our expansion to eight countries in four years.\n\nI believe the next chapter for Grab requires a CFO who can navigate both capital markets and operational rigour simultaneously. That is the work I have spent two decades preparing to do.",
+    closing: "I would welcome the opportunity to discuss how my experience aligns with Grab's priorities for the year ahead.",
+    signoff: "Yours sincerely",
+  },
 };
 
 // ── Author info (edit here to update the footer) ─────────────────
@@ -1986,81 +2189,40 @@ Awards: ${form.awards}`;
     { id: "master",    icon: "⭐", label: "Master Profile" },
     { id: "cover",     icon: "✉️",  label: "Cover Letter" },
     { id: "tracker",   icon: "📋", label: "Job Tracker" },
-    { id: "signature", icon: "✍️",  label: "Email Signature" },
-    { id: "website",   icon: "🌐", label: "Personal Website" },
+    { id: "signature", icon: "✍️",  label: "Email Signature", soon: true },
+    { id: "website",   icon: "🌐", label: "Personal Website", soon: true },
     { id: "about",     icon: "ℹ️",  label: "About" },
   ];
 
-  const ComingSoon = ({ label }) => (
-    <div style={{ padding: isMobile ? 20 : 40 }}>
-      <PageHeader eyebrow="Coming Soon" icon="🚧" title={label} sub="This feature is on its way. Stay tuned for updates!" isMobile={isMobile} />
-    </div>
-  );
+  const COMING_SOON_COPY = {
+    signature: {
+      title: "Email Signature",
+      sub: "Professional, multilingual email signatures — matching your resume style.",
+      cta: "Want it the moment it launches?",
+    },
+    website: {
+      title: "Personal Website",
+      sub: "Turn your resume into a shareable personal site in one click.",
+      cta: "Want early access?",
+    },
+  };
 
-  const PricingPage = () => (
-    <div style={{ padding: isMobile ? 16 : 32 }}>
-      <PageHeader
-        eyebrow="Pricing"
-        icon="💎"
-        title="Plans & Pricing"
-        sub="Start free, upgrade when you're ready. No hidden fees."
-        isMobile={isMobile}
-      />
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 20 }}>
-        {[
-          { name: "Free", price: "$0", period: "forever", color: "#4b5563", features: [
-            "1 Resume (live preview)", "5 templates", "PDF & DOCX download", "50+ languages",
-          ], cta: "Get started", active: true },
-          { name: "Pro", price: "$9", period: "/ month", color: "#2563eb", features: [
-            "Unlimited resumes", "All 8 templates", "Cover letter builder", "Email signature", "AI polish (GPT-4)", "Priority support",
-          ], cta: "Upgrade to Pro", badge: "Most popular" },
-          { name: "Team", price: "$29", period: "/ month", color: "#7c3aed", features: [
-            "Everything in Pro", "5 team seats", "Job tracker board", "Personal website builder", "Custom domain", "Dedicated support",
-          ], cta: "Contact us" },
-        ].map((plan) => (
-          <div key={plan.name} style={{
-            background: plan.badge
-              ? `linear-gradient(160deg, ${plan.color}14 0%, ${C.surface} 50%)`
-              : `linear-gradient(160deg, rgba(255,255,255,0.02) 0%, ${C.surface} 60%)`,
-            border: `1.5px solid ${plan.badge ? plan.color + "88" : C.border}`,
-            borderRadius: 18, padding: "28px 24px", position: "relative",
-            display: "flex", flexDirection: "column", gap: 0,
-            boxShadow: plan.badge ? `0 8px 32px ${plan.color}22` : "0 4px 16px rgba(0,0,0,0.3)" }}>
-            {plan.badge && (
-              <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
-                background: plan.color, color: "#fff", fontSize: 11, fontWeight: 700,
-                padding: "3px 14px", borderRadius: 999, whiteSpace: "nowrap",
-                boxShadow: `0 4px 12px ${plan.color}55` }}>
-                {plan.badge}
-              </div>
-            )}
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: plan.color,
-              textTransform: "uppercase", letterSpacing: "1.2px", marginBottom: 8 }}>{plan.name}</div>
-            <div style={{ fontSize: 42, fontWeight: 800, color: C.text1, lineHeight: 1,
-              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
-              {plan.price}<span style={{ fontSize: 14, fontWeight: 500, color: C.text2 }}>{plan.period}</span>
-            </div>
-            <div style={{ height: 1, background: C.border, margin: "20px 0" }} />
-            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", display: "flex", flexDirection: "column", gap: 10 }}>
-              {plan.features.map((f) => (
-                <li key={f} style={{ fontSize: 13.5, color: C.text1, display: "flex", gap: 8 }}>
-                  <span style={{ color: plan.color, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
-                </li>
-              ))}
-            </ul>
-            <button style={{ marginTop: "auto", padding: "12px 0", width: "100%",
-              background: plan.active ? "transparent" : plan.color,
-              border: `1.5px solid ${plan.color}`, borderRadius: 10,
-              color: plan.active ? plan.color : "#fff",
-              fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-              boxShadow: plan.active ? "none" : `0 4px 16px ${plan.color}44` }}>
-              {plan.cta}
-            </button>
-          </div>
-        ))}
+  const ComingSoon = ({ id, label }) => {
+    const copy = COMING_SOON_COPY[id] || { title: label, sub: "This feature is on its way.", cta: "Stay tuned:" };
+    return (
+      <div style={{ padding: isMobile ? 20 : 40, maxWidth: 560 }}>
+        <PageHeader eyebrow="Coming Soon" icon="🚧" title={copy.title} sub={copy.sub} isMobile={isMobile} />
+        <div style={{ marginTop: 8, fontSize: 14.5, color: C.text2 }}>
+          {copy.cta}{" "}
+          <a href={`mailto:${AUTHOR.email}?subject=${encodeURIComponent(copy.title + " — early access")}`}
+            style={{ color: C.accent2, fontWeight: 600, textDecoration: "none" }}>
+            {AUTHOR.email} →
+          </a>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
 
   const AboutPage = () => (
     <div style={{ padding: isMobile ? 20 : 40, maxWidth: 720 }}>
@@ -2080,9 +2242,9 @@ Awards: ${form.awards}`;
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
           letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>Mission</div>
         <p style={{ fontSize: 14.5, color: C.text1, lineHeight: 1.8, margin: 0 }}>
-          Getting a job is hard enough without fighting the tools that are supposed to help you.
-          ApplyCraft exists to give every job seeker — regardless of budget or background — access
-          to polished, ATS-friendly documents in 50+ languages.
+          Getting a job is hard enough without fighting the tools meant to help you. ApplyCraft
+          gives every job seeker — regardless of budget or background — free access to polished,
+          ATS-friendly documents in 50+ languages. No account, no paywall, no catch.
         </p>
       </div>
 
@@ -2092,7 +2254,7 @@ Awards: ${form.awards}`;
           letterSpacing: "2px", color: C.accent2, marginBottom: 16 }}>What you can do</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           {[
-            ["📄", "Build a resume", "Choose from 13 professional templates with live preview."],
+            ["📄", "Build a resume", "Choose from 22 professional templates with live preview."],
             ["✉️", "Write a cover letter", "6 matching cover letter styles with full customisation."],
             ["🌍", "50+ languages", "Full RTL support for Arabic, Hebrew and more."],
             ["⬇️", "PDF & DOCX export", "Download in the format any employer expects."],
@@ -2895,9 +3057,8 @@ Awards: ${form.awards}`;
   else if (navPage === "cover") pageBody = coverStep === "form" ? (coverFormContent || coverTemplatesContent) : coverTemplatesContent;
   else if (navPage === "master") pageBody = masterContent;
   else if (navPage === "tracker") pageBody = trackerContent;
-  else if (navPage === "pricing") pageBody = <PricingPage />;
   else if (navPage === "about") pageBody = <AboutPage />;
-  else pageBody = <ComingSoon label={NAV.find(n => n.id === navPage)?.label || ""} />;
+  else pageBody = <ComingSoon id={navPage} label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
   // Two-column independent scroll: only on desktop, resume form view
   const isFormView = !isMobile && navPage === "resume" && step === "form" && !!tpl;
@@ -3014,8 +3175,8 @@ Awards: ${form.awards}`;
             <p style={{ animation: "acFadeUp 0.65s ease 0.34s both",
               fontSize: "clamp(16px, 2vw, 20px)", color: C.text2, maxWidth: 520,
               margin: "0 auto 44px", lineHeight: 1.65 }}>
-              ATS-friendly templates, live preview, PDF & DOCX export.
-              Free forever — no sign-up, no watermark, no data stored.
+              ATS-friendly templates, live preview, PDF & DOCX export. Every feature free,
+              forever — no sign-up, no watermark, no paywall, no data stored.
             </p>
             <div style={{ animation: "acFadeUp 0.65s ease 0.5s both",
               display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -3411,6 +3572,55 @@ Awards: ${form.awards}`;
           );
         })()}
 
+        {/* Master Profile teaser */}
+        <FadeIn>
+          <div style={{ padding: "72px 24px 80px", borderTop: `1px solid ${C.border}` }}>
+            <div style={{ maxWidth: 860, margin: "0 auto", display: "flex",
+              flexDirection: isMobile ? "column" : "row", gap: isMobile ? 32 : 64,
+              alignItems: "center" }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase",
+                  letterSpacing: "2px", color: C.accent2, marginBottom: 14 }}>Master Profile</p>
+                <h2 style={{ fontSize: "clamp(24px, 3vw, 40px)", fontWeight: 800,
+                  letterSpacing: "-0.8px", color: C.text1, margin: "0 0 16px", lineHeight: 1.2 }}>
+                  Build once.<br />Tailor for everything.
+                </h2>
+                <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.75, margin: "0 0 28px" }}>
+                  Create your complete career profile a single time — every job, every skill,
+                  every achievement. Paste a job description and get a perfectly tailored
+                  resume in seconds. No retyping, ever.
+                </p>
+                <button onClick={() => enter("master")}
+                  style={{ padding: "12px 28px", background: C.grad, border: "none", borderRadius: 10,
+                    color: "#fff", fontSize: 14.5, fontWeight: 700, cursor: "pointer",
+                    fontFamily: "inherit", boxShadow: `0 4px 20px ${C.accent}44` }}>
+                  Build my Master Profile →
+                </button>
+              </div>
+              <div style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", gap: 12,
+                width: isMobile ? "100%" : 280 }}>
+                {[
+                  { icon: "📋", step: "1", text: "Fill your complete career history once" },
+                  { icon: "📋", step: "2", text: "Paste any job description" },
+                  { icon: "⭐", step: "3", text: "AI scores and selects relevant items" },
+                  { icon: "📄", step: "4", text: "One-click tailored resume, ready to send" },
+                ].map(({ icon, step, text }) => (
+                  <div key={step} style={{ display: "flex", alignItems: "center", gap: 14,
+                    padding: "12px 16px", background: C.elevated, border: `1px solid ${C.border}`,
+                    borderRadius: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.grad,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 12, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+                      {step}
+                    </div>
+                    <div style={{ fontSize: 13.5, color: C.text1, lineHeight: 1.5 }}>{text}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+
         {/* How it works */}
         <div style={{ padding: "72px 24px 80px", borderTop: `1px solid ${C.border}` }}>
           <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -3531,9 +3741,10 @@ Awards: ${form.awards}`;
                 Free means <span style={{ background: C.grad,
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>actually free.</span>
               </h2>
-              <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.8, margin: "0 auto 36px", maxWidth: 500 }}>
-                No paid tier. No watermarks. No account ever. Every template, every language,
-                every download — included for everyone, permanently.
+              <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.8, margin: "0 auto 36px", maxWidth: 520 }}>
+                No paid tier. No "Pro" upsell. No watermarks. No account, ever. All 22 templates,
+                every language, every feature — included for everyone, permanently. We make money
+                by not needing your data.
               </p>
               <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
                 {["✓ No watermarks", "✓ No account", "✓ No credit card", "✓ No data stored", "✓ Unlimited downloads"].map(t => (
@@ -3667,7 +3878,7 @@ Awards: ${form.awards}`;
             </FadeIn>
             {[
               { q: "Is ApplyCraft really free?",
-                a: "Yes — completely. Every template, every language, every download is free. There are no paid plans, no premium tiers, no watermarks. Download as many resumes and cover letters as you need." },
+                a: "Yes — completely. All 22 templates, every language, every feature, and every download are free, with no paid tier and no premium upsell. We don't charge because we store nothing and have no costs to pass on. It's free now and it stays free." },
               { q: "Do you store or sell my data?",
                 a: "No. Everything you type lives only in your browser. ApplyCraft has no backend, no database, and no account system. Nothing leaves your device. When you close the tab, your data is gone." },
               { q: "Are the templates ATS-compatible?",
@@ -3867,43 +4078,32 @@ Awards: ${form.awards}`;
                   overflow: "hidden",
                   boxShadow: navPage === item.id ? `inset 2px 0 0 ${C.accent}` : "none" }}>
                 <span style={{ fontSize: 19, flexShrink: 0 }}>{item.icon}</span>
-                {sidebarOpen && <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>}
+                {sidebarOpen && <span style={{ overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>{item.label}</span>}
+                {sidebarOpen && item.soon && <span style={{ fontSize: 9, fontWeight: 700, color: C.accent2, background: `${C.accent}20`, borderRadius: 999, padding: "2px 6px", flexShrink: 0 }}>SOON</span>}
               </button>
             ))}
           </nav>
 
-          {/* Pricing + upsell */}
-          <div style={{ padding: "10px 8px", borderTop: `1px solid ${C.border}` }}>
-            <button onClick={() => setNavPage("pricing")}
-              title={!sidebarOpen ? "Plans & Pricing" : undefined}
-              style={{ display: "flex", alignItems: "center", gap: 10,
-                padding: sidebarOpen ? "9px 12px" : "9px 0",
-                justifyContent: sidebarOpen ? "flex-start" : "center",
-                borderRadius: 9, border: "none", cursor: "pointer", width: "100%", fontFamily: "inherit",
-                fontSize: 15, fontWeight: navPage === "pricing" ? 700 : 500,
-                background: navPage === "pricing" ? `${C.blue}18` : "transparent",
-                color: navPage === "pricing" ? "#93C5FD" : C.text2,
-                transition: "background .15s, color .15s, padding .22s", whiteSpace: "nowrap", overflow: "hidden" }}>
-              <span style={{ fontSize: 19, flexShrink: 0 }}>💎</span>
-              {sidebarOpen && "Plans & Pricing"}
-            </button>
-            {sidebarOpen && (
-              <div style={{ margin: "8px 4px 0", padding: "10px 12px",
-                background: `${C.accent}0E`, border: `1px solid ${C.accent}30`,
-                borderRadius: 10 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent2, marginBottom: 4,
-                  letterSpacing: "0.6px", textTransform: "uppercase" }}>Free Plan</div>
-                <div style={{ fontSize: 12.5, color: C.text3, lineHeight: 1.5 }}>
-                  Upgrade to Pro for AI polish, cover letters & more.
+          {/* Free badge */}
+          {sidebarOpen && (
+            <div style={{ padding: "10px 12px", borderTop: `1px solid ${C.border}` }}>
+              <div style={{ padding: "10px 12px", background: `${C.accent}0E`,
+                border: `1px solid ${C.accent}30`, borderRadius: 10 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.accent2, marginBottom: 4,
+                  letterSpacing: "0.4px" }}>100% FREE</div>
+                <div style={{ fontSize: 12, color: C.text3, lineHeight: 1.55 }}>
+                  Every feature, every template, every language. No account, no limits.
                 </div>
-                <button onClick={() => setNavPage("pricing")} style={{ marginTop: 8, fontSize: 12.5, fontWeight: 700,
-                  color: C.accent2, background: "none", border: "none", cursor: "pointer", padding: 0,
-                  fontFamily: "inherit" }}>
-                  View plans →
-                </button>
+                {AUTHOR.github && (
+                  <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-block", marginTop: 8, fontSize: 12, fontWeight: 700,
+                      color: C.accent2, textDecoration: "none" }}>
+                    ⭐ Star on GitHub →
+                  </a>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </aside>
       )}
 
@@ -3987,16 +4187,9 @@ Awards: ${form.awards}`;
                   borderRadius: 8, border: `1px solid ${C.border}`, cursor: "pointer", fontSize: 12,
                   background: navPage === item.id ? `${C.accent}18` : "transparent",
                   color: navPage === item.id ? C.accent2 : C.text2, fontFamily: "inherit" }}>
-                {item.icon} {item.label}
+                {item.icon} {item.label}{item.soon && <span style={{ fontSize: 9, fontWeight: 700, color: C.accent2, background: `${C.accent}20`, borderRadius: 999, padding: "1px 5px", marginLeft: 2 }}>SOON</span>}
               </button>
             ))}
-            <button onClick={() => setNavPage("pricing")}
-              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "6px 11px",
-                borderRadius: 8, border: `1px solid ${C.accent}30`, cursor: "pointer", fontSize: 12,
-                background: navPage === "pricing" ? `${C.blue}18` : "transparent",
-                color: navPage === "pricing" ? "#93C5FD" : C.text2, fontFamily: "inherit" }}>
-              💎 Pricing
-            </button>
           </div>
         )}
 
@@ -4034,19 +4227,23 @@ Awards: ${form.awards}`;
                       background: navPage === item.id ? `${C.accent}18` : "transparent",
                       color: navPage === item.id ? C.accent2 : C.text2,
                       boxShadow: navPage === item.id ? `inset 2px 0 0 ${C.accent}` : "none" }}>
-                    <span style={{ fontSize: 17 }}>{item.icon}</span>{item.label}
+                    <span style={{ fontSize: 17 }}>{item.icon}</span>
+                    {item.label}
+                    {item.soon && <span style={{ fontSize: 9, fontWeight: 700, color: C.accent2, background: `${C.accent}20`, borderRadius: 999, padding: "2px 6px", marginLeft: "auto", flexShrink: 0 }}>SOON</span>}
                   </button>
                 ))}
               </nav>
-              <div style={{ padding: "10px 8px", borderTop: `1px solid ${C.border}` }}>
-                <button onClick={() => { setNavPage("pricing"); setSidebarOpen(false); }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                    borderRadius: 9, border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                    fontSize: 14, fontWeight: navPage === "pricing" ? 700 : 500, fontFamily: "inherit",
-                    background: navPage === "pricing" ? `${C.blue}18` : "transparent",
-                    color: navPage === "pricing" ? "#93C5FD" : C.text2 }}>
-                  <span style={{ fontSize: 17 }}>💎</span>Plans & Pricing
-                </button>
+              <div style={{ padding: "10px 12px", borderTop: `1px solid ${C.border}` }}>
+                <div style={{ padding: "10px 12px", background: `${C.accent}0E`, border: `1px solid ${C.accent}30`, borderRadius: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.accent2, marginBottom: 4 }}>100% FREE</div>
+                  <div style={{ fontSize: 12, color: C.text3, lineHeight: 1.55 }}>Every feature, every template, every language. No account, no limits.</div>
+                  {AUTHOR.github && (
+                    <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer"
+                      style={{ display: "inline-block", marginTop: 7, fontSize: 12, fontWeight: 700, color: C.accent2, textDecoration: "none" }}>
+                      ⭐ Star on GitHub →
+                    </a>
+                  )}
+                </div>
               </div>
             </aside>
           </>
@@ -6273,7 +6470,7 @@ function CoverThumbPreview({ tp, isMobile }) {
       <div style={{ height: H, overflow: "hidden", position: "relative", background: "#fff" }}>
         <div style={{ width: INNER_W, transform: `scale(${scale})`, transformOrigin: "top left",
           position: "absolute", top: 0, left: 0, pointerEvents: "none", userSelect: "none" }}>
-          <CoverLetterPaper tpl={tp} data={SAMPLE_COVER} preview />
+          <CoverLetterPaper tpl={tp} data={COVER_THUMB_SAMPLES[tp.id] || SAMPLE_COVER} preview />
         </div>
       </div>
     </div>
