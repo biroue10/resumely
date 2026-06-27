@@ -2061,12 +2061,22 @@ Awards: ${form.awards}`;
                 {translating ? "⏳ Translating…" : `🌍 Translate to ${selectedLang.name}`}
               </button>
             )}
-            <button onClick={generate} disabled={loading}
-              style={{ ...cta, marginTop: 0, background: C.grad,
-                opacity: loading ? 0.6 : 1,
-                boxShadow: `0 6px 28px rgba(99,102,241,0.45)` }}>
-              {loading ? t.generating : "✨ " + t.generate}
-            </button>
+            {(() => {
+              const allFilled = form.name.trim() && form.title.trim() && form.email.trim() &&
+                form.phone.trim() && form.location.trim() && form.summary.trim() &&
+                form.experience.trim() && form.education.trim() && form.skills.trim();
+              const disabled = loading || !allFilled;
+              return (
+                <button onClick={generate} disabled={disabled}
+                  title={!allFilled ? "Please fill in all required fields first" : undefined}
+                  style={{ ...cta, marginTop: 0, background: C.grad,
+                    opacity: disabled ? 0.45 : 1,
+                    cursor: disabled ? "not-allowed" : "pointer",
+                    boxShadow: disabled ? "none" : `0 6px 28px rgba(99,102,241,0.45)` }}>
+                  {loading ? t.generating : "✨ " + t.generate}
+                </button>
+              );
+            })()}
             {result && (
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                 <button onClick={downloadPDF}
