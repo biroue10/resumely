@@ -432,6 +432,13 @@ function buildLiveData(form, t) {
   };
 }
 
+const defaultMaster = {
+  name: "", email: "", phone: "", location: "", linkedin: "", website: "",
+  headline: "", summary: "",
+  jobs: [], education: [], skills: [], certifications: [],
+  projects: [], languages: [], achievements: [], volunteer: [],
+};
+
 export default function ResumeGenerator() {
   const [navPage, setNavPage] = useState("resume");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -485,6 +492,15 @@ export default function ResumeGenerator() {
   const [coachAnswers, setCoachAnswers] = useState({});
   const [coachResult, setCoachResult] = useState("");
   const [atsOpen, setAtsOpen] = useState(false);
+  const [master, setMaster] = useState(() => { try { return JSON.parse(localStorage.getItem("ac_master") || "null") || {...defaultMaster}; } catch { return {...defaultMaster}; } });
+  const [masterTab, setMasterTab] = useState("personal");
+  const [masterOpen, setMasterOpen] = useState({});
+  const [tailorOpen, setTailorOpen] = useState(false);
+  const [jdText, setJdText] = useState("");
+  const [jdKws, setJdKws] = useState(null);
+  const [tailorSel, setTailorSel] = useState(null);
+  const [skillDraft, setSkillDraft] = useState("");
+  useEffect(() => { localStorage.setItem("ac_master", JSON.stringify(master)); }, [master]);
   const [trackerCards, setTrackerCards] = useState(() => {
     try { return JSON.parse(localStorage.getItem("ac_tracker") || "[]"); } catch { return []; }
   });
@@ -1839,6 +1855,7 @@ Awards: ${form.awards}`;
   // ── Sidebar nav items ──────────────────────────────────────────────
   const NAV = [
     { id: "resume",    icon: "📄", label: "Resume" },
+    { id: "master",    icon: "⭐", label: "Master Profile" },
     { id: "cover",     icon: "✉️",  label: "Cover Letter" },
     { id: "tracker",   icon: "📋", label: "Job Tracker" },
     { id: "signature", icon: "✍️",  label: "Email Signature" },
@@ -2334,9 +2351,421 @@ Awards: ${form.awards}`;
     );
   })();
 
+  // ── Master Profile ──────────────────────────────────────────────────
+  const masterContent = (() => {
+    const uid = () => `m${Date.now()}${Math.random().toString(36).slice(2,5)}`;
+    const upM = (k, v) => setMaster(m => ({...m, [k]: v}));
+    const mField = (k) => (e) => upM(k, e.target.value);
+
+    // Job helpers
+    const addJob = () => { const id = uid(); setMaster(m => ({...m, jobs: [...m.jobs, {id, company:"", title:"", startDate:"", endDate:"", current:false, location:"", bullets:[""]}]})); setMasterOpen(o => ({...o, [id]: true})); };
+    const upJob = (id, ch) => upM("jobs", master.jobs.map(j => j.id===id ? {...j,...ch} : j));
+    const delJob = (id) => upM("jobs", master.jobs.filter(j => j.id!==id));
+    const upJobBullet = (jid, bi, v) => upJob(jid, {bullets: master.jobs.find(j=>j.id===jid).bullets.map((b,i) => i===bi ? v : b)});
+    const addJobBullet = (jid) => upJob(jid, {bullets: [...(master.jobs.find(j=>j.id===jid)?.bullets||[]), ""]});
+    const delJobBullet = (jid, bi) => upJob(jid, {bullets: master.jobs.find(j=>j.id===jid).bullets.filter((_,i) => i!==bi)});
+
+    // Education helpers
+    const addEdu = () => { const id = uid(); setMaster(m => ({...m, education: [...m.education, {id, school:"", degree:"", field:"", startDate:"", endDate:"", gpa:""}]})); setMasterOpen(o => ({...o, [id]: true})); };
+    const upEdu = (id, ch) => upM("education", master.education.map(e => e.id===id ? {...e,...ch} : e));
+    const delEdu = (id) => upM("education", master.education.filter(e => e.id!==id));
+
+    // Skills helpers
+    const addSkill = (name) => { if (!name.trim() || master.skills.find(s => s.name.toLowerCase()===name.trim().toLowerCase())) return; upM("skills", [...master.skills, {id: uid(), name: name.trim()}]); setSkillDraft(""); };
+    const delSkill = (id) => upM("skills", master.skills.filter(s => s.id!==id));
+
+    // Other sections helpers
+    const addCert = () => upM("certifications", [...master.certifications, {id:uid(), name:"", issuer:"", date:"", url:""}]);
+    const upCert = (id, ch) => upM("certifications", master.certifications.map(c => c.id===id ? {...c,...ch} : c));
+    const delCert = (id) => upM("certifications", master.certifications.filter(c => c.id!==id));
+
+    const addProject = () => upM("projects", [...master.projects, {id:uid(), name:"", tech:"", url:"", description:""}]);
+    const upProject = (id, ch) => upM("projects", master.projects.map(p => p.id===id ? {...p,...ch} : p));
+    const delProject = (id) => upM("projects", master.projects.filter(p => p.id!==id));
+
+    const addLang = () => upM("languages", [...master.languages, {id:uid(), name:"", level:""}]);
+    const upLang = (id, ch) => upM("languages", master.languages.map(l => l.id===id ? {...l,...ch} : l));
+    const delLang = (id) => upM("languages", master.languages.filter(l => l.id!==id));
+
+    const addAch = () => upM("achievements", [...master.achievements, {id:uid(), title:"", description:"", date:""}]);
+    const upAch = (id, ch) => upM("achievements", master.achievements.map(a => a.id===id ? {...a,...ch} : a));
+    const delAch = (id) => upM("achievements", master.achievements.filter(a => a.id!==id));
+
+    const addVol = () => upM("volunteer", [...master.volunteer, {id:uid(), org:"", role:"", startDate:"", endDate:"", description:""}]);
+    const upVol = (id, ch) => upM("volunteer", master.volunteer.map(v => v.id===id ? {...v,...ch} : v));
+    const delVol = (id) => upM("volunteer", master.volunteer.filter(v => v.id!==id));
+
+    const toggleOpen = (id) => setMasterOpen(o => ({...o, [id]: !o[id]}));
+
+    // Keyword analysis
+    const STOP = new Set(["and","or","the","a","an","in","of","to","for","with","on","at","by","from","as","is","are","was","were","be","been","have","has","had","do","does","did","will","would","could","should","may","might","can","this","that","their","they","we","you","i","it","its","our","your","which","who","what","when","where","how","not","but","if","than","then","so","yet","both","also","just","more","most","very","too","about","into","each","many","all","any","some","such","no","only","same","other","per","via","able","using"]);
+    const getKws = (jd) => new Set(jd.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !STOP.has(w)));
+    const scoreText = (text, kws) => { if (!kws || !kws.size) return 0; const words = text.toLowerCase().split(/\W+/); return Math.min(100, Math.round((words.filter(w => kws.has(w)).length / kws.size) * 300)); };
+    const badge = (score) => score >= 40 ? {label:"Strong match", color:"#10B981"} : score >= 15 ? {label:"Relevant", color:"#F59E0B"} : {label:"Low match", color:"#64748B"};
+
+    const analyzeJD = () => {
+      const kws = getKws(jdText);
+      setJdKws(kws);
+      setTailorSel({
+        jobs: Object.fromEntries(master.jobs.map(j => [j.id, true])),
+        education: Object.fromEntries(master.education.map(e => [e.id, true])),
+        skills: Object.fromEntries(master.skills.map(s => [s.id, true])),
+        certifications: Object.fromEntries(master.certifications.map(c => [c.id, true])),
+        projects: Object.fromEntries(master.projects.map(p => [p.id, true])),
+        languages: Object.fromEntries(master.languages.map(l => [l.id, true])),
+        achievements: Object.fromEntries(master.achievements.map(a => [a.id, true])),
+      });
+    };
+    const toggleSel = (group, id) => setTailorSel(s => ({...s, [group]: {...s[group], [id]: !s[group]?.[id]}}));
+
+    const generateTailored = () => {
+      const s = tailorSel || {};
+      const selJobs = master.jobs.filter(j => s.jobs?.[j.id] !== false);
+      const experience = selJobs.map(j => [`${j.title}${j.company ? ` | ${j.company}` : ""}${j.location ? ` | ${j.location}` : ""}${j.startDate ? ` | ${j.startDate} – ${j.current ? "Present" : j.endDate||""}` : ""}`, ...j.bullets.filter(Boolean).map(b => `• ${b}`)].join("\n")).join("\n\n");
+      const education = master.education.filter(e => s.education?.[e.id] !== false).map(e => `${e.degree}${e.field ? ` in ${e.field}` : ""} — ${e.school}${e.endDate ? ` (${e.endDate})` : ""}${e.gpa ? ` · GPA ${e.gpa}` : ""}`).join("\n");
+      const skills = master.skills.filter(sk => s.skills?.[sk.id] !== false).map(sk => sk.name).join(", ");
+      const certifications = master.certifications.filter(c => s.certifications?.[c.id] !== false).map(c => `${c.name}${c.issuer ? ` — ${c.issuer}` : ""}${c.date ? ` (${c.date})` : ""}`).join("\n");
+      const projects = master.projects.filter(p => s.projects?.[p.id] !== false).map(p => `${p.name}${p.tech ? ` | ${p.tech}` : ""}${p.url ? ` | ${p.url}` : ""}${p.description ? `\n${p.description}` : ""}`).join("\n\n");
+      const languages = master.languages.filter(l => s.languages?.[l.id] !== false).map(l => `${l.name}${l.level ? ` (${l.level})` : ""}`).join(", ");
+      const achievements = master.achievements.filter(a => s.achievements?.[a.id] !== false).map(a => `${a.title}${a.date ? ` (${a.date})` : ""}${a.description ? ` — ${a.description}` : ""}`).join("\n");
+      setForm(f => ({...f, name: master.name||f.name, title: master.headline||f.title, email: master.email||f.email, phone: master.phone||f.phone, location: master.location||f.location, linkedin: master.linkedin||f.linkedin, website: master.website||f.website, summary: master.summary||f.summary, experience: experience||f.experience, education: education||f.education, skills: skills||f.skills, certifications: certifications||f.certifications, projects: projects||f.projects, languages: languages||f.languages, achievements: achievements||f.achievements}));
+      setTailorOpen(false); setJdKws(null); setTailorSel(null);
+      setNavPage("resume");
+      if (tpl) setStep("form"); // stay on form if template already picked
+    };
+
+    // Shared styles
+    const mi = {width:"100%", background:C.surface, border:`1px solid ${C.border}`, borderRadius:8, padding:"9px 12px", fontSize:13.5, color:C.text1, fontFamily:"inherit", outline:"none", boxSizing:"border-box"};
+    const lb = {fontSize:12, fontWeight:600, color:C.text2, display:"block", marginBottom:5};
+    const g2 = {display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:14};
+
+    const totalItems = master.jobs.length + master.education.length + master.skills.length + master.certifications.length + master.projects.length + master.languages.length + master.achievements.length + master.volunteer.length;
+
+    const TABS = [
+      {id:"personal", label:"Personal"},
+      {id:"experience", label:"Experience", count:master.jobs.length},
+      {id:"education", label:"Education", count:master.education.length},
+      {id:"skills", label:"Skills", count:master.skills.length},
+      {id:"more", label:"More", count:master.certifications.length+master.projects.length+master.languages.length+master.achievements.length+master.volunteer.length},
+    ];
+
+    // Inline selectable item row for tailor panel (avoid nested component)
+    const renderSelRow = (item, group, scoreText_val, labelText) => {
+      const checked = tailorSel?.[group]?.[item.id] !== false;
+      const bd = badge(scoreText_val);
+      return (
+        <label key={item.id} style={{display:"flex", alignItems:"center", gap:10, padding:"8px 12px", borderRadius:8, marginBottom:4, cursor:"pointer", background: checked ? `${bd.color}10` : C.surface, border:`1px solid ${checked ? bd.color+"40" : C.border}`, transition:"all 0.12s"}}>
+          <input type="checkbox" checked={checked} onChange={() => toggleSel(group, item.id)} style={{accentColor:bd.color, flexShrink:0}} />
+          <div style={{flex:1, minWidth:0, fontSize:13, fontWeight:600, color:C.text1, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{labelText}</div>
+          <span style={{fontSize:10.5, fontWeight:700, color:bd.color, background:`${bd.color}18`, padding:"2px 8px", borderRadius:999, whiteSpace:"nowrap", flexShrink:0}}>{bd.label} · {scoreText_val}%</span>
+        </label>
+      );
+    };
+
+    return (
+      <div style={{padding: isMobile ? "16px 12px" : "24px 28px", maxWidth:860, margin:"0 auto"}}>
+        {/* Header */}
+        <div style={{display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24, gap:16, flexWrap:"wrap"}}>
+          <div>
+            <h2 style={{margin:"0 0 4px", fontSize: isMobile ? 20 : 26, fontWeight:800, color:C.text1, letterSpacing:"-0.5px"}}>Master Profile</h2>
+            <p style={{margin:0, fontSize:13.5, color:C.text2}}>{totalItems > 0 ? `${totalItems} career items · generates any tailored resume in seconds` : "Build your complete career profile once. Generate any tailored resume from it."}</p>
+          </div>
+          <button onClick={() => setTailorOpen(o => !o)} disabled={totalItems === 0}
+            style={{background:C.grad, color:"#fff", border:"none", borderRadius:9, padding:"10px 20px", fontSize:14, fontWeight:700, cursor: totalItems===0 ? "not-allowed" : "pointer", fontFamily:"inherit", whiteSpace:"nowrap", opacity: totalItems===0 ? 0.45 : 1}}>
+            ✨ Tailor for a Job →
+          </button>
+        </div>
+
+        {/* Tailor Panel */}
+        {tailorOpen && (
+          <div style={{background:`${C.accent}08`, border:`1.5px solid ${C.accent}40`, borderRadius:14, padding:"20px 22px", marginBottom:24}}>
+            <div style={{fontSize:15, fontWeight:800, color:C.text1, marginBottom:4}}>Tailor for a Specific Job</div>
+            <div style={{fontSize:13, color:C.text2, marginBottom:14}}>Paste the job description — we'll score your profile against it and let you select exactly what to include.</div>
+            <textarea value={jdText} onChange={e => { setJdText(e.target.value); setJdKws(null); setTailorSel(null); }}
+              placeholder="Paste the full job description here..." rows={6}
+              style={{...mi, resize:"vertical", lineHeight:1.6, marginBottom:12}} />
+            <div style={{display:"flex", gap:10, alignItems:"center", marginBottom: jdKws ? 20 : 0}}>
+              <button onClick={analyzeJD} disabled={!jdText.trim()}
+                style={{background:C.grad, color:"#fff", border:"none", borderRadius:8, padding:"9px 20px", fontSize:13.5, fontWeight:700, cursor: jdText.trim() ? "pointer" : "not-allowed", fontFamily:"inherit", opacity: jdText.trim() ? 1 : 0.5}}>
+                Analyze →
+              </button>
+              {jdKws && <span style={{fontSize:12.5, color:C.text2}}>{jdKws.size} keywords extracted</span>}
+            </div>
+
+            {tailorSel && jdKws && (
+              <div style={{borderTop:`1px solid ${C.border}`, paddingTop:20}}>
+                <div style={{fontSize:14, fontWeight:700, color:C.text1, marginBottom:14}}>Select what to include in your tailored resume:</div>
+                {master.jobs.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, marginBottom:8}}>Work Experience</div>{master.jobs.map(j => renderSelRow(j, "jobs", scoreText(j.title+" "+j.company+" "+j.bullets.join(" "), jdKws), `${j.title}${j.company ? " · "+j.company : ""}${j.startDate ? " ("+j.startDate+" – "+(j.current?"Present":j.endDate||"?")+")" : ""}`))}</>)}
+                {master.education.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, margin:"14px 0 8px"}}>Education</div>{master.education.map(e => renderSelRow(e, "education", scoreText(e.degree+" "+e.field+" "+e.school, jdKws), `${e.degree}${e.field ? " in "+e.field : ""} — ${e.school}`))}</>)}
+                {master.skills.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, margin:"14px 0 8px"}}>Skills</div><div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:4}}>{master.skills.map(sk => { const sc = scoreText(sk.name, jdKws); const bd = badge(sc); const checked = tailorSel.skills?.[sk.id] !== false; return (<button key={sk.id} onClick={() => toggleSel("skills", sk.id)} style={{padding:"5px 12px", borderRadius:999, fontSize:12.5, fontWeight:600, border:`1.5px solid ${checked ? bd.color : C.border}`, background: checked ? `${bd.color}18` : "transparent", color: checked ? bd.color : C.text3, cursor:"pointer", fontFamily:"inherit", transition:"all 0.12s"}}>{sk.name}</button>); })}</div></>)}
+                {master.projects.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, margin:"14px 0 8px"}}>Projects</div>{master.projects.map(p => renderSelRow(p, "projects", scoreText(p.name+" "+p.tech+" "+p.description, jdKws), `${p.name}${p.tech ? " · "+p.tech : ""}`))}</>)}
+                {master.certifications.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, margin:"14px 0 8px"}}>Certifications</div>{master.certifications.map(c => renderSelRow(c, "certifications", scoreText(c.name+" "+c.issuer, jdKws), `${c.name}${c.issuer ? " · "+c.issuer : ""}`))}</>)}
+                {master.languages.length > 0 && (<><div style={{fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:C.text3, margin:"14px 0 8px"}}>Languages</div>{master.languages.map(l => renderSelRow(l, "languages", scoreText(l.name, jdKws), `${l.name}${l.level ? " ("+l.level+")" : ""}`))}</>)}
+                <div style={{display:"flex", gap:10, marginTop:20, flexWrap:"wrap"}}>
+                  <button onClick={generateTailored}
+                    style={{background:C.grad, color:"#fff", border:"none", borderRadius:8, padding:"11px 24px", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}>
+                    Generate Tailored Resume →
+                  </button>
+                  <button onClick={() => { setTailorOpen(false); setJdKws(null); setTailorSel(null); setJdText(""); }}
+                    style={{background:"transparent", color:C.text2, border:`1px solid ${C.border}`, borderRadius:8, padding:"11px 16px", fontSize:13.5, cursor:"pointer", fontFamily:"inherit"}}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div style={{display:"flex", gap:0, marginBottom:24, borderBottom:`1px solid ${C.border}`, overflowX:"auto"}}>
+          {TABS.map(tab => (
+            <button key={tab.id} onClick={() => setMasterTab(tab.id)}
+              style={{padding:"9px 16px", fontSize:13, fontWeight: masterTab===tab.id ? 700 : 500, color: masterTab===tab.id ? C.accent2 : C.text2, background:"none", border:"none", borderBottom:`2px solid ${masterTab===tab.id ? C.accent : "transparent"}`, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap", marginBottom:-1, transition:"color 0.15s"}}>
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span style={{marginLeft:6, fontSize:10.5, fontWeight:700, color: masterTab===tab.id ? C.accent : C.text3, background: masterTab===tab.id ? `${C.accent}18` : C.elevated, padding:"1px 6px", borderRadius:999, border:`1px solid ${C.border}`}}>{tab.count}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Personal tab */}
+        {masterTab === "personal" && (
+          <div>
+            <div style={g2}>
+              {[["name","Full name","Alexandra Johnson"],["headline","Professional headline","Senior Product Designer"],["email","Email","alex@email.com"],["phone","Phone","+1 415 555 0000"],["location","Location","San Francisco, CA"],["linkedin","LinkedIn","linkedin.com/in/alexj"],["website","Website / Portfolio","alexj.design"]].map(([k,label,ph]) => (
+                <div key={k}>
+                  <label style={lb}>{label}</label>
+                  <input value={master[k]||""} onChange={mField(k)} placeholder={ph} style={mi} />
+                </div>
+              ))}
+            </div>
+            <div style={{marginTop:14}}>
+              <label style={lb}>Professional summary</label>
+              <textarea value={master.summary||""} onChange={mField("summary")} placeholder="Write a 2–3 sentence summary of your career, skills, and goals..." rows={4} style={{...mi, resize:"vertical", lineHeight:1.6}} />
+            </div>
+          </div>
+        )}
+
+        {/* Experience tab */}
+        {masterTab === "experience" && (
+          <div>
+            {master.jobs.length === 0 && <div style={{textAlign:"center", padding:"32px 24px", color:C.text3, fontSize:13}}>No work experience added yet.</div>}
+            {master.jobs.map(job => (
+              <div key={job.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:11, marginBottom:10, overflow:"hidden"}}>
+                <div style={{display:"flex", alignItems:"center", gap:10, padding:"12px 14px", cursor:"pointer", userSelect:"none"}} onClick={() => toggleOpen(job.id)}>
+                  <span style={{color:C.text3, fontSize:12, display:"inline-block", transform: masterOpen[job.id] ? "rotate(90deg)" : "none", transition:"transform 0.15s"}}>▶</span>
+                  <div style={{flex:1, minWidth:0}}>
+                    <div style={{fontSize:13.5, fontWeight:700, color:C.text1, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{job.title||"Untitled role"}{job.company ? ` · ${job.company}` : ""}</div>
+                    {(job.startDate||job.endDate||job.current) && <div style={{fontSize:11.5, color:C.text3, marginTop:1}}>{job.startDate} – {job.current ? "Present" : job.endDate}</div>}
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); delJob(job.id); }} style={{background:"none", border:"none", color:"#EF4444", cursor:"pointer", fontSize:13, padding:"4px 6px", borderRadius:6, fontFamily:"inherit", opacity:0.7}}>✕</button>
+                </div>
+                {masterOpen[job.id] && (
+                  <div style={{padding:"0 14px 16px", borderTop:`1px solid ${C.border}`}}>
+                    <div style={{...g2, marginTop:14}}>
+                      {[["title","Job title","Software Engineer"],["company","Company","Stripe"],["startDate","Start date","Jan 2022"],["location","Location","Remote"]].map(([k,label,ph]) => (
+                        <div key={k}><label style={lb}>{label}</label><input value={job[k]||""} onChange={e => upJob(job.id, {[k]:e.target.value})} placeholder={ph} style={mi} /></div>
+                      ))}
+                      <div>
+                        <label style={lb}>End date</label>
+                        <input value={job.endDate||""} onChange={e => upJob(job.id, {endDate:e.target.value})} placeholder="Present" disabled={job.current} style={{...mi, opacity: job.current ? 0.45 : 1}} />
+                      </div>
+                      <div style={{display:"flex", alignItems:"center", gap:8, paddingTop:22}}>
+                        <input type="checkbox" id={`cur_${job.id}`} checked={!!job.current} onChange={e => upJob(job.id, {current:e.target.checked, endDate:""})} style={{accentColor:C.accent}} />
+                        <label htmlFor={`cur_${job.id}`} style={{fontSize:13, color:C.text2, cursor:"pointer"}}>Currently working here</label>
+                      </div>
+                    </div>
+                    <div style={{marginTop:16}}>
+                      <label style={lb}>Achievements & responsibilities</label>
+                      {job.bullets.map((b, bi) => (
+                        <div key={bi} style={{display:"flex", gap:8, marginBottom:6, alignItems:"center"}}>
+                          <span style={{color:C.text3, fontSize:16, flexShrink:0, lineHeight:"38px"}}>•</span>
+                          <input value={b} onChange={e => upJobBullet(job.id, bi, e.target.value)} placeholder="Led migration of 3 services, reducing infra costs by 40%..." style={{...mi, flex:1}} />
+                          <button onClick={() => delJobBullet(job.id, bi)} style={{background:"none", border:"none", color:C.text3, cursor:"pointer", fontSize:14, padding:"4px 6px", flexShrink:0, fontFamily:"inherit"}}>✕</button>
+                        </div>
+                      ))}
+                      <button onClick={() => addJobBullet(job.id)} style={{marginTop:4, background:"none", border:`1px dashed ${C.border}`, borderRadius:7, padding:"6px 12px", fontSize:12.5, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add bullet</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            <button onClick={addJob} style={{width:"100%", background:C.surface, border:`1.5px dashed ${C.border}`, borderRadius:10, padding:"11px", fontSize:13.5, color:C.text2, cursor:"pointer", fontFamily:"inherit", marginTop:4}}>+ Add work experience</button>
+          </div>
+        )}
+
+        {/* Education tab */}
+        {masterTab === "education" && (
+          <div>
+            {master.education.length === 0 && <div style={{textAlign:"center", padding:"32px 24px", color:C.text3, fontSize:13}}>No education added yet.</div>}
+            {master.education.map(edu => (
+              <div key={edu.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:11, marginBottom:10, overflow:"hidden"}}>
+                <div style={{display:"flex", alignItems:"center", gap:10, padding:"12px 14px", cursor:"pointer", userSelect:"none"}} onClick={() => toggleOpen(edu.id)}>
+                  <span style={{color:C.text3, fontSize:12, display:"inline-block", transform: masterOpen[edu.id] ? "rotate(90deg)" : "none", transition:"transform 0.15s"}}>▶</span>
+                  <div style={{flex:1, minWidth:0}}>
+                    <div style={{fontSize:13.5, fontWeight:700, color:C.text1, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{edu.degree||"Degree"}{edu.field ? ` in ${edu.field}` : ""}{edu.school ? ` · ${edu.school}` : ""}</div>
+                    {edu.endDate && <div style={{fontSize:11.5, color:C.text3, marginTop:1}}>{edu.endDate}</div>}
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); delEdu(edu.id); }} style={{background:"none", border:"none", color:"#EF4444", cursor:"pointer", fontSize:13, padding:"4px 6px", borderRadius:6, fontFamily:"inherit", opacity:0.7}}>✕</button>
+                </div>
+                {masterOpen[edu.id] && (
+                  <div style={{padding:"0 14px 16px", borderTop:`1px solid ${C.border}`}}>
+                    <div style={{...g2, marginTop:14}}>
+                      {[["school","School / University","MIT"],["degree","Degree","B.Sc."],["field","Field of study","Computer Science"],["endDate","Graduation year","2024"],["gpa","GPA (optional)","3.8 / 4.0"]].map(([k,label,ph]) => (
+                        <div key={k}><label style={lb}>{label}</label><input value={edu[k]||""} onChange={e => upEdu(edu.id, {[k]:e.target.value})} placeholder={ph} style={mi} /></div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            <button onClick={addEdu} style={{width:"100%", background:C.surface, border:`1.5px dashed ${C.border}`, borderRadius:10, padding:"11px", fontSize:13.5, color:C.text2, cursor:"pointer", fontFamily:"inherit", marginTop:4}}>+ Add education</button>
+          </div>
+        )}
+
+        {/* Skills tab */}
+        {masterTab === "skills" && (
+          <div>
+            <div style={{marginBottom:20}}>
+              <label style={lb}>Add a skill</label>
+              <div style={{display:"flex", gap:8}}>
+                <input value={skillDraft} onChange={e => setSkillDraft(e.target.value)} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); addSkill(skillDraft); } }} placeholder="e.g. React, Python, Project Management..." style={{...mi, flex:1}} />
+                <button onClick={() => addSkill(skillDraft)} disabled={!skillDraft.trim()} style={{background:C.grad, color:"#fff", border:"none", borderRadius:8, padding:"9px 16px", fontSize:13.5, fontWeight:700, cursor: skillDraft.trim() ? "pointer" : "not-allowed", fontFamily:"inherit", flexShrink:0, opacity: skillDraft.trim() ? 1 : 0.5}}>Add</button>
+              </div>
+              <div style={{fontSize:11.5, color:C.text3, marginTop:5}}>Press Enter to add quickly</div>
+            </div>
+            {master.skills.length > 0 ? (
+              <div style={{display:"flex", flexWrap:"wrap", gap:8}}>
+                {master.skills.map(s => (
+                  <div key={s.id} style={{display:"flex", alignItems:"center", gap:5, background:`${C.accent}14`, border:`1px solid ${C.accent}30`, borderRadius:999, padding:"5px 10px 5px 14px", fontSize:13, color:C.accent2, fontWeight:600}}>
+                    {s.name}
+                    <button onClick={() => delSkill(s.id)} style={{background:"none", border:"none", color:C.text3, cursor:"pointer", fontSize:12, padding:0, lineHeight:1, fontFamily:"inherit"}}>✕</button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{textAlign:"center", padding:"32px 24px", color:C.text3, fontSize:13}}>No skills yet. Type a skill and press Enter.</div>
+            )}
+            {master.skills.length > 0 && <div style={{marginTop:12, fontSize:12.5, color:C.text3}}>{master.skills.length} skill{master.skills.length!==1?"s":""}</div>}
+          </div>
+        )}
+
+        {/* More tab */}
+        {masterTab === "more" && (
+          <div>
+            {/* Certifications */}
+            <div style={{marginBottom:28}}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:10, borderBottom:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11, fontWeight:700, color:C.text2, textTransform:"uppercase", letterSpacing:"0.8px"}}>Certifications</span>
+                <button onClick={addCert} style={{background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"4px 10px", fontSize:12, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add</button>
+              </div>
+              {master.certifications.length === 0 && <div style={{fontSize:12.5, color:C.text3}}>None added.</div>}
+              {master.certifications.map(c => (
+                <div key={c.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:9, padding:"12px 14px", marginBottom:8}}>
+                  <div style={{...g2, marginBottom:10}}>
+                    <div><label style={lb}>Certification name</label><input value={c.name||""} onChange={e => upCert(c.id, {name:e.target.value})} placeholder="AWS Solutions Architect" style={mi} /></div>
+                    <div><label style={lb}>Issuing organization</label><input value={c.issuer||""} onChange={e => upCert(c.id, {issuer:e.target.value})} placeholder="Amazon Web Services" style={mi} /></div>
+                    <div><label style={lb}>Date</label><input value={c.date||""} onChange={e => upCert(c.id, {date:e.target.value})} placeholder="March 2024" style={mi} /></div>
+                    <div><label style={lb}>URL (optional)</label><input value={c.url||""} onChange={e => upCert(c.id, {url:e.target.value})} placeholder="credential link..." style={mi} /></div>
+                  </div>
+                  <button onClick={() => delCert(c.id)} style={{fontSize:12, color:"#EF4444", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}>Remove</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Projects */}
+            <div style={{marginBottom:28}}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:10, borderBottom:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11, fontWeight:700, color:C.text2, textTransform:"uppercase", letterSpacing:"0.8px"}}>Projects</span>
+                <button onClick={addProject} style={{background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"4px 10px", fontSize:12, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add</button>
+              </div>
+              {master.projects.length === 0 && <div style={{fontSize:12.5, color:C.text3}}>None added.</div>}
+              {master.projects.map(p => (
+                <div key={p.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:9, padding:"12px 14px", marginBottom:8}}>
+                  <div style={{...g2, marginBottom:10}}>
+                    <div><label style={lb}>Project name</label><input value={p.name||""} onChange={e => upProject(p.id, {name:e.target.value})} placeholder="Portfolio website" style={mi} /></div>
+                    <div><label style={lb}>Tech stack</label><input value={p.tech||""} onChange={e => upProject(p.id, {tech:e.target.value})} placeholder="React, Node.js, PostgreSQL" style={mi} /></div>
+                  </div>
+                  <div style={{marginBottom:10}}><label style={lb}>Description</label><textarea value={p.description||""} onChange={e => upProject(p.id, {description:e.target.value})} placeholder="What did you build and what was the impact?" rows={2} style={{...mi, resize:"none", lineHeight:1.6}} /></div>
+                  <div style={{marginBottom:8}}><label style={lb}>URL (optional)</label><input value={p.url||""} onChange={e => upProject(p.id, {url:e.target.value})} placeholder="github.com/..." style={mi} /></div>
+                  <button onClick={() => delProject(p.id)} style={{fontSize:12, color:"#EF4444", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}>Remove</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Languages */}
+            <div style={{marginBottom:28}}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:10, borderBottom:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11, fontWeight:700, color:C.text2, textTransform:"uppercase", letterSpacing:"0.8px"}}>Languages</span>
+                <button onClick={addLang} style={{background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"4px 10px", fontSize:12, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add</button>
+              </div>
+              {master.languages.length === 0 && <div style={{fontSize:12.5, color:C.text3}}>None added.</div>}
+              {master.languages.map(l => (
+                <div key={l.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:9, padding:"12px 14px", marginBottom:8}}>
+                  <div style={{...g2, marginBottom:8}}>
+                    <div><label style={lb}>Language</label><input value={l.name||""} onChange={e => upLang(l.id, {name:e.target.value})} placeholder="Spanish" style={mi} /></div>
+                    <div><label style={lb}>Proficiency</label>
+                      <select value={l.level||""} onChange={e => upLang(l.id, {level:e.target.value})} style={{...mi, cursor:"pointer"}}>
+                        <option value="">Select level...</option>
+                        {["Native","Fluent","Advanced","Intermediate","Basic"].map(lv => <option key={lv} value={lv}>{lv}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <button onClick={() => delLang(l.id)} style={{fontSize:12, color:"#EF4444", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}>Remove</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Achievements */}
+            <div style={{marginBottom:28}}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:10, borderBottom:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11, fontWeight:700, color:C.text2, textTransform:"uppercase", letterSpacing:"0.8px"}}>Awards & Achievements</span>
+                <button onClick={addAch} style={{background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"4px 10px", fontSize:12, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add</button>
+              </div>
+              {master.achievements.length === 0 && <div style={{fontSize:12.5, color:C.text3}}>None added.</div>}
+              {master.achievements.map(a => (
+                <div key={a.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:9, padding:"12px 14px", marginBottom:8}}>
+                  <div style={{...g2, marginBottom:10}}>
+                    <div><label style={lb}>Award / Achievement</label><input value={a.title||""} onChange={e => upAch(a.id, {title:e.target.value})} placeholder="Employee of the Year" style={mi} /></div>
+                    <div><label style={lb}>Date (optional)</label><input value={a.date||""} onChange={e => upAch(a.id, {date:e.target.value})} placeholder="2023" style={mi} /></div>
+                  </div>
+                  <div style={{marginBottom:8}}><label style={lb}>Description (optional)</label><textarea value={a.description||""} onChange={e => upAch(a.id, {description:e.target.value})} placeholder="Brief description..." rows={2} style={{...mi, resize:"none", lineHeight:1.6}} /></div>
+                  <button onClick={() => delAch(a.id)} style={{fontSize:12, color:"#EF4444", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}>Remove</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Volunteer */}
+            <div style={{marginBottom:28}}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:10, borderBottom:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11, fontWeight:700, color:C.text2, textTransform:"uppercase", letterSpacing:"0.8px"}}>Volunteer Experience</span>
+                <button onClick={addVol} style={{background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"4px 10px", fontSize:12, color:C.text2, cursor:"pointer", fontFamily:"inherit"}}>+ Add</button>
+              </div>
+              {master.volunteer.length === 0 && <div style={{fontSize:12.5, color:C.text3}}>None added.</div>}
+              {master.volunteer.map(v => (
+                <div key={v.id} style={{background:C.surface, border:`1px solid ${C.border}`, borderRadius:9, padding:"12px 14px", marginBottom:8}}>
+                  <div style={{...g2, marginBottom:10}}>
+                    <div><label style={lb}>Organization</label><input value={v.org||""} onChange={e => upVol(v.id, {org:e.target.value})} placeholder="Red Cross" style={mi} /></div>
+                    <div><label style={lb}>Role</label><input value={v.role||""} onChange={e => upVol(v.id, {role:e.target.value})} placeholder="Event Coordinator" style={mi} /></div>
+                    <div><label style={lb}>Start date</label><input value={v.startDate||""} onChange={e => upVol(v.id, {startDate:e.target.value})} placeholder="Jan 2022" style={mi} /></div>
+                    <div><label style={lb}>End date</label><input value={v.endDate||""} onChange={e => upVol(v.id, {endDate:e.target.value})} placeholder="Present" style={mi} /></div>
+                  </div>
+                  <div style={{marginBottom:8}}><label style={lb}>Description</label><textarea value={v.description||""} onChange={e => upVol(v.id, {description:e.target.value})} placeholder="What did you do and what was the impact?" rows={2} style={{...mi, resize:"none", lineHeight:1.6}} /></div>
+                  <button onClick={() => delVol(v.id)} style={{fontSize:12, color:"#EF4444", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}>Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  })();
+
   let pageBody;
   if (navPage === "resume") pageBody = step === "form" ? (formContent || mainContent) : mainContent;
   else if (navPage === "cover") pageBody = coverStep === "form" ? (coverFormContent || coverTemplatesContent) : coverTemplatesContent;
+  else if (navPage === "master") pageBody = masterContent;
   else if (navPage === "tracker") pageBody = trackerContent;
   else if (navPage === "pricing") pageBody = <PricingPage />;
   else if (navPage === "about") pageBody = <AboutPage />;
@@ -3530,7 +3959,7 @@ Awards: ${form.awards}`;
 
         {isFormView
           ? <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{pageBody}</div>
-          : navPage === "tracker"
+          : (navPage === "tracker" || navPage === "master")
             ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{pageBody}</div>
             : pageBody}
         </div>
