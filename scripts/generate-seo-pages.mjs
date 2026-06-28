@@ -146,6 +146,7 @@ function page({ slug, title, description, eyebrow, h1, sub, keywords, resumeCard
 <meta name="twitter:image:alt" content="${SOCIAL_IMAGE_ALT}"/>
 <link rel="icon" href="/favicon.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="${cssRel}"/>
 <script type="application/ld+json">${faqSchema(faqs)}</script>

@@ -1,0 +1,41 @@
+# Cloudflare Pages response headers
+
+# Hashed JS and CSS assets — Vite appends a content hash to every filename.
+# These never change on a given URL, so they can be cached indefinitely.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Versioned images / fonts served from /assets/
+# (covered by the rule above)
+
+# Favicon — changes infrequently but has no hash.
+/favicon.svg
+  Cache-Control: public, max-age=86400
+
+# OG image — social cards cache aggressively in crawlers; use a short TTL
+# so we can refresh the card without a cache-bust.
+/og.png
+  Cache-Control: public, max-age=86400
+
+# Sitemap and robots — crawlers expect fresh data within a day or two.
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+# HTML pages (prerendered by vite-react-ssg): allow browsers to cache
+# for a short period but must revalidate, so deploys propagate quickly.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Root index — same short-lived policy.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Security headers applied to all responses.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

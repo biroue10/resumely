@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 // ── UI translation codes (languages with full UI translation) ──────
 const UI_LANGS = new Set(["en", "fr", "es", "ar", "de"]);
@@ -839,14 +839,28 @@ export default function ResumeGenerator() {
   const [jdKws, setJdKws] = useState(null);
   const [tailorSel, setTailorSel] = useState(null);
   const [skillDraft, setSkillDraft] = useState("");
-  useEffect(() => { localStorage.setItem("ac_master", JSON.stringify(master)); }, [master]);
+  // Debounced localStorage writes: master and tracker can hold large JSON blobs.
+  // Serialising synchronously on every state change would block the main thread
+  // during rapid updates. 800 ms is short enough to not lose data on tab close,
+  // long enough to skip intermediate states during rapid drag operations.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try { localStorage.setItem("ac_master", JSON.stringify(master)); } catch {}
+    }, 800);
+    return () => clearTimeout(id);
+  }, [master]);
   const [trackerCards, setTrackerCards] = useState(() => {
     try { return JSON.parse(localStorage.getItem("ac_tracker") || "[]"); } catch { return []; }
   });
   const [trackerModal, setTrackerModal] = useState({ open: false, card: null });
   const [trackerDragId, setTrackerDragId] = useState(null);
   const [trackerDragOver, setTrackerDragOver] = useState(null);
-  useEffect(() => { localStorage.setItem("ac_tracker", JSON.stringify(trackerCards)); }, [trackerCards]);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try { localStorage.setItem("ac_tracker", JSON.stringify(trackerCards)); } catch {}
+    }, 800);
+    return () => clearTimeout(id);
+  }, [trackerCards]);
 
   const [atsText, setAtsText] = useState("");
   const [atsJd, setAtsJd] = useState("");
@@ -871,13 +885,19 @@ export default function ResumeGenerator() {
   const lang = UI_LANGS.has(selectedLang.code) ? selectedLang.code : "en";
   const t = UI[lang];
   const rtl = selectedLang.rtl || false;
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const set = useCallback((k) => (e) => setForm(f => ({ ...f, [k]: e.target.value })), []);
+  const setField = useCallback((k, v) => setForm(f => ({ ...f, [k]: v })), []);
   const fullPhone = form.phone.trim() ? `${phoneCode} ${form.phone.trim()}` : "";
-  const liveData = buildLiveData({ ...form, phone: fullPhone, photo: photoUrl }, t);
+  // Memoised so non-form state changes (modal open, ATS result, etc.) don't
+  // trigger an expensive re-parse of the entire form on every render.
+  const liveData = useMemo(
+    () => buildLiveData({ ...form, phone: fullPhone, photo: photoUrl }, t),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, fullPhone, photoUrl, lang]
+  );
   const isMobile = useIsMobile();
-  const rPage  = { ...page,  padding: isMobile ? "8px 4px" : "16px 8px", overflowX: "hidden" };
-  const rShell = { ...shell, padding: isMobile ? "16px 12px" : "28px 32px" };
+  const rPage  = isMobile ? rPageMobile  : rPageDesktop;
+  const rShell = isMobile ? rShellMobile : rShellDesktop;
 
   function validateEmail(val) {
     if (!val.trim()) return "";
@@ -3595,9 +3615,12 @@ Awards: ${form.awards}`;
   else pageBody = <ComingSoon id={navPage} label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
   // Two-column independent scroll: only on desktop, resume form view
-  const isFormView = !isMobile && (
-    (navPage === "resume" && step === "form" && !!tpl) ||
-    (navPage === "cover" && coverStep === "form" && !!coverTpl)
+  const isFormView = useMemo(() =>
+    !isMobile && (
+      (navPage === "resume" && step === "form" && !!tpl) ||
+      (navPage === "cover" && coverStep === "form" && !!coverTpl)
+    ),
+    [isMobile, navPage, step, tpl, coverStep, coverTpl]
   );
 
   // ── Landing page ──────────────────────────────────────────────────
@@ -6685,6 +6708,9 @@ const page = {
   fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
   color: C.text1,
 };
+// Pre-baked mobile/desktop variants so the component doesn't spread+override on every render.
+const rPageDesktop = { ...page, padding: "16px 8px", overflowX: "hidden" };
+const rPageMobile  = { ...page, padding: "8px 4px",  overflowX: "hidden" };
 const shell = {
   margin: "0 auto",
   background: `linear-gradient(160deg, rgba(99,102,241,0.04) 0%, transparent 40%), ${C.surface}`,
@@ -6693,6 +6719,8 @@ const shell = {
   border: `1px solid ${C.border}`,
   boxShadow: `0 0 0 1px rgba(99,102,241,0.06), 0 24px 64px rgba(0,0,0,0.45)`,
 };
+const rShellDesktop = { ...shell, padding: "28px 32px" };
+const rShellMobile  = { ...shell, padding: "16px 12px" };
 const h1 = {
   fontSize: 30, fontWeight: 800, margin: "0 0 6px",
   color: C.text1, letterSpacing: "-0.6px",

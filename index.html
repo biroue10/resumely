@@ -132,6 +132,14 @@
         from { opacity: 0; }
         to   { opacity: 1; }
       }
+      /* Respect user preference for reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
       @keyframes acPulse {
         0%, 100% { box-shadow: 0 4px 24px rgba(99,102,241,0.4); }
         50%       { box-shadow: 0 8px 48px rgba(99,102,241,0.7), 0 0 0 5px rgba(99,102,241,0.1); }
