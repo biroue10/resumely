@@ -923,6 +923,7 @@ export default function ResumeGenerator() {
   };
   const [uploadedResume, setUploadedResume] = useState(null);
   const [uploadDragOver, setUploadDragOver] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [appView, setAppView] = useState("landing");
   const [coachOpen, setCoachOpen] = useState(false);
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
@@ -3965,6 +3966,16 @@ Awards: ${form.awards}`;
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
           onLogin={user => { setCurrentUser(user); setAuthModal(false); }} />
         <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+        <UploadResumeModal
+          open={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+          onImprove={(file, email) => {
+            setUploadedResume(file);
+            setForm(f => ({ ...f, email: email || f.email }));
+            setUploadModalOpen(false);
+            startResume("resume_upload");
+          }}
+        />
 
         {/* Coming soon modal */}
         {comingSoonFeature && (
@@ -4052,35 +4063,20 @@ Awards: ${form.awards}`;
                   textTransform: "uppercase", whiteSpace: "nowrap" }}>or improve an existing one</span>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
               </div>
-              <label
-                htmlFor="landing-resume-upload"
-                onDragOver={e => { e.preventDefault(); setUploadDragOver(true); }}
-                onDragLeave={() => setUploadDragOver(false)}
-                onDrop={e => {
-                  e.preventDefault();
-                  setUploadDragOver(false);
-                  const file = e.dataTransfer.files?.[0];
-                  if (validateResumeImport(file)) {
-                    setUploadedResume(file);
-                    startResume("resume_upload");
-                  } else {
-                    setStatusMsg("Resume upload must be a PDF or DOCX under 8 MB.");
-                    setTimeout(() => setStatusMsg(""), 2500);
-                  }
-                }}
+              <button onClick={() => setUploadModalOpen(true)}
                 style={{ display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
-                  border: `2px dashed ${uploadDragOver ? C.accent : C.border}`,
-                  borderRadius: C.radiusLg, padding: "18px 24px",
-                  background: uploadDragOver ? `${C.accent}08` : C.surface,
-                  transition: "border-color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.borderHi; }}
-                onMouseLeave={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.border; }}>
+                  border: `2px dashed ${C.border}`, borderRadius: C.radiusLg,
+                  padding: "18px 24px", width: "100%", background: C.surface,
+                  transition: "border-color 0.2s, background 0.2s", fontFamily: "inherit",
+                  textAlign: "left" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = C.borderHi; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}>
                 <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0,
                   background: `${C.accent}14`, border: `1px solid ${C.accent}30`,
                   display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <LineIcon name="upload" size={22} color={C.accent2} />
                 </div>
-                <div style={{ textAlign: "left" }}>
+                <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 3 }}>
                     Upload your resume
                   </div>
@@ -4089,20 +4085,7 @@ Awards: ${form.awards}`;
                   </div>
                 </div>
                 <LineIcon name="upload" size={18} color={C.text3} style={{ marginLeft: "auto" }} />
-                <input id="landing-resume-upload" type="file" accept=".pdf,.docx"
-                  style={{ display: "none" }}
-                  onChange={e => {
-                    const file = e.target.files?.[0];
-                    if (validateResumeImport(file)) {
-                      setUploadedResume(file);
-                      startResume("resume_upload");
-                    } else if (file) {
-                      setStatusMsg("Resume upload must be a PDF or DOCX under 8 MB.");
-                      e.target.value = "";
-                      setTimeout(() => setStatusMsg(""), 2500);
-                    }
-                  }} />
-              </label>
+              </button>
               </div>
             </div>
             {!isMobile && (
@@ -5163,6 +5146,155 @@ Awards: ${form.awards}`;
             : pageBody}
         </div>
       </main>
+    </div>
+  );
+}
+
+// ── UploadResumeModal ─────────────────────────────────────────────
+function UploadResumeModal({ open, onClose, onImprove }) {
+  const [file, setFile] = useState(null);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  const [fileError, setFileError] = useState("");
+  const dialogRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      setFile(null); setEmail(""); setEmailError(""); setDragOver(false); setFileError("");
+      setTimeout(() => dialogRef.current?.querySelector("input[type='email']")?.focus(), 80);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  function acceptFile(f) {
+    if (!f) return;
+    if (!validateResumeImport(f)) {
+      setFileError("Please upload a PDF or DOCX file under 8 MB.");
+      return;
+    }
+    setFileError("");
+    setFile(f);
+  }
+
+  function validateEmailLocal(val) {
+    if (!val.trim()) return "Email address is required.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())) return "Enter a valid email address.";
+    return "";
+  }
+
+  function handleImprove() {
+    const err = validateEmailLocal(email);
+    if (err) { setEmailError(err); return; }
+    if (!file) { setFileError("Please select a resume file first."); return; }
+    onImprove(file, email.trim());
+  }
+
+  const canImprove = email.trim().length > 0 && !!file;
+
+  if (!open) return null;
+
+  return (
+    <div onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9999,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div ref={dialogRef} onClick={e => e.stopPropagation()}
+        role="dialog" aria-modal="true" aria-labelledby="upload-modal-title"
+        style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16,
+          padding: "32px 28px", maxWidth: 480, width: "100%",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.55)", position: "relative" }}>
+
+        {/* Close */}
+        <button onClick={onClose} aria-label="Close"
+          style={{ position: "absolute", top: 14, right: 14, width: 28, height: 28,
+            borderRadius: "50%", background: C.elevated, border: `1px solid ${C.border}`,
+            color: C.text2, cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 13, fontFamily: "inherit" }}>✕</button>
+
+        <h2 id="upload-modal-title"
+          style={{ fontSize: 20, fontWeight: 800, color: C.text1, margin: "0 0 6px", paddingRight: 32 }}>
+          Upload resume
+        </h2>
+        <p style={{ fontSize: 13.5, color: C.text2, lineHeight: 1.6, margin: "0 0 24px" }}>
+          Upload your existing resume and we'll pre-fill the editor so you can improve it.
+        </p>
+
+        {/* Drop zone */}
+        <div
+          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={e => { e.preventDefault(); setDragOver(false); acceptFile(e.dataTransfer.files?.[0]); }}
+          onClick={() => fileInputRef.current?.click()}
+          style={{ border: `2px dashed ${dragOver ? C.accent : file ? "#4ade80" : C.border}`,
+            borderRadius: C.radiusLg, padding: "22px 20px", marginBottom: 8,
+            background: dragOver ? `${C.accent}08` : file ? "rgba(74,222,128,0.06)" : C.elevated,
+            cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}>
+          {file ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              <span style={{ fontSize: 22 }}>📄</span>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: C.text1 }}>{file.name}</div>
+                <div style={{ fontSize: 11.5, color: C.text3, marginTop: 2 }}>
+                  {(file.size / 1024).toFixed(0)} KB · click to change
+                </div>
+              </div>
+              <span style={{ fontSize: 18, color: "#4ade80", marginLeft: "auto" }}>✓</span>
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⬆️</div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: C.text1, marginBottom: 4 }}>
+                Drag & drop or click to browse
+              </div>
+              <div style={{ fontSize: 12, color: C.text3 }}>PDF or DOCX · max 8 MB</div>
+            </>
+          )}
+          <input ref={fileInputRef} type="file" accept=".pdf,.docx" style={{ display: "none" }}
+            onChange={e => { acceptFile(e.target.files?.[0]); e.target.value = ""; }} />
+        </div>
+        {fileError && (
+          <p role="alert" style={{ color: "#f87171", fontSize: 12, margin: "0 0 16px" }}>{fileError}</p>
+        )}
+        {!fileError && <div style={{ marginBottom: 20 }} />}
+
+        {/* Email */}
+        <div style={{ marginBottom: 24 }}>
+          <label htmlFor="upload-modal-email"
+            style={{ display: "block", fontSize: 12, fontWeight: 700, color: C.text2,
+              marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.8px" }}>
+            Email address
+          </label>
+          <input id="upload-modal-email" type="email" value={email}
+            onChange={e => { setEmail(e.target.value); if (emailError) setEmailError(""); }}
+            onBlur={() => setEmailError(validateEmailLocal(email))}
+            placeholder="you@email.com"
+            aria-invalid={!!emailError}
+            aria-describedby={emailError ? "upload-email-err" : undefined}
+            style={{ width: "100%", background: C.elevated,
+              border: `1px solid ${emailError ? "#f87171" : C.border}`,
+              borderRadius: 8, padding: "10px 12px", fontSize: 13.5, color: C.text1,
+              fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+          {emailError && (
+            <p id="upload-email-err" role="alert"
+              style={{ color: "#f87171", fontSize: 12, margin: "6px 0 0" }}>{emailError}</p>
+          )}
+        </div>
+
+        <button onClick={handleImprove} disabled={!canImprove}
+          style={{ width: "100%", background: C.grad, color: "#fff", border: "none",
+            borderRadius: 8, padding: "13px 0", fontSize: 14.5, fontWeight: 700,
+            cursor: canImprove ? "pointer" : "not-allowed", fontFamily: "inherit",
+            opacity: canImprove ? 1 : 0.45, transition: "opacity 0.15s" }}>
+          Improve my resume →
+        </button>
+      </div>
     </div>
   );
 }
