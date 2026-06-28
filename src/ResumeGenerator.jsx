@@ -909,12 +909,12 @@ function uid() {
 const ENTRY_SCHEMAS = {
   experience:     { type: "role",    icon: "💼", fields: ["title", "company", "startDate", "endDate", "description"], primary: "title",  secondary: "company" },
   education:      { type: "line",    icon: "🎓", fields: ["degree", "institution", "year"],                          primary: "degree", secondary: "institution" },
-  skills:         { type: "tag",     icon: "⚡", fields: ["name"],                                                   primary: "name" },
-  languages:      { type: "tag",     icon: "🌐", fields: ["name"],                                                   primary: "name" },
-  certifications: { type: "generic", icon: "📜", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle" },
-  projects:       { type: "generic", icon: "🛠️", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle" },
-  volunteer:      { type: "generic", icon: "🤝", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle" },
-  awards:         { type: "generic", icon: "🏆", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle" },
+  skills:         { type: "tag",     icon: "⚡", fields: ["name"],                                                   primary: "name", labelKeys: { name: "skill" } },
+  languages:      { type: "tag",     icon: "🌐", fields: ["name"],                                                   primary: "name", labelKeys: { name: "language" } },
+  certifications: { type: "generic", icon: "📜", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "certification", subtitle: "issuer", description: "details" } },
+  projects:       { type: "generic", icon: "🛠️", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "project", subtitle: "tech" } },
+  volunteer:      { type: "generic", icon: "🤝", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "role", subtitle: "organization" } },
+  awards:         { type: "generic", icon: "🏆", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "award", subtitle: "issuer", description: "details" } },
 };
 const SECTION_KEYS = Object.keys(ENTRY_SCHEMAS);
 
@@ -1075,15 +1075,15 @@ function buildLiveData(form, t) {
 // ── Entry-editor microcopy (5 languages, RTL-aware via caller) ─────────────
 const ENTRY_UI = {
   en: { editHeading: "Edit heading", addEntry: "Add entry", remove: "Remove", show: "Show in resume", hide: "Hide from resume", untitled: "Untitled entry", collapse: "Collapse", expand: "Expand", reorder: "Drag to reorder",
-        labels: { title: "Job title", company: "Company", startDate: "Start date", endDate: "End date", description: "Description", degree: "Degree", institution: "Institution", year: "Year", subtitle: "Subtitle", skill: "Skill", language: "Language" } },
+        labels: { title: "Job title", company: "Company", startDate: "Start date", endDate: "End date", description: "Description", degree: "Degree", institution: "Institution", year: "Year", subtitle: "Subtitle", skill: "Skill", language: "Language", certification: "Certification", issuer: "Issuer", project: "Project", tech: "Tools / role", role: "Role", organization: "Organization", award: "Award", details: "Details" } },
   fr: { editHeading: "Modifier le titre", addEntry: "Ajouter", remove: "Supprimer", show: "Afficher dans le CV", hide: "Masquer du CV", untitled: "Entrée sans titre", collapse: "Réduire", expand: "Développer", reorder: "Glisser pour réordonner",
-        labels: { title: "Intitulé du poste", company: "Entreprise", startDate: "Date de début", endDate: "Date de fin", description: "Description", degree: "Diplôme", institution: "Établissement", year: "Année", subtitle: "Sous-titre", skill: "Compétence", language: "Langue" } },
+        labels: { title: "Intitulé du poste", company: "Entreprise", startDate: "Date de début", endDate: "Date de fin", description: "Description", degree: "Diplôme", institution: "Établissement", year: "Année", subtitle: "Sous-titre", skill: "Compétence", language: "Langue", certification: "Certification", issuer: "Émetteur", project: "Projet", tech: "Outils / rôle", role: "Rôle", organization: "Organisation", award: "Récompense", details: "Détails" } },
   es: { editHeading: "Editar título", addEntry: "Añadir", remove: "Eliminar", show: "Mostrar en el CV", hide: "Ocultar del CV", untitled: "Entrada sin título", collapse: "Contraer", expand: "Expandir", reorder: "Arrastra para reordenar",
-        labels: { title: "Puesto", company: "Empresa", startDate: "Fecha de inicio", endDate: "Fecha de fin", description: "Descripción", degree: "Título", institution: "Institución", year: "Año", subtitle: "Subtítulo", skill: "Habilidad", language: "Idioma" } },
+        labels: { title: "Puesto", company: "Empresa", startDate: "Fecha de inicio", endDate: "Fecha de fin", description: "Descripción", degree: "Título", institution: "Institución", year: "Año", subtitle: "Subtítulo", skill: "Habilidad", language: "Idioma", certification: "Certificación", issuer: "Emisor", project: "Proyecto", tech: "Herramientas / rol", role: "Rol", organization: "Organización", award: "Premio", details: "Detalles" } },
   ar: { editHeading: "تعديل العنوان", addEntry: "إضافة", remove: "حذف", show: "إظهار في السيرة", hide: "إخفاء من السيرة", untitled: "إدخال بدون عنوان", collapse: "طي", expand: "توسيع", reorder: "اسحب لإعادة الترتيب",
-        labels: { title: "المسمى الوظيفي", company: "الشركة", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", description: "الوصف", degree: "الشهادة", institution: "المؤسسة", year: "السنة", subtitle: "عنوان فرعي", skill: "مهارة", language: "لغة" } },
+        labels: { title: "المسمى الوظيفي", company: "الشركة", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", description: "الوصف", degree: "الشهادة", institution: "المؤسسة", year: "السنة", subtitle: "عنوان فرعي", skill: "مهارة", language: "لغة", certification: "الشهادة", issuer: "الجهة المانحة", project: "المشروع", tech: "الأدوات / الدور", role: "الدور", organization: "المنظمة", award: "الجائزة", details: "التفاصيل" } },
   de: { editHeading: "Überschrift bearbeiten", addEntry: "Eintrag hinzufügen", remove: "Entfernen", show: "Im Lebenslauf anzeigen", hide: "Im Lebenslauf ausblenden", untitled: "Eintrag ohne Titel", collapse: "Einklappen", expand: "Ausklappen", reorder: "Zum Umordnen ziehen",
-        labels: { title: "Position", company: "Unternehmen", startDate: "Startdatum", endDate: "Enddatum", description: "Beschreibung", degree: "Abschluss", institution: "Institution", year: "Jahr", subtitle: "Untertitel", skill: "Fähigkeit", language: "Sprache" } },
+        labels: { title: "Position", company: "Unternehmen", startDate: "Startdatum", endDate: "Enddatum", description: "Beschreibung", degree: "Abschluss", institution: "Institution", year: "Jahr", subtitle: "Untertitel", skill: "Fähigkeit", language: "Sprache", certification: "Zertifizierung", issuer: "Aussteller", project: "Projekt", tech: "Tools / Rolle", role: "Rolle", organization: "Organisation", award: "Auszeichnung", details: "Details" } },
 };
 
 // Inline rich-text editor for an entry description. Reuses the markdown-marker
@@ -1159,7 +1159,10 @@ function EntryRow({ sectionKey, entry, index, eui, rtl, expanded, onToggleExpand
   const primary = (entry[schema.primary] || "").trim();
   const secondary = schema.secondary ? (entry[schema.secondary] || "").trim() : "";
   const hidden = entry.visible === false;
-  const labelFor = (f) => (f === "name" ? (sectionKey === "skills" ? eui.labels.skill : eui.labels.language) : eui.labels[f]);
+  const labelFor = (f) => {
+    const token = (schema.labelKeys && schema.labelKeys[f]) || f;
+    return eui.labels[token] || eui.labels[f] || f;
+  };
   const iconBtn = (content, title, onClick, extra = {}) => (
     <button type="button" title={title} aria-label={title} onClick={(e) => { e.stopPropagation(); onClick(); }}
       style={{ background: SECTION_TOKENS.iconBtnBg, border: "none", borderRadius: SECTION_TOKENS.iconBtnRadius,
@@ -1213,7 +1216,7 @@ function EntryRow({ sectionKey, entry, index, eui, rtl, expanded, onToggleExpand
           )}
           {schema.fields.includes("description") && (
             <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: C.text3, marginBottom: 4 }}>{eui.labels.description}</label>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: C.text3, marginBottom: 4 }}>{labelFor("description")}</label>
               <EntryDescriptionEditor value={entry.description} onChange={(val) => onChange({ description: val })} rtl={rtl} />
             </div>
           )}
