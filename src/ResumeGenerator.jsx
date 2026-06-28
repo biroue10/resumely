@@ -1286,6 +1286,25 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
   );
 }
 
+// Same card chrome as SectionCard, but for fixed-field sections (Personal Info,
+// Summary) that aren't entry lists. Collapsible, no add/reorder/edit-heading.
+function FieldCard({ icon, title, children, collapsed, onToggleCollapse, rtl, eui }) {
+  return (
+    <section style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: SECTION_TOKENS.radius,
+      boxShadow: SECTION_TOKENS.shadow, padding: SECTION_TOKENS.padCard, marginTop: SECTION_TOKENS.gap3 }}>
+      <header style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2 }}>
+        <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+        <h3 style={{ flex: 1, margin: 0, fontSize: 16, fontWeight: 800, color: C.text1, textAlign: rtl ? "right" : "left" }}>{title}</h3>
+        <button type="button" onClick={onToggleCollapse} aria-label={collapsed ? eui.expand : eui.collapse} aria-expanded={!collapsed}
+          style={{ background: "none", border: "none", color: C.text2, cursor: "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}>
+          {collapsed ? "▸" : "▾"}
+        </button>
+      </header>
+      {!collapsed && <div style={{ marginTop: SECTION_TOKENS.gap3 }}>{children}</div>}
+    </section>
+  );
+}
+
 const defaultMaster = {
   name: "", email: "", phone: "", location: "", linkedin: "", website: "",
   headline: "", summary: "",
@@ -2719,7 +2738,8 @@ Awards: ${form.awards}`;
           padding: "20px 20px 32px" }) }}>
 
           {/* ── SECTION: Personal Info ── */}
-          <SectionHeader icon="👤" title="Personal Info" filled={!!(form.name && form.email)} />
+          <FieldCard icon="👤" title="Personal Info" rtl={rtl} eui={eui}
+            collapsed={!!collapsedSections.personal} onToggleCollapse={() => toggleSectionCollapse("personal")}>
 
           {/* Photo upload */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18,
@@ -2821,13 +2841,15 @@ Awards: ${form.awards}`;
             </div>
           </div>
 
-          {/* ── SECTION: Professional ── */}
-          <SectionHeader icon="📝" title="Professional" filled={!!(form.summary && form.experience)} />
+          </FieldCard>
 
-          <label htmlFor="field-summary" style={lbl}>{t.summary}</label>
-          {field("summary", true, t.placeholderSummary, undefined, summaryError)}
-          {summaryError && <p style={fieldErr}>{summaryError}</p>}
-          <Hint text="2–4 sentences. Who you are, your years of experience, and your biggest strength." />
+          {/* ── SECTION: Professional summary ── */}
+          <FieldCard icon="📝" title={t.summary} rtl={rtl} eui={eui}
+            collapsed={!!collapsedSections.summary} onToggleCollapse={() => toggleSectionCollapse("summary")}>
+            {field("summary", true, t.placeholderSummary, undefined, summaryError)}
+            {summaryError && <p style={fieldErr}>{summaryError}</p>}
+            <Hint text="2–4 sentences. Who you are, your years of experience, and your biggest strength." />
+          </FieldCard>
 
           {weakBullets.length > 0 && !coachOpen && (
             <div style={{ display: "flex", justifyContent: rtl ? "flex-start" : "flex-end", marginTop: 10 }}>
