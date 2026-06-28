@@ -1235,26 +1235,30 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
   return (
     <section style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: SECTION_TOKENS.radius,
       boxShadow: SECTION_TOKENS.shadow, padding: SECTION_TOKENS.padCard, marginTop: SECTION_TOKENS.gap3 }}>
-      <header style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2 }}>
+      <header role="button" tabIndex={0} aria-expanded={!collapsed}
+        aria-label={collapsed ? eui.expand : eui.collapse}
+        onClick={() => { if (!editingHeading) onToggleCollapse(); }}
+        onKeyDown={(e) => { if (!editingHeading && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onToggleCollapse(); } }}
+        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none" }}>
         <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{schema.icon}</span>
         {editingHeading ? (
           <input autoFocus value={headingDraft} onChange={(e) => setHeadingDraft(e.target.value)}
-            onBlur={commitHeading} onKeyDown={(e) => { if (e.key === "Enter") commitHeading(); if (e.key === "Escape") { setEditingHeading(false); setHeadingDraft(heading); } }}
+            onClick={(e) => e.stopPropagation()}
+            onBlur={commitHeading} onKeyDown={(e) => { e.stopPropagation(); if (e.key === "Enter") commitHeading(); if (e.key === "Escape") { setEditingHeading(false); setHeadingDraft(heading); } }}
             dir={rtl ? "rtl" : "ltr"}
             style={{ flex: 1, background: C.elevated, border: `1px solid ${C.accent}`, borderRadius: 8, padding: "6px 10px",
               color: C.text1, fontSize: 16, fontWeight: 800, fontFamily: "inherit", outline: "none" }} />
         ) : (
           <h3 style={{ flex: 1, margin: 0, fontSize: 16, fontWeight: 800, color: C.text1 }}>{heading}</h3>
         )}
-        <button type="button" onClick={() => { setHeadingDraft(heading); setEditingHeading(true); }}
+        <button type="button" onClick={(e) => { e.stopPropagation(); setHeadingDraft(heading); setEditingHeading(true); }}
           style={{ display: "inline-flex", alignItems: "center", gap: 5, background: C.elevated, border: `1px solid ${C.border}`,
             borderRadius: 999, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: C.text2, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
           ✎ {eui.editHeading}
         </button>
-        <button type="button" onClick={onToggleCollapse} aria-label={collapsed ? eui.expand : eui.collapse} aria-expanded={!collapsed}
-          style={{ background: "none", border: "none", color: C.text2, cursor: "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}>
+        <span aria-hidden style={{ color: C.text2, fontSize: 26, lineHeight: 1, padding: "0 4px", flexShrink: 0 }}>
           {collapsed ? "▸" : "▾"}
-        </button>
+        </span>
       </header>
       {!collapsed && (
         <>
@@ -1292,13 +1296,16 @@ function FieldCard({ icon, title, children, collapsed, onToggleCollapse, rtl, eu
   return (
     <section style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: SECTION_TOKENS.radius,
       boxShadow: SECTION_TOKENS.shadow, padding: SECTION_TOKENS.padCard, marginTop: SECTION_TOKENS.gap3 }}>
-      <header style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2 }}>
+      <header role="button" tabIndex={0} aria-expanded={!collapsed}
+        aria-label={collapsed ? eui.expand : eui.collapse}
+        onClick={onToggleCollapse}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggleCollapse(); } }}
+        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none" }}>
         <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
         <h3 style={{ flex: 1, margin: 0, fontSize: 16, fontWeight: 800, color: C.text1, textAlign: rtl ? "right" : "left" }}>{title}</h3>
-        <button type="button" onClick={onToggleCollapse} aria-label={collapsed ? eui.expand : eui.collapse} aria-expanded={!collapsed}
-          style={{ background: "none", border: "none", color: C.text2, cursor: "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}>
+        <span aria-hidden style={{ color: C.text2, fontSize: 26, lineHeight: 1, padding: "0 4px", flexShrink: 0 }}>
           {collapsed ? "▸" : "▾"}
-        </button>
+        </span>
       </header>
       {!collapsed && <div style={{ marginTop: SECTION_TOKENS.gap3 }}>{children}</div>}
     </section>
