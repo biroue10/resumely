@@ -4455,7 +4455,7 @@ Awards: ${form.awards}`;
                   { icon: "📄", step: "4", text: "One-click tailored resume, ready to send" },
                 ].map(({ icon, step, text }) => (
                   <div key={step} style={{ display: "flex", alignItems: "center", gap: 14,
-                    padding: "12px 16px", background: C.elevated, border: `1px solid ${C.border}`,
+                    padding: "12px 16px", background: C.elevated,
                     borderRadius: 12 }}>
                     <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.grad,
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -4579,9 +4579,8 @@ Awards: ${form.awards}`;
 
         {/* Free pledge */}
         <FadeIn>
-          <div style={{ margin: "0 24px 80px", borderRadius: 4,
-            background: `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent2}08 100%)`,
-            border: `1px solid ${C.accent}30`, padding: "56px 40px", textAlign: "center" }}>
+          <div style={{ background: `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent2}08 100%)`,
+            padding: "80px 24px", textAlign: "center" }}>
             <div style={{ maxWidth: 680, margin: "0 auto" }}>
               <div style={{ fontSize: 11.5, fontWeight: 700, textTransform: "uppercase",
                 letterSpacing: "2.5px", color: C.accent2, marginBottom: 16 }}>Our commitment</div>
@@ -4626,11 +4625,11 @@ Awards: ${form.awards}`;
                 { icon: "document", title: "Multilingual cover letters", desc: "Create a matching cover letter with the same formatting approach as your resume." },
               ].map((f, i) => (
                 <FadeIn key={f.title} delay={i * 55}>
-                  <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
+                  <div style={{ background: C.elevated,
                     borderRadius: 3, padding: "22px 20px",
-                    transition: "border-color 0.2s, transform 0.2s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.accent}66`; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "none"; }}>
+                    transition: "transform 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = "none"; }}>
                     <LineIcon name={f.icon} size={24} color={C.accent2} style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 6 }}>{f.title}</div>
                     <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.65 }}>{f.desc}</div>
@@ -4665,11 +4664,8 @@ Awards: ${form.awards}`;
                 { icon: "lock", title: "No account profile", body: "No email, password, or personal dashboard is required before creating and downloading a resume." },
               ].map((f, i) => (
                 <FadeIn key={f.title} delay={i * 60}>
-                  <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
-                    borderRadius: 12, padding: "22px 20px",
-                    transition: "border-color 0.2s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.accent}55`; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}>
+                  <div style={{ background: C.elevated,
+                    borderRadius: 12, padding: "22px 20px" }}>
                     <LineIcon name={f.icon} size={24} color={C.accent2} style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 6 }}>{f.title}</div>
                     <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.65 }}>{f.body}</div>
