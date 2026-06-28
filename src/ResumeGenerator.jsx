@@ -182,6 +182,7 @@ const UI = {
     linkedin: "LinkedIn", website: "Website / Portfolio",
     certifications: "Certifications", languages: "Languages (comma separated)",
     projects: "Projects", volunteer: "Volunteer Work", awards: "Awards & Achievements",
+    publications: "Publications", references: "References", extracurricular: "Extra-Curricular",
     placeholderEx: "Role, company, dates, what you did — one per line", madeBy: "Built by",
     placeholderName: "e.g. Jane Doe", placeholderTitle: "e.g. Software Engineer",
     placeholderEmail: "you@example.com", placeholderPhone: "e.g. 712 345 678",
@@ -207,6 +208,7 @@ const UI = {
     linkedin: "LinkedIn", website: "Site web / Portfolio",
     certifications: "Certifications", languages: "Langues (séparées par des virgules)",
     projects: "Projets", volunteer: "Bénévolat", awards: "Récompenses & Réalisations",
+    publications: "Publications", references: "Références", extracurricular: "Activités extra-scolaires",
     placeholderEx: "Poste, entreprise, dates, missions — une par ligne", madeBy: "Créé par",
     placeholderName: "ex. Jean Dupont", placeholderTitle: "ex. Ingénieur logiciel",
     placeholderEmail: "vous@exemple.com", placeholderPhone: "ex. 06 12 34 56 78",
@@ -232,6 +234,7 @@ const UI = {
     linkedin: "LinkedIn", website: "Sitio web / Portafolio",
     certifications: "Certificaciones", languages: "Idiomas (separados por comas)",
     projects: "Proyectos", volunteer: "Voluntariado", awards: "Premios & Logros",
+    publications: "Publicaciones", references: "Referencias", extracurricular: "Actividades extracurriculares",
     placeholderEx: "Puesto, empresa, fechas, qué hiciste — uno por línea", madeBy: "Creado por",
     placeholderName: "ej. Juan García", placeholderTitle: "ej. Ingeniero de software",
     placeholderEmail: "tu@ejemplo.com", placeholderPhone: "ej. 612 345 678",
@@ -257,6 +260,7 @@ const UI = {
     linkedin: "لينكدإن", website: "الموقع / المحفظة",
     certifications: "الشهادات", languages: "اللغات (مفصولة بفواصل)",
     projects: "المشاريع", volunteer: "العمل التطوعي", awards: "الجوائز والإنجازات",
+    publications: "المنشورات", references: "المراجع", extracurricular: "الأنشطة اللاصفية",
     placeholderEx: "المنصب، الشركة، التواريخ، مهامك — واحدة في كل سطر", madeBy: "من إبداع",
     placeholderName: "مثال: أحمد محمد", placeholderTitle: "مثال: مهندس برمجيات",
     placeholderEmail: "you@example.com", placeholderPhone: "مثال: 06 12 34 56 78",
@@ -282,6 +286,7 @@ const UI = {
     linkedin: "LinkedIn", website: "Website / Portfolio",
     certifications: "Zertifizierungen", languages: "Sprachen (durch Kommas getrennt)",
     projects: "Projekte", volunteer: "Ehrenamtliche Arbeit", awards: "Auszeichnungen & Leistungen",
+    publications: "Publikationen", references: "Referenzen", extracurricular: "Außerschulische Aktivitäten",
     placeholderEx: "Position, Firma, Zeitraum, Aufgaben — eine pro Zeile", madeBy: "Erstellt von",
     placeholderName: "z.B. Hans Müller", placeholderTitle: "z.B. Softwareentwickler",
     placeholderEmail: "du@beispiel.de", placeholderPhone: "z.B. 170 1234567",
@@ -915,8 +920,17 @@ const ENTRY_SCHEMAS = {
   projects:       { type: "generic", icon: "🛠️", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "project", subtitle: "tech" } },
   volunteer:      { type: "generic", icon: "🤝", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "role", subtitle: "organization" } },
   awards:         { type: "generic", icon: "🏆", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "award", subtitle: "issuer", description: "details" } },
+  publications:   { type: "generic", icon: "📚", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "pubTitle", subtitle: "publisher", description: "details" } },
+  references:     { type: "generic", icon: "📇", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "refName", subtitle: "refRelation", description: "contact" } },
+  extracurricular:{ type: "generic", icon: "🎯", fields: ["title", "subtitle", "description"],                       primary: "title",  secondary: "subtitle", labelKeys: { title: "activity", subtitle: "organization" } },
 };
 const SECTION_KEYS = Object.keys(ENTRY_SCHEMAS);
+// Always-visible core sections vs. ones the user adds via the "Add content" picker.
+const CORE_SECTIONS = ["experience", "education", "skills", "languages"];
+const OPTIONAL_SECTIONS = ["certifications", "projects", "volunteer", "awards", "publications", "references", "extracurricular"];
+// Catalog order shown in the picker (summary is the always-present FieldCard).
+const PICKER_CATALOG = ["summary", "experience", "education", "skills", "languages", "certifications", "projects", "volunteer", "awards", "publications", "references", "extracurricular"];
+const PICKER_ICONS = { summary: "📝", ...Object.fromEntries(SECTION_KEYS.map((k) => [k, ENTRY_SCHEMAS[k].icon])) };
 
 function blankEntry(key) {
   const e = { id: uid(), visible: true };
@@ -1041,6 +1055,13 @@ function migrateForm(form) {
     out[arrKey] = entries;
     out[key] = entriesToText(key, entries);
   });
+  // Which optional sections are active in the editor. Auto-add any that already
+  // hold content so existing resumes keep showing their sections.
+  const added = Array.isArray(out.addedSections) ? out.addedSections.filter((k) => OPTIONAL_SECTIONS.includes(k)) : [];
+  OPTIONAL_SECTIONS.forEach((key) => {
+    if (!added.includes(key) && (out[key + "Entries"] || []).length > 0) added.push(key);
+  });
+  out.addedSections = added;
   return out;
 }
 
@@ -1062,6 +1083,9 @@ function buildLiveData(form, t) {
   add("languages",       headingOf("languages", label("languages")));
   add("volunteer",       headingOf("volunteer", t.volunteer));
   add("awards",          headingOf("awards", t.awards));
+  add("publications",    headingOf("publications", t.publications));
+  add("references",      headingOf("references", t.references));
+  add("extracurricular", headingOf("extracurricular", t.extracurricular));
   return {
     name: form.name || "—",
     title: form.title || "",
@@ -1075,15 +1099,15 @@ function buildLiveData(form, t) {
 // ── Entry-editor microcopy (5 languages, RTL-aware via caller) ─────────────
 const ENTRY_UI = {
   en: { editHeading: "Edit heading", addEntry: "Add entry", remove: "Remove", show: "Show in resume", hide: "Hide from resume", untitled: "Untitled entry", collapse: "Collapse", expand: "Expand", reorder: "Drag to reorder",
-        labels: { title: "Job title", company: "Company", startDate: "Start date", endDate: "End date", description: "Description", degree: "Degree", institution: "Institution", year: "Year", subtitle: "Subtitle", skill: "Skill", language: "Language", certification: "Certification", issuer: "Issuer", project: "Project", tech: "Tools / role", role: "Role", organization: "Organization", award: "Award", details: "Details" } },
+        labels: { title: "Job title", company: "Company", startDate: "Start date", endDate: "End date", description: "Description", degree: "Degree", institution: "Institution", year: "Year", subtitle: "Subtitle", skill: "Skill", language: "Language", certification: "Certification", issuer: "Issuer", project: "Project", tech: "Tools / role", role: "Role", organization: "Organization", award: "Award", details: "Details", pubTitle: "Title", publisher: "Publisher / venue", refName: "Name", refRelation: "Relationship", contact: "Contact details", activity: "Activity" }, addContent: "Add content", addContentSub: "Choose a section to add to your resume", alreadyAdded: "Already added", close: "Close" },
   fr: { editHeading: "Modifier le titre", addEntry: "Ajouter", remove: "Supprimer", show: "Afficher dans le CV", hide: "Masquer du CV", untitled: "Entrée sans titre", collapse: "Réduire", expand: "Développer", reorder: "Glisser pour réordonner",
-        labels: { title: "Intitulé du poste", company: "Entreprise", startDate: "Date de début", endDate: "Date de fin", description: "Description", degree: "Diplôme", institution: "Établissement", year: "Année", subtitle: "Sous-titre", skill: "Compétence", language: "Langue", certification: "Certification", issuer: "Émetteur", project: "Projet", tech: "Outils / rôle", role: "Rôle", organization: "Organisation", award: "Récompense", details: "Détails" } },
+        labels: { title: "Intitulé du poste", company: "Entreprise", startDate: "Date de début", endDate: "Date de fin", description: "Description", degree: "Diplôme", institution: "Établissement", year: "Année", subtitle: "Sous-titre", skill: "Compétence", language: "Langue", certification: "Certification", issuer: "Émetteur", project: "Projet", tech: "Outils / rôle", role: "Rôle", organization: "Organisation", award: "Récompense", details: "Détails", pubTitle: "Titre", publisher: "Éditeur / lieu", refName: "Nom", refRelation: "Relation", contact: "Coordonnées", activity: "Activité" }, addContent: "Ajouter du contenu", addContentSub: "Choisissez une section à ajouter à votre CV", alreadyAdded: "Déjà ajouté", close: "Fermer" },
   es: { editHeading: "Editar título", addEntry: "Añadir", remove: "Eliminar", show: "Mostrar en el CV", hide: "Ocultar del CV", untitled: "Entrada sin título", collapse: "Contraer", expand: "Expandir", reorder: "Arrastra para reordenar",
-        labels: { title: "Puesto", company: "Empresa", startDate: "Fecha de inicio", endDate: "Fecha de fin", description: "Descripción", degree: "Título", institution: "Institución", year: "Año", subtitle: "Subtítulo", skill: "Habilidad", language: "Idioma", certification: "Certificación", issuer: "Emisor", project: "Proyecto", tech: "Herramientas / rol", role: "Rol", organization: "Organización", award: "Premio", details: "Detalles" } },
+        labels: { title: "Puesto", company: "Empresa", startDate: "Fecha de inicio", endDate: "Fecha de fin", description: "Descripción", degree: "Título", institution: "Institución", year: "Año", subtitle: "Subtítulo", skill: "Habilidad", language: "Idioma", certification: "Certificación", issuer: "Emisor", project: "Proyecto", tech: "Herramientas / rol", role: "Rol", organization: "Organización", award: "Premio", details: "Detalles", pubTitle: "Título", publisher: "Editorial / lugar", refName: "Nombre", refRelation: "Relación", contact: "Datos de contacto", activity: "Actividad" }, addContent: "Añadir contenido", addContentSub: "Elige una sección para añadir a tu CV", alreadyAdded: "Ya añadido", close: "Cerrar" },
   ar: { editHeading: "تعديل العنوان", addEntry: "إضافة", remove: "حذف", show: "إظهار في السيرة", hide: "إخفاء من السيرة", untitled: "إدخال بدون عنوان", collapse: "طي", expand: "توسيع", reorder: "اسحب لإعادة الترتيب",
-        labels: { title: "المسمى الوظيفي", company: "الشركة", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", description: "الوصف", degree: "الشهادة", institution: "المؤسسة", year: "السنة", subtitle: "عنوان فرعي", skill: "مهارة", language: "لغة", certification: "الشهادة", issuer: "الجهة المانحة", project: "المشروع", tech: "الأدوات / الدور", role: "الدور", organization: "المنظمة", award: "الجائزة", details: "التفاصيل" } },
+        labels: { title: "المسمى الوظيفي", company: "الشركة", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", description: "الوصف", degree: "الشهادة", institution: "المؤسسة", year: "السنة", subtitle: "عنوان فرعي", skill: "مهارة", language: "لغة", certification: "الشهادة", issuer: "الجهة المانحة", project: "المشروع", tech: "الأدوات / الدور", role: "الدور", organization: "المنظمة", award: "الجائزة", details: "التفاصيل", pubTitle: "العنوان", publisher: "الناشر / المكان", refName: "الاسم", refRelation: "العلاقة", contact: "بيانات الاتصال", activity: "النشاط" }, addContent: "إضافة محتوى", addContentSub: "اختر قسمًا لإضافته إلى سيرتك الذاتية", alreadyAdded: "مضاف بالفعل", close: "إغلاق" },
   de: { editHeading: "Überschrift bearbeiten", addEntry: "Eintrag hinzufügen", remove: "Entfernen", show: "Im Lebenslauf anzeigen", hide: "Im Lebenslauf ausblenden", untitled: "Eintrag ohne Titel", collapse: "Einklappen", expand: "Ausklappen", reorder: "Zum Umordnen ziehen",
-        labels: { title: "Position", company: "Unternehmen", startDate: "Startdatum", endDate: "Enddatum", description: "Beschreibung", degree: "Abschluss", institution: "Institution", year: "Jahr", subtitle: "Untertitel", skill: "Fähigkeit", language: "Sprache", certification: "Zertifizierung", issuer: "Aussteller", project: "Projekt", tech: "Tools / Rolle", role: "Rolle", organization: "Organisation", award: "Auszeichnung", details: "Details" } },
+        labels: { title: "Position", company: "Unternehmen", startDate: "Startdatum", endDate: "Enddatum", description: "Beschreibung", degree: "Abschluss", institution: "Institution", year: "Jahr", subtitle: "Untertitel", skill: "Fähigkeit", language: "Sprache", certification: "Zertifizierung", issuer: "Aussteller", project: "Projekt", tech: "Tools / Rolle", role: "Rolle", organization: "Organisation", award: "Auszeichnung", details: "Details", pubTitle: "Titel", publisher: "Verlag / Ort", refName: "Name", refRelation: "Beziehung", contact: "Kontaktdaten", activity: "Aktivität" }, addContent: "Inhalt hinzufügen", addContentSub: "Wählen Sie einen Abschnitt für Ihren Lebenslauf", alreadyAdded: "Bereits hinzugefügt", close: "Schließen" },
 };
 
 // Inline rich-text editor for an entry description. Reuses the markdown-marker
@@ -1363,6 +1387,71 @@ function ScaledResumePreview({ tpl, result, pageWidth = 794 }) {
   );
 }
 
+// Section picker opened by the "Add content" button. Accessible (role=dialog,
+// focus trap, Esc/backdrop close, visible ×); bottom-sheet on mobile.
+function AddContentModal({ open, onClose, addedSet, onAdd, sectionName, eui, rtl, isMobile }) {
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const prev = document.activeElement;
+    const focusables = () => (dialogRef.current
+      ? Array.from(dialogRef.current.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'))
+      : []);
+    const first = focusables()[0]; if (first) first.focus();
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); onClose(); return; }
+      if (e.key === "Tab") {
+        const f = focusables(); if (!f.length) return;
+        const i = f.indexOf(document.activeElement);
+        if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && (i === f.length - 1 || i === -1)) { e.preventDefault(); f[0].focus(); }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); if (prev && prev.focus) prev.focus(); };
+  }, [open, onClose]);
+  if (!open) return null;
+  return (
+    <div onClick={onClose} dir={rtl ? "rtl" : "ltr"}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9999, display: "flex",
+        alignItems: isMobile ? "flex-end" : "center", justifyContent: "center", padding: isMobile ? 0 : 24 }}>
+      <div ref={dialogRef} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="addcontent-title"
+        style={{ background: C.surface, border: `1px solid ${C.border}`,
+          borderRadius: isMobile ? "16px 16px 0 0" : 16, padding: "22px 22px 24px",
+          width: "100%", maxWidth: isMobile ? "100%" : 460, maxHeight: isMobile ? "85vh" : "80vh",
+          overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
+          <h3 id="addcontent-title" style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.text1 }}>{eui.addContent}</h3>
+          <button type="button" onClick={onClose} aria-label={eui.close}
+            style={{ background: "none", border: "none", color: C.text3, cursor: "pointer", fontSize: 22, lineHeight: 1, padding: "0 2px" }}>×</button>
+        </div>
+        <p style={{ margin: "0 0 16px", fontSize: 13, color: C.text2 }}>{eui.addContentSub}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {PICKER_CATALOG.map((key) => {
+            const added = addedSet.has(key);
+            return (
+              <button key={key} type="button" disabled={added} onClick={() => onAdd(key)}
+                style={{ display: "flex", alignItems: "center", gap: 12, textAlign: rtl ? "right" : "left",
+                  background: added ? "transparent" : C.elevated, border: `1px solid ${C.border}`, borderRadius: 10,
+                  padding: "11px 14px", cursor: added ? "default" : "pointer", fontFamily: "inherit", color: C.text1,
+                  opacity: added ? 0.55 : 1, width: "100%" }}>
+                <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{PICKER_ICONS[key]}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700 }}>{sectionName(key)}</span>
+                {added
+                  ? <span style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, flexShrink: 0 }}>✓ {eui.alreadyAdded}</span>
+                  : <span aria-hidden style={{ fontSize: 18, color: C.accent2, fontWeight: 800, flexShrink: 0 }}>+</span>}
+              </button>
+            );
+          })}
+        </div>
+        {/* TODO: custom/blank section with a user-defined title — the app has no
+            custom-section concept yet; add a "Custom section" entry here that
+            creates a user-titled generic section when that model exists. */}
+      </div>
+    </div>
+  );
+}
+
 const defaultMaster = {
   name: "", email: "", phone: "", location: "", linkedin: "", website: "",
   headline: "", summary: "",
@@ -1408,7 +1497,6 @@ export default function ResumeGenerator() {
   const [phoneCode, setPhoneCode] = useState(() => LANG_CODE[selectedLang?.code] || "+1");
   const [zoomed, setZoomed] = useState(false);
   const [mobileResumeMode, setMobileResumeMode] = useState("edit");
-  const [showOptionalSections, setShowOptionalSections] = useState(false);
   const [exporting, setExporting] = useState("");
   const [exportSuccess, setExportSuccess] = useState("");
   const [aiPolished, setAiPolished] = useState(false);
@@ -1624,6 +1712,28 @@ export default function ResumeGenerator() {
   });
   const toggleSectionCollapse = useCallback((key) => {
     setCollapsedSections((c) => ({ ...c, [key]: !c[key] }));
+  }, []);
+  // ── "Add content" section picker ──────────────────────────────────────────
+  const [addContentOpen, setAddContentOpen] = useState(false);
+  const sectionName = useCallback((key) => t[key] || key, [t]);
+  // A section is "present" if it's core/summary or has been added by the user.
+  const addedSet = new Set(["summary", ...CORE_SECTIONS, ...(form.addedSections || [])]);
+  const addSection = useCallback((key) => {
+    if (!OPTIONAL_SECTIONS.includes(key)) return; // core/summary always present
+    setForm((f) => {
+      const added = f.addedSections || [];
+      if (added.includes(key)) return f;
+      const next = { ...f, addedSections: [...added, key] };
+      // Give it a blank entry so the card is immediately useful.
+      if ((f[key + "Entries"] || []).length === 0) {
+        const e = blankEntry(key);
+        next[key + "Entries"] = [e];
+        next[key] = entriesToText(key, [e]);
+      }
+      return next;
+    });
+    setCollapsedSections((c) => ({ ...c, [key]: false })); // open it
+    setAddContentOpen(false);
   }, []);
   const fullPhone = form.phone.trim() ? `${phoneCode} ${form.phone.trim()}` : "";
   // Memoised so non-form state changes (modal open, ATS result, etc.) don't
@@ -3061,25 +3171,22 @@ Awards: ${form.awards}`;
           {skillsError && <p style={fieldErr}>{skillsError}</p>}
           {renderSection("languages", t.languages.replace(/\s*\(.*\)/, ""))}
 
-          {/* ── SECTION: Additional ── */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <SectionHeader icon="➕" title="Additional (optional)" filled={!!(form.certifications || form.projects || form.volunteer || form.awards)} />
-            <button type="button" onClick={() => setShowOptionalSections(v => !v)}
-              aria-expanded={showOptionalSections}
-              style={{ border: `1px solid ${C.border}`, background: C.elevated, color: C.text2,
-                borderRadius: 7, padding: "6px 10px", fontSize: 12, fontWeight: 700,
-                cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
-              {showOptionalSections ? "Hide optional" : "Add projects, awards, more"}
+          {/* ── Added optional sections ── */}
+          {(form.addedSections || []).map((key) => (
+            <div key={key}>{renderSection(key, sectionName(key))}</div>
+          ))}
+
+          {/* ── Add content ── */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: SECTION_TOKENS.gap4 }}>
+            <button type="button" onClick={() => setAddContentOpen(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.grad, color: "#fff",
+                border: "none", borderRadius: 999, padding: "11px 24px", fontSize: 14, fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(99,102,241,0.35)" }}>
+              <span aria-hidden style={{ fontSize: 17, lineHeight: 1, fontWeight: 800 }}>+</span> {eui.addContent}
             </button>
           </div>
-          {showOptionalSections && (
-            <>
-              {renderSection("certifications", t.certifications)}
-              {renderSection("projects", t.projects)}
-              {renderSection("volunteer", t.volunteer)}
-              {renderSection("awards", t.awards)}
-            </>
-          )}
+          <AddContentModal open={addContentOpen} onClose={() => setAddContentOpen(false)}
+            addedSet={addedSet} onAdd={addSection} sectionName={sectionName} eui={eui} rtl={rtl} isMobile={isMobile} />
 
           {/* ── ATS Checker Panel ── */}
           {atsOpen && (() => {
