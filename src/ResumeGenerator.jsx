@@ -3946,21 +3946,14 @@ Awards: ${form.awards}`;
             ApplyCraft
           </button>
 
-          <div style={{ flex: 1, display: isMobile ? "none" : "flex", justifyContent: "center", gap: 18,
-            fontSize: 13, color: C.text3 }}>
-            <span>No signup</span>
-            <span>No watermark</span>
-            <span>PDF & DOCX included</span>
-          </div>
+          <div style={{ flex: 1 }} />
 
-          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 10, flexShrink: 0 }}>
-            <span style={{ display: isMobile ? "none" : "inline", fontSize: 13, color: C.text3 }}>No signup needed</span>
-            <button onClick={() => startResume("nav_cta")}
-              style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
-                padding: isMobile ? "8px 14px" : "10px 24px", fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: "pointer" }}>
-              Create my resume
-            </button>
-          </div>
+          <button onClick={() => startResume("nav_cta")}
+            style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
+              padding: isMobile ? "8px 14px" : "10px 24px", fontSize: isMobile ? 13 : 14, fontWeight: 700,
+              cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
+            Create my resume
+          </button>
           </div>
         </nav>
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
@@ -4005,48 +3998,48 @@ Awards: ${form.awards}`;
 
         {/* Hero */}
         <div style={{ background: `radial-gradient(ellipse 80% 50% at 50% -10%, ${C.glow} 0%, transparent 70%)` }}>
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "88px 16px 40px" : "144px 24px 72px",
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "108px 20px 48px" : "144px 24px 72px",
             display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.02fr 0.98fr",
             gap: isMobile ? 34 : 52, alignItems: "center" }}>
             <div style={{ textAlign: isMobile ? "center" : "left" }}>
-              <div style={{ animation: "acFadeUp 0.6s ease 0.05s both", display: "inline-block",
+              <div style={{ animation: isMobile ? "none" : "acFadeUp 0.6s ease 0.05s both", display: "inline-block",
                 fontSize: 12, fontWeight: 600, letterSpacing: "2px",
                 textTransform: "uppercase", color: C.accent2, background: `${C.accent}18`,
                 border: `1px solid ${C.accent}44`, borderRadius: 999, padding: "4px 14px", marginBottom: 24 }}>
                 Free resume builder
               </div>
-              <h1 style={{ animation: "acFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both",
+              <h1 style={{ animation: isMobile ? "none" : "acFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both",
                 fontSize: "clamp(34px, 5vw, 58px)", fontWeight: 800, lineHeight: 1.08,
                 letterSpacing: "-0.8px", margin: "0 0 22px",
                 background: "linear-gradient(135deg, #EEF2FF 0%, #94A3B8 100%)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 Create a job-ready resume without signing up.
               </h1>
-              <p style={{ animation: "acFadeUp 0.65s ease 0.34s both",
+              <p style={{ animation: isMobile ? "none" : "acFadeUp 0.65s ease 0.34s both",
                 fontSize: "clamp(16px, 2vw, 19px)", color: C.text2, maxWidth: 590,
                 margin: isMobile ? "0 auto 34px" : "0 0 34px", lineHeight: 1.65 }}>
                 Free resume builder with no signup, no watermark, and unlimited PDF or DOCX downloads. Editing and export happen in your browser unless you deliberately use an AI helper.
               </p>
-              <div style={{ animation: "acFadeUp 0.65s ease 0.5s both",
+              <div style={{ animation: isMobile ? "none" : "acFadeUp 0.65s ease 0.5s both",
                 display: "flex", gap: 12, justifyContent: isMobile ? "center" : "flex-start", flexWrap: "wrap" }}>
               <button onClick={() => startResume("hero_primary")}
                 style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
                   padding: "14px 32px", fontSize: 15, fontWeight: 700, cursor: "pointer",
-                  animation: "acPulse 2.8s ease-in-out 1.4s infinite",
-                  transition: "opacity 0.2s" }}>
+                  animation: isMobile ? "none" : "acPulse 2.8s ease-in-out 1.4s infinite",
+                  transition: "opacity 0.2s", fontFamily: "inherit" }}>
                 Create my resume
               </button>
               <button onClick={() => enter("ats")}
                 style={{ background: "transparent", color: C.text2, border: `1.5px solid ${C.border}`,
                   borderRadius: 3, padding: "14px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                  transition: "border-color 0.2s, color 0.2s" }}
+                  transition: "border-color 0.2s, color 0.2s", fontFamily: "inherit" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent2; e.currentTarget.style.color = C.accent2; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.text2; }}>
                 Check my existing resume
               </button>
               </div>
               {/* Trust row */}
-              <div style={{ animation: "acFadeUp 0.5s ease 0.65s both",
+              <div style={{ animation: isMobile ? "none" : "acFadeUp 0.5s ease 0.65s both",
                 display: "flex", gap: 16, justifyContent: isMobile ? "center" : "flex-start",
                 flexWrap: "wrap", marginTop: 24 }}>
                 {["Browser-first editing", "No signup", "No credit card", "PDF & DOCX"].map(t => (
@@ -4055,7 +4048,7 @@ Awards: ${form.awards}`;
               </div>
 
               {/* Upload existing resume */}
-              <div style={{ animation: "acFadeUp 0.5s ease 0.8s both", marginTop: 34, maxWidth: 430,
+              <div style={{ animation: isMobile ? "none" : "acFadeUp 0.5s ease 0.8s both", marginTop: 34, maxWidth: 430,
                 marginLeft: isMobile ? "auto" : 0, marginRight: isMobile ? "auto" : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
