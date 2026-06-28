@@ -3941,12 +3941,12 @@ Awards: ${form.awards}`;
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${C.border}`, position: "fixed", top: 0,
           left: 0, right: 0, zIndex: 100, background: C.bg + "ee", backdropFilter: "blur(12px)" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px", height: 76,
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
             display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setAppView("landing")}
             style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               border: "none", cursor: "pointer", padding: 0, flexShrink: 0,
-              fontSize: 26, fontWeight: 800, letterSpacing: "-0.8px", fontFamily: "inherit" }}>
+              fontSize: isMobile ? 20 : 26, fontWeight: 800, letterSpacing: "-0.8px", fontFamily: "inherit" }}>
             ApplyCraft
           </button>
 
@@ -3957,11 +3957,11 @@ Awards: ${form.awards}`;
             <span>PDF & DOCX included</span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 10, flexShrink: 0 }}>
             <span style={{ display: isMobile ? "none" : "inline", fontSize: 13, color: C.text3 }}>No signup needed</span>
             <button onClick={() => startResume("nav_cta")}
               style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
-                padding: "10px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                padding: isMobile ? "8px 14px" : "10px 24px", fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: "pointer" }}>
               Create my resume
             </button>
           </div>
@@ -3998,7 +3998,7 @@ Awards: ${form.awards}`;
 
         {/* Hero */}
         <div style={{ background: `radial-gradient(ellipse 80% 50% at 50% -10%, ${C.glow} 0%, transparent 70%)` }}>
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "144px 24px 72px",
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "88px 16px 40px" : "144px 24px 72px",
             display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.02fr 0.98fr",
             gap: isMobile ? 34 : 52, alignItems: "center" }}>
             <div style={{ textAlign: isMobile ? "center" : "left" }}>
@@ -4109,6 +4109,7 @@ Awards: ${form.awards}`;
               </label>
               </div>
             </div>
+            {!isMobile && (
             <div style={{ animation: "acFadeUp 0.65s ease 0.42s both" }}>
               <div style={{ background: C.surface, border: `1px solid ${C.border}`,
                 borderRadius: 10, padding: 12, boxShadow: "0 24px 70px rgba(0,0,0,0.42)" }}>
@@ -4118,11 +4119,12 @@ Awards: ${form.awards}`;
                   <span style={{ fontSize: 11, color: C.accent2, background: `${C.accent}18`,
                     borderRadius: 999, padding: "2px 8px", fontWeight: 800 }}>Updates as you type</span>
                 </div>
-                <div style={{ maxHeight: isMobile ? 360 : 520, overflow: "hidden", borderRadius: 8 }}>
+                <div style={{ maxHeight: 520, overflow: "hidden", borderRadius: 8 }}>
                   <ResumePaper tpl={recommendedTemplate} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
@@ -4296,7 +4298,7 @@ Awards: ${form.awards}`;
 
                   {/* Right: Live preview */}
                   <FadeIn delay={160}>
-                    <div style={{ position: "sticky", top: 96 }}>
+                    <div style={isMobile ? {} : { position: "sticky", top: 96 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase",
                         letterSpacing: "1.5px", color: C.text3, marginBottom: 14, textAlign: "center" }}>
                         Live preview
@@ -4363,7 +4365,7 @@ Awards: ${form.awards}`;
                       </div>
 
                       {/* Feature callouts below preview */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8, marginTop: 16 }}>
                         {[
                           ["check", "ATS score in real-time"],
                           ["globe", `${DOCUMENT_LANGUAGE_COUNT} document languages`],
@@ -5009,8 +5011,8 @@ Awards: ${form.awards}`;
         <div style={{ width: "100%",
           ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } : { maxWidth: 1320, margin: "0 auto" }) }}>
 
-        {/* Persistent top bar: language picker + auth */}
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center",
+        {/* Persistent top bar: language picker + auth (desktop only) */}
+        <div style={{ display: isMobile ? "none" : "flex", justifyContent: "flex-end", alignItems: "center",
           marginBottom: 10, gap: 8, flexWrap: "wrap" }}>
           <LanguageDropdown
             selected={selectedLang}
@@ -5064,25 +5066,40 @@ Awards: ${form.awards}`;
 
         {/* Mobile top bar */}
         {isMobile && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto",
-            padding: "4px 0 12px", borderBottom: `1px solid ${C.border}`, marginBottom: 12 }}>
-            {/* Hamburger */}
-            <button onClick={() => setSidebarOpen(o => !o)} aria-label="Open menu" aria-expanded={sidebarOpen}
-              style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, background: C.surface,
-                border: `1px solid ${C.border}`, color: C.text2, cursor: "pointer",
-                fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "inherit" }}>
-              ☰
-            </button>
-            {NAV.map((item) => (
-              <button key={item.id} onClick={() => setNavPage(item.id)}
-                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "6px 11px",
-                  borderRadius: 8, border: `1px solid ${C.border}`, cursor: "pointer", fontSize: 12,
-                  background: navPage === item.id ? `${C.accent}18` : "transparent",
-                  color: navPage === item.id ? C.accent2 : C.text2, fontFamily: "inherit" }}>
-                {item.icon} {item.label}{item.soon && <span style={{ fontSize: 9, fontWeight: 700, color: C.accent2, background: `${C.accent}20`, borderRadius: 999, padding: "1px 5px", marginLeft: 2 }}>SOON</span>}
+          <div style={{ display: "flex", alignItems: "center", gap: 0,
+            borderBottom: `1px solid ${C.border}`, marginBottom: 12, paddingBottom: 8 }}>
+            {/* Scrollable: hamburger + nav items */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto",
+              flex: 1, padding: "4px 0 0", scrollbarWidth: "none" }}>
+              {/* Hamburger */}
+              <button onClick={() => setSidebarOpen(o => !o)} aria-label="Open menu" aria-expanded={sidebarOpen}
+                style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, background: C.surface,
+                  border: `1px solid ${C.border}`, color: C.text2, cursor: "pointer",
+                  fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: "inherit" }}>
+                ☰
               </button>
-            ))}
+              {NAV.map((item) => (
+                <button key={item.id} onClick={() => setNavPage(item.id)}
+                  aria-current={navPage === item.id ? "page" : undefined}
+                  style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "6px 11px",
+                    borderRadius: 8, border: `1px solid ${C.border}`, cursor: "pointer", fontSize: 12,
+                    background: navPage === item.id ? `${C.accent}18` : "transparent",
+                    color: navPage === item.id ? C.accent2 : C.text2, fontFamily: "inherit" }}>
+                  {item.icon} {item.label}{item.soon && <span style={{ fontSize: 9, fontWeight: 700, color: C.accent2, background: `${C.accent}20`, borderRadius: 999, padding: "1px 5px", marginLeft: 2 }}>SOON</span>}
+                </button>
+              ))}
+            </div>
+            {/* Pinned right: language picker */}
+            <div style={{ flexShrink: 0, paddingLeft: 8 }}>
+              <LanguageDropdown
+                selected={selectedLang}
+                onSelect={(l) => {
+                  setSelectedLang(l);
+                  setPhoneCode(LANG_CODE[l.code] || "+1");
+                }}
+              />
+            </div>
           </div>
         )}
 
