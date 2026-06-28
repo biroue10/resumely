@@ -1234,12 +1234,13 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
   const commitHeading = () => { setEditingHeading(false); const h = headingDraft.trim(); if (h && h !== heading) onEditHeading(h); else setHeadingDraft(heading); };
   return (
     <section style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: SECTION_TOKENS.radius,
-      boxShadow: SECTION_TOKENS.shadow, padding: SECTION_TOKENS.padCard, marginTop: SECTION_TOKENS.gap3 }}>
+      boxShadow: SECTION_TOKENS.shadow, padding: 0, overflow: "hidden", marginTop: SECTION_TOKENS.gap3 }}>
       <header role="button" tabIndex={0} aria-expanded={!collapsed}
         aria-label={collapsed ? eui.expand : eui.collapse}
         onClick={() => { if (!editingHeading) onToggleCollapse(); }}
         onKeyDown={(e) => { if (!editingHeading && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onToggleCollapse(); } }}
-        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none" }}>
+        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none",
+          padding: `${SECTION_TOKENS.gap3}px ${SECTION_TOKENS.padCard}px` }}>
         <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{schema.icon}</span>
         {editingHeading ? (
           <input autoFocus value={headingDraft} onChange={(e) => setHeadingDraft(e.target.value)}
@@ -1261,9 +1262,8 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
         </span>
       </header>
       {!collapsed && (
-        <>
-          <div style={{ marginTop: SECTION_TOKENS.gap2 }}
-            onDragOver={(e) => { e.preventDefault(); }}>
+        <div style={{ padding: `0 ${SECTION_TOKENS.padCard}px ${SECTION_TOKENS.padCard}px` }}>
+          <div onDragOver={(e) => { e.preventDefault(); }}>
             {list.map((entry, i) => (
               <div key={entry.id} onDragOver={() => setDropTarget(i)}>
                 <EntryRow sectionKey={sectionKey} entry={entry} index={i} eui={eui} rtl={rtl}
@@ -1284,7 +1284,7 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
               + {eui.addEntry}
             </button>
           </div>
-        </>
+        </div>
       )}
     </section>
   );
@@ -1295,19 +1295,20 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
 function FieldCard({ icon, title, children, collapsed, onToggleCollapse, rtl, eui }) {
   return (
     <section style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: SECTION_TOKENS.radius,
-      boxShadow: SECTION_TOKENS.shadow, padding: SECTION_TOKENS.padCard, marginTop: SECTION_TOKENS.gap3 }}>
+      boxShadow: SECTION_TOKENS.shadow, padding: 0, overflow: "hidden", marginTop: SECTION_TOKENS.gap3 }}>
       <header role="button" tabIndex={0} aria-expanded={!collapsed}
         aria-label={collapsed ? eui.expand : eui.collapse}
         onClick={onToggleCollapse}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggleCollapse(); } }}
-        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none" }}>
+        style={{ display: "flex", alignItems: "center", gap: SECTION_TOKENS.gap2, cursor: "pointer", userSelect: "none",
+          padding: `${SECTION_TOKENS.gap3}px ${SECTION_TOKENS.padCard}px` }}>
         <span aria-hidden style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
         <h3 style={{ flex: 1, margin: 0, fontSize: 16, fontWeight: 800, color: C.text1, textAlign: rtl ? "right" : "left" }}>{title}</h3>
         <span aria-hidden style={{ color: C.text2, fontSize: 26, lineHeight: 1, padding: "0 4px", flexShrink: 0 }}>
           {collapsed ? "▸" : "▾"}
         </span>
       </header>
-      {!collapsed && <div style={{ marginTop: SECTION_TOKENS.gap3 }}>{children}</div>}
+      {!collapsed && <div style={{ padding: `0 ${SECTION_TOKENS.padCard}px ${SECTION_TOKENS.padCard}px` }}>{children}</div>}
     </section>
   );
 }
