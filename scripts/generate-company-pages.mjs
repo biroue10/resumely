@@ -220,40 +220,46 @@ const PAGES = {
   "about": {
     path: "/about/",
     title: "About ApplyCraft",
-    description: "ApplyCraft is a free resume builder from Biroue Digital Ltd — one mission: help every job seeker create a professional resume without paying or signing up.",
+    description: "Learn why ApplyCraft stands out: a browser-first resume builder with no sign-up, no watermarks, ATS-conscious templates, multilingual support, and privacy-respecting design.",
     content: `
 <h1>About ApplyCraft</h1>
-<p class="lead">ApplyCraft is a free resume and cover letter builder from Biroue Digital Ltd, with a straightforward mission: every job seeker deserves a professional resume, regardless of budget.</p>
+<p class="lead">ApplyCraft is a resume and cover letter builder for people who need a polished document quickly, without surrendering their career data, fighting a paywall, or learning a complicated design tool.</p>
 
 <h2>Who we are</h2>
-<p>ApplyCraft is built and operated by Biroue Digital Ltd. We built this tool because we were frustrated with every existing resume builder out there: they either locked features behind a paywall, plastered watermarks on your download, or required an account just to see your own resume.</p>
-<p>We wanted to build something that respected the user: no sign-up, no watermarks, no hidden fees, and — critically — no storing of your personal career data on a server we control. Your resume is yours.</p>
-<p>ApplyCraft is an independent product. It's not VC-funded, not backed by an ad network, and not secretly harvesting data to monetise later. It's simply a tool built to be genuinely useful.</p>
+<p>ApplyCraft is built and operated by Biroue Digital Ltd. We created it after seeing the same pattern across too many resume builders: users spend time entering personal details, then discover that downloading, removing a watermark, or using a useful template requires payment or an account.</p>
+<p>ApplyCraft takes the opposite approach. The core builder is fast, useful, and available before you create an account. Your resume should feel like your document from the first minute, not a file being held hostage until checkout.</p>
+<p>ApplyCraft is independent. It is not built around advertising profiles, hidden resume databases, or forced cloud storage. The product is designed around a simple standard: help job seekers create better applications with less friction.</p>
 
 <div class="callout">
   <p>📬 Want to reach us? Email: <a href="mailto:${EMAIL}">${EMAIL}</a></p>
 </div>
 
 <h2>The mission</h2>
-<p>Resume builders should not be a luxury. A well-formatted, ATS-friendly resume can be the difference between getting an interview and being filtered out before a human ever reads your application. That's a high-stakes problem that doesn't discriminate by income.</p>
-<p>ApplyCraft's goal is to give every job seeker — student, career changer, international applicant, or experienced professional — the same quality of tool that paid products offer, completely free.</p>
+<p>A strong resume should not be a luxury purchase. For many roles, your document has to satisfy two audiences at once: automated screening software and the human recruiter who reads the shortlist. Bad formatting, unclear sections, weak phrasing, or the wrong language can cost an interview before your experience is properly considered.</p>
+<p>ApplyCraft exists to make that first step fairer. Students, career changers, international applicants, and experienced professionals should all have access to clean templates, practical writing support, and export formats that are ready to send.</p>
 
-<h2>What makes ApplyCraft different</h2>
+<h2>Why ApplyCraft stands out</h2>
 <ul>
-  <li><strong>Browser-first editing.</strong> ApplyCraft does not require an account or cloud resume storage.</li>
-  <li><strong>Optional AI features.</strong> Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text.</li>
-  <li><strong>No watermarks.</strong> The resume you download looks exactly like a professionally prepared document.</li>
-  <li><strong>99 document languages with RTL support.</strong> Built for the global job market, not just English speakers.</li>
-  <li><strong>ATS-conscious.</strong> Templates use clear headings, readable typography, and text-based layouts to improve parsing compatibility.</li>
-  <li><strong>Open development.</strong> The code is on <a href="https://github.com/biroue10" rel="noopener">GitHub</a>. See exactly what it does.</li>
+  <li><strong>No sign-up wall.</strong> You can start building, previewing, and exporting without handing over an email address first.</li>
+  <li><strong>No watermarked downloads.</strong> Your resume exports as a professional document, not an advertisement for the tool that made it.</li>
+  <li><strong>Browser-first by design.</strong> The main resume workflow runs in your browser, reducing unnecessary server storage of personal career information.</li>
+  <li><strong>ATS-conscious templates.</strong> Layouts use readable typography, clear section labels, and text-based structure so applicant tracking systems can parse the document more reliably.</li>
+  <li><strong>Global by default.</strong> ApplyCraft supports 99 document languages, right-to-left layouts, and separate interface/document language choices for international applications.</li>
+  <li><strong>Resume and cover letter together.</strong> You can build matching application documents instead of piecing together separate files from different tools.</li>
+  <li><strong>Optional AI helpers.</strong> Writing, tailoring, and translation features are available when useful, but the core builder does not depend on AI or force it into the workflow.</li>
+  <li><strong>Practical exports.</strong> Download PDF or DOCX files you can submit directly, share with recruiters, or keep as your own editable records.</li>
 </ul>
 
+<h2>Built for real job searches</h2>
+<p>ApplyCraft is not trying to be a generic document editor. It is focused on the specific work of building applications: structuring experience, highlighting measurable achievements, matching a resume and cover letter visually, and keeping the final file clean enough for both software screening and human review.</p>
+<p>That focus is what makes the product different. Instead of giving you a blank page and dozens of decorative choices, ApplyCraft gives you guided sections, proven resume patterns, and export-ready templates that keep momentum on the job search itself.</p>
+
 <h2>Technical stack</h2>
-<p>ApplyCraft is a single-page React application built with Vite. PDF generation runs in the browser using jsPDF and html2canvas. DOCX generation uses docx.js. There is no backend — no API server, no database, no session management. Everything runs client-side.</p>
-<p>Hosted on Cloudflare Pages. Deployed automatically on every commit to main.</p>
+<p>ApplyCraft is a React application built with Vite. PDF generation runs in the browser using jsPDF and html2canvas. DOCX generation uses docx.js. The free builder is intentionally lightweight so the product stays fast, accessible, and easy to use from a modern browser.</p>
+<p>The site is hosted on Cloudflare Pages and deployed automatically from the production codebase.</p>
 
 <h2>Roadmap and feedback</h2>
-<p>See what's coming on the <a href="/roadmap/">product roadmap</a>. Have a feature request or found a bug? Email us directly at <a href="mailto:${EMAIL}">${EMAIL}</a> — we read every message.</p>
+<p>See what's coming on the <a href="/roadmap/">product roadmap</a>. Have a feature request, found a bug, or want to explain what would make ApplyCraft more useful for your job search? Email us directly at <a href="mailto:${EMAIL}">${EMAIL}</a> — we read every message.</p>
 
 <p style="margin-top:40px;font-size:13px;color:#475569">Biroue Digital Ltd · <a href="mailto:${EMAIL}">${EMAIL}</a> · <a href="https://github.com/biroue10" rel="noopener">GitHub</a></p>
 `,
