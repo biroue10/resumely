@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 
 // ── UI translation codes (languages with full UI translation) ──────
 const UI_LANGS = new Set(["en", "fr", "es", "ar", "de"]);
+const DOCUMENT_LANGUAGE_COUNT = 99;
+const UI_LANGUAGE_COUNT = UI_LANGS.size;
 
 // ── All world languages for the picker ────────────────────────────
 const WORLD_LANGUAGES = [
@@ -3101,7 +3103,7 @@ Awards: ${form.awards}`;
         <p style={{ fontSize: 14.5, color: C.text1, lineHeight: 1.8, margin: 0 }}>
           Getting a job is hard enough without fighting the tools meant to help you. ApplyCraft
           gives every job seeker — regardless of budget or background — free access to polished,
-          ATS-friendly documents in 50+ languages. No account, no paywall, no catch.
+          ATS-conscious documents with labels in {DOCUMENT_LANGUAGE_COUNT} document languages. No account, no paywall, no catch.
         </p>
       </div>
 
@@ -3111,16 +3113,16 @@ Awards: ${form.awards}`;
           letterSpacing: "2px", color: C.accent2, marginBottom: 16 }}>What you can do</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           {[
-            ["📄", "Build a resume", "Choose from 22 professional templates with live preview."],
-            ["✉️", "Write a cover letter", "6 matching cover letter styles with full customisation."],
-            ["🌍", "50+ languages", "Full RTL support for Arabic, Hebrew and more."],
-            ["⬇️", "PDF & DOCX export", "Download in the format any employer expects."],
-            ["🔒", "Browser-first", "Build and export without creating an account or cloud profile."],
-            ["✦", "AI suggestions", "Optional AI polish to sharpen your wording instantly."],
+            ["document", "Build a resume", "Choose from 22 professional templates with live preview."],
+            ["document", "Write a cover letter", "6 matching cover letter styles with full customisation."],
+            ["globe", `${DOCUMENT_LANGUAGE_COUNT} document languages`, "Full RTL support for Arabic, Hebrew and more."],
+            ["upload", "PDF & DOCX export", "Download in the format any employer expects."],
+            ["lock", "Browser-first", "Build and export without creating an account or cloud profile."],
+            ["spark", "AI suggestions", "Optional AI polish to sharpen your wording instantly."],
           ].map(([icon, title, desc]) => (
             <div key={title} style={{ background: C.elevated, border: `1px solid ${C.border}`,
               borderRadius: 12, padding: "16px 18px", display: "flex", gap: 14, alignItems: "flex-start" }}>
-              <span style={{ fontSize: 22, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <LineIcon name={icon} size={22} color={C.accent2} style={{ marginTop: 1 }} />
               <div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 4 }}>{title}</div>
                 <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{desc}</div>
@@ -4007,8 +4009,8 @@ Awards: ${form.awards}`;
                 Free resume builder
               </div>
               <h1 style={{ animation: "acFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both",
-                fontSize: "clamp(34px, 5.4vw, 64px)", fontWeight: 800, lineHeight: 1.08,
-                letterSpacing: "-1.5px", margin: "0 0 22px",
+                fontSize: "clamp(34px, 5vw, 58px)", fontWeight: 800, lineHeight: 1.08,
+                letterSpacing: "-0.8px", margin: "0 0 22px",
                 background: "linear-gradient(135deg, #EEF2FF 0%, #94A3B8 100%)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 Create a job-ready resume without signing up.
@@ -4072,15 +4074,15 @@ Awards: ${form.awards}`;
                 }}
                 style={{ display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
                   border: `2px dashed ${uploadDragOver ? C.accent : C.border}`,
-                  borderRadius: 12, padding: "18px 24px",
+                  borderRadius: C.radiusLg, padding: "18px 24px",
                   background: uploadDragOver ? `${C.accent}08` : C.surface,
                   transition: "border-color 0.2s, background 0.2s" }}
                 onMouseEnter={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.borderHi; }}
                 onMouseLeave={e => { if (!uploadDragOver) e.currentTarget.style.borderColor = C.border; }}>
                 <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0,
                   background: `${C.accent}14`, border: `1px solid ${C.accent}30`,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                  📂
+                  display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <LineIcon name="upload" size={22} color={C.accent2} />
                 </div>
                 <div style={{ textAlign: "left" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 3 }}>
@@ -4090,7 +4092,7 @@ Awards: ${form.awards}`;
                     PDF or DOCX · drag & drop or click
                   </div>
                 </div>
-                <div style={{ marginLeft: "auto", fontSize: 18, color: C.text3 }}>↑</div>
+                <LineIcon name="upload" size={18} color={C.text3} style={{ marginLeft: "auto" }} />
                 <input id="landing-resume-upload" type="file" accept=".pdf,.docx"
                   style={{ display: "none" }}
                   onChange={e => {
@@ -4133,7 +4135,7 @@ Awards: ${form.awards}`;
             {[
               { n: "22", label: "Templates" },
               { n: "6", label: "Cover letter styles" },
-              { n: "50+", label: "Languages" },
+              { n: DOCUMENT_LANGUAGE_COUNT, label: "Document languages" },
               { n: "2", label: "Export formats" },
               { n: "∞", label: "Free downloads" },
             ].map(s => (
@@ -4363,15 +4365,15 @@ Awards: ${form.awards}`;
                       {/* Feature callouts below preview */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
                         {[
-                          ["📊", "ATS score in real-time"],
-                          ["🌍", "50+ languages"],
-                          ["✨", "Achievement coaching"],
-                          ["📄", "PDF & DOCX export"],
+                          ["check", "ATS score in real-time"],
+                          ["globe", `${DOCUMENT_LANGUAGE_COUNT} document languages`],
+                          ["spark", "Achievement coaching"],
+                          ["document", "PDF & DOCX export"],
                         ].map(([icon, label]) => (
                           <div key={label} style={{ display: "flex", alignItems: "center", gap: 8,
                             background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8,
                             padding: "8px 12px", fontSize: 12, color: C.text2 }}>
-                            <span>{icon}</span>
+                            <LineIcon name={icon} size={15} color={C.accent2} />
                             <span>{label}</span>
                           </div>
                         ))}
@@ -4501,7 +4503,7 @@ Awards: ${form.awards}`;
             </FadeIn>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 0 }}>
               {[
-                { n: "1", title: "Pick a template", desc: "Choose from 22 professional designs — from minimal to bold. Every template is ATS-safe." },
+                { n: "1", title: "Pick a template", desc: "Choose from 22 professional designs — from minimal to bold. Templates use ATS-conscious structure." },
                 { n: "2", title: "Fill in your details", desc: "Type directly into the live form. The preview updates in real time as you write." },
                 { n: "3", title: "Download & apply", desc: "Export as PDF or DOCX in your chosen language. Ready to send in under 5 minutes." },
               ].map((s, i) => (
@@ -4638,11 +4640,11 @@ Awards: ${form.awards}`;
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
               {[
-                { icon: "🌍", title: "Create a CV in 50+ languages", desc: "Switch the full interface and document language with one click. Every label, date format, and section adapts automatically." },
-                { icon: "↔️", title: "Full right-to-left support", desc: "Arabic, Hebrew, Farsi and other RTL languages render with correct alignment, mirroring, and typography." },
-                { icon: "🖋️", title: "Formatting survives translation", desc: "Your layout, template, and design stay pixel-perfect after translation. Only the words change." },
-                { icon: "📝", title: "Multilingual cover letters", desc: "Generate a matching cover letter in any language with the same formatting as your resume." },
-                { icon: "🔄", title: "Translate an existing CV", desc: "Paste your CV and translate all content to a new language instantly — no rebuilding from scratch." },
+                { icon: "globe", title: `Document labels in ${DOCUMENT_LANGUAGE_COUNT} languages`, desc: `Switch resume section labels and date formats across ${DOCUMENT_LANGUAGE_COUNT} document languages without changing your written content.` },
+                { icon: "document", title: `Full interface translation in ${UI_LANGUAGE_COUNT} languages`, desc: "Use the builder interface in English, French, Spanish, Arabic, or German while keeping the resume language separate." },
+                { icon: "arrowRight", title: "Full right-to-left support", desc: "Arabic, Hebrew, Farsi and other RTL languages render with correct alignment, mirroring, and typography." },
+                { icon: "check", title: "Formatting survives translation", desc: "Your layout, template, and design stay stable after translation. Only the words change." },
+                { icon: "document", title: "Multilingual cover letters", desc: "Create a matching cover letter with the same formatting approach as your resume." },
               ].map((f, i) => (
                 <FadeIn key={f.title} delay={i * 55}>
                   <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
@@ -4650,7 +4652,7 @@ Awards: ${form.awards}`;
                     transition: "border-color 0.2s, transform 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.accent}66`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "none"; }}>
-                    <div style={{ fontSize: 26, marginBottom: 10 }}>{f.icon}</div>
+                    <LineIcon name={f.icon} size={24} color={C.accent2} style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 6 }}>{f.title}</div>
                     <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.65 }}>{f.desc}</div>
                   </div>
@@ -4676,12 +4678,12 @@ Awards: ${form.awards}`;
             </FadeIn>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16, marginBottom: 40 }}>
               {[
-                { icon: "🔒", title: "No account required", body: "ApplyCraft does not require an email, password, or account profile to use the core resume builder." },
-                { icon: "🤖", title: "Optional AI helpers", body: "Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text." },
-                { icon: "🇪🇺", title: "Privacy-conscious design", body: "The builder is designed to reduce the amount of personal data handled by the service." },
-                { icon: "🗑️", title: "Delete local data", body: "Remove ApplyCraft-created master profile, job tracker, and ATS checker records from this browser." },
-                { icon: "📍", title: "Browser-side export", body: "The standard PDF and DOCX export flow runs in the browser using JavaScript." },
-                { icon: "🔓", title: "No account profile", body: "No email, password, or personal dashboard is required before creating and downloading a resume." },
+                { icon: "lock", title: "No account required", body: "ApplyCraft does not require an email, password, or account profile to use the core resume builder." },
+                { icon: "spark", title: "Optional AI helpers", body: "Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text." },
+                { icon: "check", title: "Privacy-conscious design", body: "The builder is designed to reduce the amount of personal data handled by the service." },
+                { icon: "trash", title: "Delete local data", body: "Remove ApplyCraft-created master profile, job tracker, and ATS checker records from this browser." },
+                { icon: "document", title: "Browser-side export", body: "The standard PDF and DOCX export flow runs in the browser using JavaScript." },
+                { icon: "lock", title: "No account profile", body: "No email, password, or personal dashboard is required before creating and downloading a resume." },
               ].map((f, i) => (
                 <FadeIn key={f.title} delay={i * 60}>
                   <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
@@ -4689,7 +4691,7 @@ Awards: ${form.awards}`;
                     transition: "border-color 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.accent}55`; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}>
-                    <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
+                    <LineIcon name={f.icon} size={24} color={C.accent2} style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text1, marginBottom: 6 }}>{f.title}</div>
                     <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.65 }}>{f.body}</div>
                   </div>
@@ -4727,7 +4729,7 @@ Awards: ${form.awards}`;
         <div style={{ borderTop: `1px solid ${C.border}`, padding: "72px 24px" }}>
           <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
             <FadeIn>
-              <div style={{ fontSize: 36, marginBottom: 16 }}>🚀</div>
+              <LineIcon name="spark" size={32} color={C.accent2} style={{ margin: "0 auto 16px" }} />
               <h2 style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 800,
                 letterSpacing: "-0.6px", color: C.text1, margin: "0 0 14px" }}>
                 We're just getting started
@@ -4767,8 +4769,8 @@ Awards: ${form.awards}`;
                 a: "ApplyCraft does not require an account profile to build a resume. Standard editing and export are browser-first; optional AI and translation helpers may process the text you choose to submit." },
               { q: "Are the templates ATS-compatible?",
                 a: "The templates are designed with readable typography, clear section headings, and ATS-conscious layouts to improve parsing compatibility." },
-              { q: "Can I really use 50+ languages?",
-                a: "Yes. Type directly in any language, switch document labels and date formats, and use the Translate button to convert an existing CV to a different language without rebuilding from scratch. RTL languages like Arabic are fully supported." },
+              { q: `Can I really use ${DOCUMENT_LANGUAGE_COUNT} document languages?`,
+                a: `Yes. Type directly in any language, switch document labels and date formats across ${DOCUMENT_LANGUAGE_COUNT} document languages, and use the Translate button to convert an existing CV to a different language without rebuilding from scratch. RTL languages like Arabic are fully supported.` },
               { q: "What download formats are available?",
                 a: "PDF and DOCX. PDF is ideal for most applications. DOCX is available for recruiters or employers who need an editable file." },
               { q: "Do I need to create an account?",
@@ -4812,7 +4814,7 @@ Awards: ${form.awards}`;
                     fontSize: 20, fontWeight: 800, border: "none", cursor: "pointer", padding: 0,
                     fontFamily: "inherit", display: "block", marginBottom: 12, letterSpacing: "-0.5px" }}>ApplyCraft</button>
                 <p style={{ fontSize: 13, color: C.text3, lineHeight: 1.75, margin: "0 0 16px" }}>
-                  Free resume and cover letter builder for the global job market. 50+ languages, 22 templates, no sign-up required.
+                  Free resume and cover letter builder for the global job market. {DOCUMENT_LANGUAGE_COUNT} document languages, {UI_LANGUAGE_COUNT} interface languages, 22 templates, no sign-up required.
                 </p>
                 <a href={`mailto:${AUTHOR.email}`}
                   style={{ fontSize: 13, color: C.text2, textDecoration: "none" }}>
@@ -4873,9 +4875,9 @@ Awards: ${form.awards}`;
               display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
               <div style={{ fontSize: 12.5, color: C.text3 }}>© {new Date().getFullYear()} ApplyCraft by Isaac Biroue · applycraft.io</div>
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: C.text3 }}>🔒 No account required</span>
-                <span style={{ fontSize: 12, color: C.text3 }}>🤖 Optional AI helpers</span>
-                <span style={{ fontSize: 12, color: C.text3 }}>🌐 Browser-first editing</span>
+                <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="lock" size={13} color={C.text3} /> No account required</span>
+                <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="spark" size={13} color={C.text3} /> Optional AI helpers</span>
+                <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="globe" size={13} color={C.text3} /> Browser-first editing</span>
               </div>
             </div>
           </div>
@@ -5682,6 +5684,32 @@ function FAQItem({ item, C }) {
       </div>
     </FadeIn>
   );
+}
+
+function LineIcon({ name, size = 18, color = "currentColor", style = {}, decorative = true }) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: 1.9,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    style: { display: "block", flexShrink: 0, ...style },
+    ...(decorative ? { "aria-hidden": true, focusable: "false" } : { role: "img" }),
+  };
+  const paths = {
+    upload: <><path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M20 16v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3" /></>,
+    check: <path d="M20 6 9 17l-5-5" />,
+    globe: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.7 3.7 5.7 3.7 9S14.5 18.3 12 21" /><path d="M12 3c-2.5 2.7-3.7 5.7-3.7 9S9.5 18.3 12 21" /></>,
+    lock: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
+    spark: <><path d="M12 3v4" /><path d="M12 17v4" /><path d="M3 12h4" /><path d="M17 12h4" /><path d="m5.6 5.6 2.8 2.8" /><path d="m15.6 15.6 2.8 2.8" /><path d="m5.6 18.4 2.8-2.8" /><path d="m15.6 8.4 2.8-2.8" /></>,
+    trash: <><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13h10l1-13" /><path d="M9 7V4h6v3" /></>,
+    document: <><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v5h5" /><path d="M9 13h6" /><path d="M9 17h6" /></>,
+    arrowRight: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
+  };
+  return <svg {...common}>{paths[name] || paths.document}</svg>;
 }
 
 function PageHeader({ eyebrow, icon, title, sub, pill, isMobile }) {
@@ -7005,12 +7033,12 @@ const C = {
   bg:       "#06080F",   // deepest background
   sidebar:  "#080D18",   // sidebar background
   surface:  "#0D1424",   // shell / cards
-  elevated: "#111D30",   // inputs, selects
-  border:   "#1A2740",   // default border
-  borderHi: "#253A58",   // stronger border
+  elevated: "#132036",   // inputs, selects
+  border:   "#20324E",   // default border
+  borderHi: "#344967",   // stronger border
   text1:    "#EEF2FF",   // headings
-  text2:    "#94A3B8",   // body / labels
-  text3:    "#3D5170",   // muted / placeholder
+  text2:    "#B6C2D6",   // body / labels
+  text3:    "#7186A6",   // muted / placeholder
   accent:   "#6366F1",   // indigo primary
   accent2:  "#818CF8",   // lighter indigo
   blue:     "#3B82F6",   // blue secondary
@@ -7018,6 +7046,12 @@ const C = {
   gradHov:  "linear-gradient(135deg,#5254CC 0%,#2563EB 100%)",
   glow:     "rgba(99,102,241,0.14)",  // indigo glow
   glowBlue: "rgba(59,130,246,0.10)", // blue glow
+  success:  "#4ADE80",
+  warning:  "#FBBF24",
+  danger:   "#F87171",
+  radiusSm: 6,
+  radiusMd: 10,
+  radiusLg: 14,
 };
 
 const page = {
@@ -7035,7 +7069,7 @@ const rPageMobile  = { ...page, padding: "8px 4px",  overflowX: "hidden" };
 const shell = {
   margin: "0 auto",
   background: `linear-gradient(160deg, rgba(99,102,241,0.04) 0%, transparent 40%), ${C.surface}`,
-  borderRadius: 16,
+  borderRadius: C.radiusLg,
   padding: "28px 32px",
   border: `1px solid ${C.border}`,
   boxShadow: `0 0 0 1px rgba(99,102,241,0.06), 0 24px 64px rgba(0,0,0,0.45)`,
@@ -7043,7 +7077,7 @@ const shell = {
 const rShellDesktop = { ...shell, padding: "28px 32px" };
 const rShellMobile  = { ...shell, padding: "16px 12px" };
 const h1 = {
-  fontSize: 30, fontWeight: 800, margin: "0 0 6px",
+  fontSize: "clamp(24px, 3vw, 30px)", fontWeight: 800, margin: "0 0 6px",
   color: C.text1, letterSpacing: "-0.6px",
   fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
   background: `linear-gradient(135deg, ${C.text1} 40%, ${C.accent2} 100%)`,
@@ -7069,7 +7103,7 @@ const lbl = {
 const inputStyle = {
   width: "100%", boxSizing: "border-box", padding: "11px 14px",
   background: C.elevated, border: `1px solid ${C.border}`,
-  borderRadius: 10, color: C.text1, fontSize: 14.5, outline: "none",
+  borderRadius: C.radiusMd, color: C.text1, fontSize: 14.5, outline: "none",
   transition: "border-color .15s, box-shadow .15s",
 };
 const chip = {
@@ -7080,19 +7114,19 @@ const chip = {
 const chipActive = { background: `${C.accent}22`, borderColor: C.accent, color: C.accent2 };
 const cta = {
   marginTop: 26, width: "100%", padding: "15px", color: "#fff", border: "none",
-  borderRadius: 11, fontSize: 16, fontWeight: 700, cursor: "pointer",
+  borderRadius: C.radiusMd, fontSize: 16, fontWeight: 700, cursor: "pointer",
   background: C.grad, boxShadow: `0 4px 24px rgba(99,102,241,0.35)`,
   transition: "box-shadow .2s, opacity .15s",
 };
 const backBtn = {
   padding: "7px 14px", background: C.elevated, border: `1px solid ${C.border}`,
-  borderRadius: 9, color: C.text2, fontSize: 13.5, cursor: "pointer",
+  borderRadius: C.radiusSm, color: C.text2, fontSize: 13.5, cursor: "pointer",
   fontFamily: "inherit",
 };
 const copyBtn = {
   position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, padding: "6px 12px",
   background: `${C.surface}cc`, backdropFilter: "blur(8px)",
-  border: `1px solid ${C.border}`, borderRadius: 7, color: C.text2, fontSize: 12.5, cursor: "pointer",
+  border: `1px solid ${C.border}`, borderRadius: C.radiusSm, color: C.text2, fontSize: 12.5, cursor: "pointer",
   fontFamily: "inherit",
 };
 const badge = { fontSize: 11.5, fontWeight: 700, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.4px" };
@@ -7100,13 +7134,13 @@ const badgeLive  = { border: `1px solid ${C.border}`, color: C.text2, background
 const badgePolished = { border: `1px solid ${C.accent}44`, background: `${C.accent}14` };
 const dlBtn = {
   padding: "5px 13px", background: `${C.accent}14`, border: `1px solid ${C.accent}44`,
-  borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer",
+  borderRadius: C.radiusSm, fontSize: 12, fontWeight: 700, cursor: "pointer",
   color: C.accent2, transition: "background .15s", fontFamily: "inherit",
 };
 const fieldErr  = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
 const codeSelect = {
   boxSizing: "border-box", padding: "10px 8px", background: C.elevated,
-  border: `1px solid ${C.border}`, borderRadius: 9, color: C.text1, fontSize: 14,
+  border: `1px solid ${C.border}`, borderRadius: C.radiusSm, color: C.text1, fontSize: 14,
   outline: "none", cursor: "pointer", minWidth: 82, flexShrink: 0, fontFamily: "inherit",
 };
 const footerWrap = {

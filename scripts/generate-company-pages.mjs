@@ -89,7 +89,7 @@ ${content}
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. 50+ languages, 22 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder for the global job market. 99 document languages, 5 interface languages, 22 templates, no sign-up required.</p>
         <a href="mailto:${EMAIL}">${EMAIL}</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -230,7 +230,7 @@ const PAGES = {
   <li><strong>Browser-first editing.</strong> ApplyCraft does not require an account or cloud resume storage.</li>
   <li><strong>Optional AI features.</strong> Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text.</li>
   <li><strong>No watermarks.</strong> The resume you download looks exactly like a professionally prepared document.</li>
-  <li><strong>50+ languages with RTL support.</strong> Built for the global job market, not just English speakers.</li>
+  <li><strong>99 document languages with RTL support.</strong> Built for the global job market, not just English speakers.</li>
   <li><strong>ATS-conscious.</strong> Templates use clear headings, readable typography, and text-based layouts to improve parsing compatibility.</li>
   <li><strong>Open development.</strong> The code is on <a href="https://github.com/biroue10" rel="noopener">GitHub</a>. See exactly what it does.</li>
 </ul>
@@ -364,7 +364,7 @@ const PAGES = {
 <div class="changelog-entry">
   <p class="meta">v1.2 · June 2026</p>
   <h2>Multilingual &amp; RTL</h2>
-  <p><span class="badge badge-green">New</span> 50+ language support with one-click switching.</p>
+  <p><span class="badge badge-green">New</span> 99 document languages with one-click switching.</p>
   <p><span class="badge badge-green">New</span> Full RTL layout support for Arabic, Hebrew, and Farsi.</p>
   <p><span class="badge badge-green">New</span> Translate button — convert existing resume content to a new language instantly.</p>
   <p><span class="badge badge-green">New</span> 6 cover letter templates with live preview.</p>

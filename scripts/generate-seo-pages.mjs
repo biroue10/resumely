@@ -32,7 +32,7 @@ function footer() {
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. 50+ languages, 22 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder for the global job market. 99 document languages, 5 interface languages, 22 templates, no sign-up required.</p>
         <a href="mailto:hello@applycraft.io">hello@applycraft.io</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -277,7 +277,7 @@ const PAGES = [
         { icon: "⚡", title: "Live Preview", body: "See exactly how your resume looks as you type. No more guessing — what you see is what you get." },
         { icon: "🤖", title: "AI-Powered Polish", body: "Our AI rewrites weak bullet points into strong action-oriented achievements recruiters love." },
         { icon: "📄", title: "PDF & DOCX Export", body: "Download your finished resume as a perfectly formatted PDF or editable DOCX file instantly." },
-        { icon: "🌍", title: "50+ Languages", body: "Write your resume in English, French, Arabic, Spanish, German, and 45+ other languages." },
+        { icon: "🌍", title: "99 Document Languages", body: "Set resume section labels and date formats in 99 document languages, with full interface translation in English, French, Spanish, Arabic, and German." },
         { icon: "🔒", title: "Browser-First Editing", body: "Most editing and export work happens in your browser, so you can build documents without creating an account." },
       ],
     },
@@ -410,7 +410,7 @@ const PAGES = [
         { icon: "✍️", title: "6 Professional Templates", body: "From formal to modern, choose a layout that matches the tone of the company you're applying to." },
         { icon: "🔄", title: "Match Your Resume Style", body: "Cover letter templates are designed to complement your resume so both documents look like a cohesive package." },
         { icon: "⚡", title: "Live Preview", body: "See your cover letter update in real-time as you type. Adjust tone and length on the fly." },
-        { icon: "🌍", title: "50+ Languages", body: "Write your cover letter in any of 50+ languages — perfect for international job applications." },
+        { icon: "🌍", title: "99 Document Languages", body: "Use ApplyCraft's document-language support for international job applications while keeping interface language separate." },
         { icon: "📄", title: "PDF & DOCX Download", body: "Export your finished cover letter as a polished PDF or editable DOCX with one click." },
         { icon: "🎯", title: "Role-Specific Guidance", body: "Built-in prompts remind you to mention the company name, role title, and key achievements." },
       ],
@@ -519,7 +519,7 @@ const PAGES = [
       heading: "Pourquoi utiliser ApplyCraft pour votre CV en français ?",
       intro: "ApplyCraft prend en charge le français nativement : libellés de sections, mise en page et export PDF — tout est adapté au marché de l'emploi francophone.",
       ctaHeading: "Créez votre CV en français maintenant",
-      ctaSub: "Gratuit, sans inscription, disponible en 50+ langues dont le français.",
+      ctaSub: "Gratuit, sans inscription, avec 99 langues de document et une interface complète en français.",
       items: [
         { icon: "🇫🇷", title: "Interface en français", body: "L'interface, les libellés de sections (Expérience, Formation, Compétences) et les suggestions sont entièrement en français." },
         { icon: "📋", title: "Formats adaptés au marché français", body: "Nos modèles respectent les conventions du CV français : pas de photo obligatoire, format chronologique inversé, longueur d'une page." },
@@ -1175,7 +1175,7 @@ const EXAMPLES = [
       heading: "UK CV format — what British employers expect",
       intro: "The British CV has specific conventions that differ from American resumes and other international formats. Here's what UK hiring managers look for.",
       ctaHeading: "Build your UK CV free",
-      ctaSub: "British-format templates, PDF & DOCX export, 50+ languages. Free.",
+      ctaSub: "British-format templates, PDF & DOCX export, 99 document languages. Free.",
       items: [
         { icon: "📄", title: "Two Pages is Standard", body: "Unlike in the US where one page is preferred, UK CVs are typically 2 pages for anyone with more than 3 years of experience." },
         { icon: "👤", title: "Personal Statement at the Top", body: "A 3–4 sentence personal statement (sometimes called a professional profile) is standard at the top of a UK CV." },

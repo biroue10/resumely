@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/screenshots/01_cover.png" alt="ApplyCraft — The CV builder that actually works in Arabic, French, and 50+ languages" width="600"/>
+<img src="docs/screenshots/01_cover.png" alt="ApplyCraft — The CV builder that works in Arabic, French, and 99 document languages" width="600"/>
 
 <br/>
 
@@ -72,7 +72,7 @@ Paste a flat job duty and ApplyCraft rewrites it into a quantified, recruiter-re
 
 | Step | What you do | What happens |
 |------|-------------|--------------|
-| **1 · Pick a template** | Browse 22 professional designs | Every template is ATS-safe and fully responsive |
+| **1 · Pick a template** | Browse 22 professional designs | Templates use ATS-conscious structure and responsive layouts |
 | **2 · Fill in your details** | Type into the live form | The preview updates in real time as you write |
 | **3 · Download and apply** | Click Export | PDF or DOCX — ready to send in under 5 minutes |
 
@@ -106,7 +106,7 @@ Stop retyping your CV for every job. With the Master Profile workflow:
 Classic · Modern · Minimal · Bold · Elegant · Executive · Creative · Tech · Sharp · Slate · Prism · Compact · Horizon · Nordic · Dusk · Vertex · Academy · Spark · Stone · Ivy · Carbon · Pulse
 
 Every template is:
-- **ATS-safe** — structured for automated parsing, no tables or text boxes that break parsers
+- **ATS-conscious** — structured for automated parsing, avoiding tables or text boxes that commonly break parsers
 - **Print-ready** — precise margins, clean typography, correct page breaks
 - **RTL-aware** — layouts mirror automatically for Arabic, Hebrew, Farsi
 
@@ -125,7 +125,7 @@ ApplyCraft is the only resume builder designed from the ground up for multilingu
 | Feature | Detail |
 |---------|--------|
 | **99 document languages** | Set section labels (Experience, Education, Skills…) in any of 99 languages with one click |
-| **Full UI in 5 languages** | Complete interface translation for EN, FR, ES, AR, and DE |
+| **Full interface in 5 languages** | Complete interface translation for EN, FR, ES, AR, and DE |
 | **Full right-to-left** | Arabic, Hebrew, Farsi, Pashto, Urdu and other RTL languages render correctly |
 | **Formatting survives** | Your layout and design stay perfect after translation |
 | **Translate an existing CV** | Paste your CV and translate all content instantly — no rebuilding |

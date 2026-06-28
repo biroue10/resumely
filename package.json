@@ -17,6 +17,7 @@
     "test:a11y": "node scripts/a11y-check.mjs",
     "test:security": "node scripts/security-tests.mjs",
     "test:ux": "node scripts/ux-tests.mjs",
+    "test:visual": "node scripts/visual-regression.mjs",
     "audit:high": "npm audit --audit-level=high"
   },
   "dependencies": {
