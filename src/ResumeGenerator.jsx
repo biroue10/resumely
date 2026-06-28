@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { ACCOUNTS_ENABLED, PAYMENTS_ENABLED, ACTIVE_SEARCH_PASS } from "./config.js";
+import { initAnalytics, track, EVENTS } from "./analytics.js";
+import * as account from "./account.js";
 
 // ── UI translation codes (languages with full UI translation) ──────
 const UI_LANGS = new Set(["en", "fr", "es", "ar", "de"]);
@@ -107,6 +110,67 @@ const WORLD_LANGUAGES = [
   { code: "yo", name: "Yoruba",            flag: "🇳🇬", native: "Yorùbá" },
   { code: "zu", name: "Zulu",              flag: "🇿🇦", native: "isiZulu" },
 ];
+
+// ── Account / sync / paid-pass strings (optional features) ──────────
+// Kept separate from the main UI dictionary for clarity. Accessed with the
+// same active language code; RTL is handled by the existing dir="rtl" logic.
+const ACCT_UI = {
+  en: {
+    saveTitle: "Save your Master Profile", saveDesc: "Add an email to open your Master Profile on any device. Optional — the builder stays free, with no account needed.",
+    emailLabel: "Email address", consent: "Email me a sign-in link, and store my Master Profile so I can sync it across my devices.",
+    sendLink: "Send me a link", sending: "Sending…", linkSent: "Check your inbox for your sign-in link.", notConfigured: "Cross-device sync is coming soon.",
+    signedInAs: "Signed in as", signOut: "Sign out", syncNow: "Sync to my devices", syncing: "Syncing…", synced: "Master Profile synced to your devices.",
+    deleteSaved: "Delete my saved data", deletedSaved: "Your saved cloud data has been deleted.",
+    passActive: "Active Search Pass", passUntil: "Active until",
+    upsellTitle: "Unlock with the Active Search Pass", upsellSync: "Sync your Master Profile across all your devices.", upsellTailor: "Let AI rewrite your resume to match any job description.",
+    upsellBody: "A one-time 7-day pass — not a subscription. Everything else stays free, forever.", getPass: "Get the 7-day pass", notNow: "Not now", paymentsSoon: "Checkout is coming soon.",
+    aiTailor: "✨ AI-tailor to this job", tailoring: "Tailoring…",
+  },
+  fr: {
+    saveTitle: "Enregistrez votre Profil Maître", saveDesc: "Ajoutez un e-mail pour ouvrir votre Profil Maître sur n'importe quel appareil. Optionnel — l'éditeur reste gratuit, sans compte.",
+    emailLabel: "Adresse e-mail", consent: "Envoyez-moi un lien de connexion et enregistrez mon Profil Maître pour le synchroniser entre mes appareils.",
+    sendLink: "Recevoir un lien", sending: "Envoi…", linkSent: "Vérifiez votre boîte de réception pour le lien de connexion.", notConfigured: "La synchronisation arrive bientôt.",
+    signedInAs: "Connecté en tant que", signOut: "Se déconnecter", syncNow: "Synchroniser mes appareils", syncing: "Synchronisation…", synced: "Profil Maître synchronisé.",
+    deleteSaved: "Supprimer mes données enregistrées", deletedSaved: "Vos données cloud enregistrées ont été supprimées.",
+    passActive: "Pass Recherche Active", passUntil: "Actif jusqu'au",
+    upsellTitle: "Débloquez avec le Pass Recherche Active", upsellSync: "Synchronisez votre Profil Maître sur tous vos appareils.", upsellTailor: "Laissez l'IA réécrire votre CV pour correspondre à une offre.",
+    upsellBody: "Un pass unique de 7 jours — pas d'abonnement. Tout le reste reste gratuit, pour toujours.", getPass: "Obtenir le pass 7 jours", notNow: "Plus tard", paymentsSoon: "Le paiement arrive bientôt.",
+    aiTailor: "✨ Adapter par IA à cette offre", tailoring: "Adaptation…",
+  },
+  es: {
+    saveTitle: "Guarda tu Perfil Maestro", saveDesc: "Añade un correo para abrir tu Perfil Maestro en cualquier dispositivo. Opcional — el editor sigue siendo gratis, sin cuenta.",
+    emailLabel: "Correo electrónico", consent: "Envíame un enlace de acceso y guarda mi Perfil Maestro para sincronizarlo entre mis dispositivos.",
+    sendLink: "Enviarme un enlace", sending: "Enviando…", linkSent: "Revisa tu bandeja de entrada para el enlace de acceso.", notConfigured: "La sincronización llegará pronto.",
+    signedInAs: "Conectado como", signOut: "Cerrar sesión", syncNow: "Sincronizar mis dispositivos", syncing: "Sincronizando…", synced: "Perfil Maestro sincronizado.",
+    deleteSaved: "Eliminar mis datos guardados", deletedSaved: "Tus datos guardados en la nube se han eliminado.",
+    passActive: "Pase de Búsqueda Activa", passUntil: "Activo hasta",
+    upsellTitle: "Desbloquea con el Pase de Búsqueda Activa", upsellSync: "Sincroniza tu Perfil Maestro en todos tus dispositivos.", upsellTailor: "Deja que la IA reescriba tu currículum para una oferta concreta.",
+    upsellBody: "Un pase único de 7 días — sin suscripción. Todo lo demás sigue gratis, para siempre.", getPass: "Obtener el pase de 7 días", notNow: "Ahora no", paymentsSoon: "El pago llegará pronto.",
+    aiTailor: "✨ Adaptar con IA a esta oferta", tailoring: "Adaptando…",
+  },
+  ar: {
+    saveTitle: "احفظ ملفك الرئيسي", saveDesc: "أضف بريدًا إلكترونيًا لفتح ملفك الرئيسي على أي جهاز. اختياري — يبقى المُنشئ مجانيًا دون حساب.",
+    emailLabel: "البريد الإلكتروني", consent: "أرسل لي رابط تسجيل الدخول، واحفظ ملفي الرئيسي لمزامنته عبر أجهزتي.",
+    sendLink: "أرسل لي رابطًا", sending: "جارٍ الإرسال…", linkSent: "تحقق من بريدك للحصول على رابط تسجيل الدخول.", notConfigured: "المزامنة عبر الأجهزة قادمة قريبًا.",
+    signedInAs: "مسجّل الدخول باسم", signOut: "تسجيل الخروج", syncNow: "المزامنة مع أجهزتي", syncing: "جارٍ المزامنة…", synced: "تمت مزامنة الملف الرئيسي.",
+    deleteSaved: "حذف بياناتي المحفوظة", deletedSaved: "تم حذف بياناتك المحفوظة في السحابة.",
+    passActive: "تصريح البحث النشط", passUntil: "نشط حتى",
+    upsellTitle: "افتح الميزة بتصريح البحث النشط", upsellSync: "زامن ملفك الرئيسي عبر جميع أجهزتك.", upsellTailor: "دع الذكاء الاصطناعي يعيد كتابة سيرتك لتطابق أي وصف وظيفي.",
+    upsellBody: "تصريح لمرة واحدة لمدة 7 أيام — وليس اشتراكًا. كل شيء آخر يبقى مجانيًا للأبد.", getPass: "احصل على تصريح 7 أيام", notNow: "ليس الآن", paymentsSoon: "الدفع قادم قريبًا.",
+    aiTailor: "✨ تخصيص بالذكاء الاصطناعي لهذه الوظيفة", tailoring: "جارٍ التخصيص…",
+  },
+  de: {
+    saveTitle: "Master-Profil speichern", saveDesc: "Fügen Sie eine E-Mail hinzu, um Ihr Master-Profil auf jedem Gerät zu öffnen. Optional — der Builder bleibt kostenlos, ohne Konto.",
+    emailLabel: "E-Mail-Adresse", consent: "Senden Sie mir einen Anmeldelink und speichern Sie mein Master-Profil, um es über meine Geräte zu synchronisieren.",
+    sendLink: "Link senden", sending: "Senden…", linkSent: "Prüfen Sie Ihr Postfach auf den Anmeldelink.", notConfigured: "Geräteübergreifende Synchronisierung kommt bald.",
+    signedInAs: "Angemeldet als", signOut: "Abmelden", syncNow: "Mit meinen Geräten synchronisieren", syncing: "Synchronisieren…", synced: "Master-Profil synchronisiert.",
+    deleteSaved: "Meine gespeicherten Daten löschen", deletedSaved: "Ihre gespeicherten Cloud-Daten wurden gelöscht.",
+    passActive: "Active-Search-Pass", passUntil: "Aktiv bis",
+    upsellTitle: "Mit dem Active-Search-Pass freischalten", upsellSync: "Synchronisieren Sie Ihr Master-Profil auf allen Geräten.", upsellTailor: "Lassen Sie die KI Ihren Lebenslauf auf eine Stellenanzeige zuschneiden.",
+    upsellBody: "Ein einmaliger 7-Tage-Pass — kein Abo. Alles andere bleibt für immer kostenlos.", getPass: "7-Tage-Pass holen", notNow: "Jetzt nicht", paymentsSoon: "Checkout kommt bald.",
+    aiTailor: "✨ Per KI auf diese Stelle zuschneiden", tailoring: "Zuschneiden…",
+  },
+};
 
 const UI = {
   en: { name: "Full name", title: "Professional title", email: "Email", phone: "Phone",
@@ -898,7 +962,13 @@ export default function ResumeGenerator() {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [authModal, setAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState("login");
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => account.getAccount());
+  // Optional account / sync / paid-pass UI state.
+  const [saveProfileOpen, setSaveProfileOpen] = useState(false);
+  const [upsell, setUpsell] = useState(null); // null | "sync" | "tailor"
+  const [syncStatus, setSyncStatus] = useState("");
+  const [aiTailoring, setAiTailoring] = useState(false);
+  const hasPass = account.hasActivePass();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
 
@@ -906,6 +976,41 @@ export default function ResumeGenerator() {
     const close = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false); };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  // Analytics init + optional-account bootstrap (runs once in the browser).
+  useEffect(() => {
+    initAnalytics();
+    if (!ACCOUNTS_ENABLED) return;
+    let cancelled = false;
+    (async () => {
+      // 1) Complete a magic-link sign-in if the URL carries a token.
+      const acct = await account.consumeLoginFromUrl();
+      if (acct && !cancelled) {
+        setCurrentUser(acct);
+        // Pull the cloud Master Profile if the pass is active.
+        if (account.hasActivePass()) {
+          try {
+            const { master: cloud } = await account.pullMasterProfile();
+            if (cloud && !cancelled) setMaster(m => ({ ...m, ...cloud }));
+          } catch { /* no pass / nothing saved */ }
+        }
+      } else if (account.getSession() && !cancelled) {
+        // 2) Refresh pass status for an existing session.
+        const refreshed = await account.refreshAccount();
+        if (refreshed && !cancelled) setCurrentUser(refreshed);
+      }
+      // 3) Returning from a successful checkout.
+      if (typeof window !== "undefined" && new URL(window.location.href).searchParams.get("ac_checkout") === "success") {
+        track(EVENTS.CHECKOUT_COMPLETED);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("ac_checkout");
+        window.history.replaceState({}, "", url.toString());
+        const refreshed = await account.refreshAccount();
+        if (refreshed && !cancelled) setCurrentUser(refreshed);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -1008,6 +1113,7 @@ export default function ResumeGenerator() {
 
   const lang = UI_LANGS.has(selectedLang.code) ? selectedLang.code : "en";
   const t = UI[lang];
+  const at = ACCT_UI[lang]; // account / sync / pass strings
   const rtl = selectedLang.rtl || false;
   const set = useCallback((k) => (e) => setForm(f => ({ ...f, [k]: e.target.value })), []);
   const setField = useCallback((k, v) => setForm(f => ({ ...f, [k]: v })), []);
@@ -1031,6 +1137,7 @@ export default function ResumeGenerator() {
     setAppView("app");
     setMobileResumeMode("edit");
     trackUxEvent("resume_editor_started", { source });
+    track(EVENTS.RESUME_STARTED, { source });
   }, [tpl, recommendedTemplate]);
 
   const startWithTemplate = useCallback((template, source = "template") => {
@@ -1041,6 +1148,58 @@ export default function ResumeGenerator() {
     setMobileResumeMode("edit");
     trackUxEvent("resume_editor_started", { source, template: template.id });
   }, []);
+
+  // ── Optional account / sync / paid-pass handlers ──────────────────────────
+  const handleSyncNow = useCallback(async () => {
+    try {
+      setSyncStatus(at.syncing);
+      await account.pushMasterProfile(master);
+      setSyncStatus(at.synced);
+      setTimeout(() => setSyncStatus(""), 3000);
+    } catch (e) {
+      setSyncStatus("");
+      if (e?.status === 402) setUpsell("sync");        // signed in, no pass → upsell
+      else if (e?.status === 401) setSaveProfileOpen(true); // not signed in → capture
+      else { setSyncStatus(at.notConfigured); setTimeout(() => setSyncStatus(""), 3000); }
+    }
+  }, [master, at]);
+
+  const handleStartCheckout = useCallback(async () => {
+    track(EVENTS.CHECKOUT_STARTED);
+    try {
+      const { url, configured } = await account.startCheckout({ lang });
+      if (configured && url) { window.location.href = url; return; }
+    } catch { /* fall through to the "coming soon" message */ }
+    setUpsell(null);
+    setStatusMsg(at.paymentsSoon);
+    setTimeout(() => setStatusMsg(""), 3000);
+  }, [lang, at]);
+
+  const handleAiTailor = useCallback(async () => {
+    if (!hasPass) { setUpsell("tailor"); return; }   // gate: AI tailoring is paid
+    try {
+      setAiTailoring(true);
+      track(EVENTS.AI_TAILORING_USED);
+      // NEW paid capability — AI rewrites the profile to match the JD.
+      // TODO(server): add a "tailor-resume" action to /api/ai that ALSO verifies
+      // the active pass server-side (mirror the gating in functions/api/sync.js).
+      const text = await callAi("tailor-resume", JSON.stringify({ master, jd: jdText }), selectedLang.code || "en");
+      if (text) { setResult(prev => ({ ...(prev || {}), tailored: text })); setStatusMsg(at.synced); setTimeout(() => setStatusMsg(""), 3000); }
+    } catch {
+      setStatusMsg(at.notConfigured); setTimeout(() => setStatusMsg(""), 3000);
+    } finally {
+      setAiTailoring(false);
+    }
+  }, [hasPass, master, jdText, selectedLang, at]);
+
+  const handleDeleteSavedData = useCallback(async () => {
+    try { await account.deleteSavedData(); } catch { /* ignore */ }
+    setCurrentUser(null);
+    setStatusMsg(at.deletedSaved);
+    setTimeout(() => setStatusMsg(""), 3000);
+  }, [at]);
+
+  const handleSignOut = useCallback(() => { account.logout(); setCurrentUser(null); }, []);
 
   function validateEmail(val) {
     if (!val.trim()) return "";
@@ -1302,6 +1461,7 @@ Awards: ${form.awards}`;
     setExportSuccess("PDF downloaded. You can keep editing or create a matching cover letter.");
     setStatusMsg("PDF downloaded.");
     trackUxEvent("pdf_export_completed");
+    track(EVENTS.RESUME_EXPORTED, { format: "pdf", template: tpl?.id || "" });
     setTimeout(() => { setExportSuccess(""); setStatusMsg(""); }, 4500);
     } catch {
       setStatusMsg("PDF download failed. Your resume is still saved in this browser.");
@@ -1390,6 +1550,7 @@ Awards: ${form.awards}`;
     setExportSuccess("DOCX downloaded. You can keep editing or create a matching cover letter.");
     setStatusMsg("DOCX downloaded.");
     trackUxEvent("docx_export_completed");
+    track(EVENTS.RESUME_EXPORTED, { format: "docx", template: tpl?.id || "" });
     setTimeout(() => { setExportSuccess(""); setStatusMsg(""); }, 4500);
     } catch {
       setStatusMsg("DOCX download failed. Your resume is still saved in this browser.");
@@ -3621,6 +3782,27 @@ Awards: ${form.awards}`;
           </button>
         </div>
 
+        {/* Optional account / cloud-sync strip (free builder is unaffected) */}
+        {ACCOUNTS_ENABLED && (
+          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap",
+            background:C.elevated, border:`1px solid ${C.border}`, borderRadius:10, padding:"10px 14px", marginBottom:20}}>
+            {currentUser ? (<>
+              <span style={{fontSize:12.5, color:C.text2}}>{at.signedInAs} <strong style={{color:C.text1}}>{currentUser.email}</strong></span>
+              {hasPass && <span style={{fontSize:11, fontWeight:700, color:"#4ade80", background:"#4ade8018", border:"1px solid #4ade8044", borderRadius:999, padding:"2px 10px"}}>{at.passActive}</span>}
+              <div style={{flex:1, minWidth:8}} />
+              {syncStatus && <span style={{fontSize:12, color:C.text3}}>{syncStatus}</span>}
+              <button onClick={handleSyncNow} disabled={totalItems===0}
+                style={{background:`${C.accent}18`, color:C.accent2, border:`1px solid ${C.accent}44`, borderRadius:8, padding:"7px 14px", fontSize:12.5, fontWeight:700, cursor: totalItems===0 ? "not-allowed":"pointer", fontFamily:"inherit", opacity: totalItems===0?0.5:1}}>{at.syncNow}</button>
+              <button onClick={handleDeleteSavedData} style={{background:"transparent", color:C.text3, border:`1px solid ${C.border}`, borderRadius:8, padding:"7px 12px", fontSize:12.5, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}>{at.deleteSaved}</button>
+              <button onClick={handleSignOut} style={{background:"transparent", color:C.text3, border:"none", fontSize:12.5, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}>{at.signOut}</button>
+            </>) : (<>
+              <span style={{fontSize:12.5, color:C.text2, flex:1, minWidth:180}}>☁️ {at.saveDesc}</span>
+              <button onClick={() => setSaveProfileOpen(true)}
+                style={{background:`${C.accent}18`, color:C.accent2, border:`1px solid ${C.accent}44`, borderRadius:8, padding:"8px 16px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap"}}>{at.saveTitle}</button>
+            </>)}
+          </div>
+        )}
+
         {/* Tailor Panel */}
         {tailorOpen && (
           <div style={{background:`${C.accent}08`, border:`1.5px solid ${C.accent}40`, borderRadius:14, padding:"20px 22px", marginBottom:24}}>
@@ -3634,6 +3816,13 @@ Awards: ${form.awards}`;
                 style={{background:C.grad, color:"#fff", border:"none", borderRadius:8, padding:"9px 20px", fontSize:13.5, fontWeight:700, cursor: jdText.trim() ? "pointer" : "not-allowed", fontFamily:"inherit", opacity: jdText.trim() ? 1 : 0.5}}>
                 Analyze →
               </button>
+              {ACCOUNTS_ENABLED && (
+                <button onClick={handleAiTailor} disabled={!jdText.trim() || aiTailoring}
+                  title={hasPass ? "" : at.upsellTailor}
+                  style={{background:"transparent", color:C.accent2, border:`1.5px solid ${C.accent}55`, borderRadius:8, padding:"9px 16px", fontSize:13.5, fontWeight:700, cursor: jdText.trim() && !aiTailoring ? "pointer" : "not-allowed", fontFamily:"inherit", opacity: jdText.trim() ? 1 : 0.5}}>
+                  {aiTailoring ? at.tailoring : at.aiTailor}{!hasPass ? " 🔒" : ""}
+                </button>
+              )}
               {jdKws && <span style={{fontSize:12.5, color:C.text2}}>{jdKws.size} keywords extracted</span>}
             </div>
 
@@ -3958,6 +4147,8 @@ Awards: ${form.awards}`;
         </nav>
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
           onLogin={user => { setCurrentUser(user); setAuthModal(false); }} />
+        {ACCOUNTS_ENABLED && <SaveProfileModal open={saveProfileOpen} onClose={() => setSaveProfileOpen(false)} at={at} rtl={rtl} C={C} lang={lang} />}
+        {ACCOUNTS_ENABLED && <UpsellModal feature={upsell} onClose={() => setUpsell(null)} onGetPass={handleStartCheckout} at={at} rtl={rtl} C={C} />}
         <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
         <UploadResumeModal
           open={uploadModalOpen}
@@ -4018,7 +4209,7 @@ Awards: ${form.awards}`;
               <p style={{ animation: isMobile ? "none" : "acFadeUp 0.65s ease 0.34s both",
                 fontSize: "clamp(16px, 2vw, 19px)", color: C.text2, maxWidth: 590,
                 margin: isMobile ? "0 auto 34px" : "0 0 34px", lineHeight: 1.65 }}>
-                Build unlimited resumes with no signup, no watermark, and unlimited PDF or DOCX downloads — no paid tier, ever. Editing and export happen in your browser unless you deliberately use an AI helper.
+                Build unlimited resumes with no signup, no watermark, and unlimited PDF or DOCX downloads — the builder is free forever. Editing and export happen in your browser unless you deliberately use an AI helper.
               </p>
               <div style={{ animation: isMobile ? "none" : "acFadeUp 0.65s ease 0.5s both",
                 display: "flex", gap: 12, justifyContent: isMobile ? "center" : "flex-start", flexWrap: "wrap" }}>
@@ -4583,10 +4774,12 @@ Awards: ${form.awards}`;
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>actually free.</span>
               </h2>
               <p style={{ fontSize: 16, color: C.text2, lineHeight: 1.8, margin: "0 auto 36px", maxWidth: 560 }}>
-                Most resume builders give you one free resume, then charge for a second one, for AI help,
-                or just to remove a watermark. ApplyCraft has no paid tier at all — unlimited resumes,
-                unlimited cover letters, AI achievement coaching, and unlimited PDF or DOCX downloads,
-                without an account or a credit card.
+                Most resume builders give you one free resume, then charge for a second one or to remove a
+                watermark. The ApplyCraft builder is free forever — unlimited resumes and cover letters,
+                AI achievement coaching, and unlimited PDF or DOCX downloads, without an account or a credit
+                card. For an active job search, optional power-ups (AI tailoring and cross-device sync) are
+                available as a one-time 7-day pass — never a subscription, and nothing that's free today ever
+                becomes paid.
               </p>
               <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
                 {["✓ Unlimited resumes & cover letters", "✓ No watermarks", "✓ No account", "✓ No credit card", "✓ Free AI coaching", "✓ PDF & DOCX downloads"].map(t => (
@@ -4998,10 +5191,10 @@ Awards: ${form.awards}`;
                 <div style={{ width: 24, height: 24, borderRadius: "50%", background: C.grad,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 11, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                  {currentUser.name.charAt(0).toUpperCase()}
+                  {(currentUser.name || currentUser.email || "?").charAt(0).toUpperCase()}
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 600, maxWidth: 80, overflow: "hidden",
-                  textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentUser.name}</span>
+                  textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentUser.name || currentUser.email}</span>
                 <span style={{ fontSize: 9, color: C.text3 }}>▾</span>
               </button>
               {userMenuOpen && (
@@ -5009,10 +5202,10 @@ Awards: ${form.awards}`;
                   background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
                   boxShadow: "0 12px 40px rgba(0,0,0,0.5)", overflow: "hidden", zIndex: 9999 }}>
                   <div style={{ padding: "11px 14px", borderBottom: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{currentUser.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{currentUser.name || currentUser.email}</div>
                     <div style={{ fontSize: 11.5, color: C.text3, marginTop: 2 }}>{currentUser.email}</div>
                   </div>
-                  <button onClick={() => { setCurrentUser(null); setUserMenuOpen(false); }}
+                  <button onClick={() => { account.logout(); setCurrentUser(null); setUserMenuOpen(false); }}
                     style={{ display: "block", width: "100%", padding: "10px 14px", textAlign: "left",
                       background: "none", border: "none", color: "#f87171", fontSize: 13,
                       fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
@@ -5031,6 +5224,8 @@ Awards: ${form.awards}`;
         </div>
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
           onLogin={user => { setCurrentUser(user); setAuthModal(false); }} />
+        {ACCOUNTS_ENABLED && <SaveProfileModal open={saveProfileOpen} onClose={() => setSaveProfileOpen(false)} at={at} rtl={rtl} C={C} lang={lang} />}
+        {ACCOUNTS_ENABLED && <UpsellModal feature={upsell} onClose={() => setUpsell(null)} onGetPass={handleStartCheckout} at={at} rtl={rtl} C={C} />}
 
         {/* Mobile top bar */}
         {isMobile && (
@@ -5463,6 +5658,104 @@ function FeedbackModal({ open, onClose }) {
 }
 
 // ── AuthModal ─────────────────────────────────────────────────────
+// ── SaveProfileModal ──────────────────────────────────────────────────────
+// Optional, passwordless email capture for Master Profile sync. Never gates
+// the free builder; fully dismissable. Sends a magic link via the backend.
+function SaveProfileModal({ open, onClose, at, rtl, C, lang }) {
+  const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(true);
+  const [status, setStatus] = useState(""); // "" | "sending" | "sent" | "soon" | "error"
+  const [err, setErr] = useState("");
+  useEffect(() => { if (open) { setEmail(""); setConsent(true); setStatus(""); setErr(""); } }, [open]);
+  if (!open) return null;
+
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  async function submit(e) {
+    e.preventDefault();
+    if (!valid) { setErr("•"); return; }
+    setStatus("sending");
+    try {
+      const res = await account.requestMagicLink(email.trim(), { consent, lang });
+      if (res?.configured === false) { setStatus("soon"); return; }
+      track(EVENTS.EMAIL_CAPTURED);
+      setStatus("sent");
+    } catch { setStatus("error"); }
+  }
+
+  return (
+    <div onClick={onClose} dir={rtl ? "rtl" : "ltr"}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9999,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true"
+        style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16,
+          padding: "30px 28px", maxWidth: 420, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}>
+        <h3 style={{ margin: "0 0 8px", fontSize: 19, fontWeight: 800, color: C.text1 }}>{at.saveTitle}</h3>
+        <p style={{ margin: "0 0 20px", fontSize: 13.5, color: C.text2, lineHeight: 1.6 }}>{at.saveDesc}</p>
+        {status === "sent" ? (
+          <div style={{ fontSize: 14, color: "#4ade80", fontWeight: 600, padding: "8px 0 4px" }}>✓ {at.linkSent}</div>
+        ) : status === "soon" ? (
+          <div style={{ fontSize: 14, color: C.text2, fontWeight: 600, padding: "8px 0 4px" }}>{at.notConfigured}</div>
+        ) : (
+          <form onSubmit={submit} noValidate>
+            <label style={{ fontSize: 12.5, fontWeight: 700, color: C.text2, display: "block", marginBottom: 6 }}>{at.emailLabel}</label>
+            <input type="email" autoComplete="email" value={email}
+              onChange={e => { setEmail(e.target.value); setErr(""); }}
+              style={{ width: "100%", padding: "11px 13px", fontSize: 14, borderRadius: 8,
+                border: `1.5px solid ${err ? "#f87171" : C.border}`, background: C.elevated, color: C.text1,
+                fontFamily: "inherit", marginBottom: 14 }} placeholder="you@example.com" />
+            <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12, color: C.text2,
+              lineHeight: 1.5, marginBottom: 18, cursor: "pointer" }}>
+              <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 2 }} />
+              <span>{at.consent}</span>
+            </label>
+            <button type="submit" disabled={status === "sending" || !consent}
+              style={{ width: "100%", background: C.grad, color: "#fff", border: "none", borderRadius: 9,
+                padding: "12px", fontSize: 14, fontWeight: 700, cursor: status === "sending" || !consent ? "not-allowed" : "pointer",
+                fontFamily: "inherit", opacity: status === "sending" || !consent ? 0.55 : 1 }}>
+              {status === "sending" ? at.sending : at.sendLink}
+            </button>
+            {status === "error" && <div style={{ fontSize: 12.5, color: "#f87171", marginTop: 10 }}>{at.notConfigured}</div>}
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── UpsellModal ───────────────────────────────────────────────────────────
+// Non-naggy, point-of-use upsell for the one-time Active Search Pass. Shown
+// only when a user tries a paid feature (AI tailoring or cross-device sync).
+function UpsellModal({ feature, onClose, onGetPass, at, rtl, C }) {
+  if (!feature) return null;
+  const benefit = feature === "tailor" ? at.upsellTailor : at.upsellSync;
+  const price = `$${ACTIVE_SEARCH_PASS.priceUsd}`;
+  return (
+    <div onClick={onClose} dir={rtl ? "rtl" : "ltr"}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 10000,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true"
+        style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16,
+          padding: "32px 28px", maxWidth: 420, width: "100%", textAlign: "center",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>✨</div>
+        <h3 style={{ margin: "0 0 10px", fontSize: 19, fontWeight: 800, color: C.text1 }}>{at.upsellTitle}</h3>
+        <p style={{ margin: "0 0 6px", fontSize: 14, color: C.text1, fontWeight: 600, lineHeight: 1.55 }}>{benefit}</p>
+        <p style={{ margin: "0 0 22px", fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{at.upsellBody}</p>
+        <button onClick={onGetPass}
+          style={{ width: "100%", background: C.grad, color: "#fff", border: "none", borderRadius: 9,
+            padding: "13px", fontSize: 14.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 12 }}>
+          {at.getPass} — {price}
+        </button>
+        <button onClick={onClose}
+          style={{ background: "transparent", color: C.text3, border: "none", fontSize: 13,
+            fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+          {at.notNow}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function AuthModal({ open, initialTab = "login", onClose, onLogin }) {
   const [tab, setTab] = useState(initialTab);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
