@@ -97,6 +97,37 @@ function faqSchema(items) {
   });
 }
 
+// Title-case a URL slug for use as a breadcrumb label, preserving known acronyms.
+const BREADCRUMB_ACRONYMS = { it: "IT", uk: "UK", us: "US", cv: "CV", ats: "ATS", pdf: "PDF", docx: "DOCX" };
+function prettifySlug(slug) {
+  return slug
+    .split("-")
+    .map(w => BREADCRUMB_ACRONYMS[w.toLowerCase()] || w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+// Build a BreadcrumbList from a canonical path, e.g. "/examples/uk-cv-format/"
+// → Home › Examples › UK CV Format. Any intermediate segments become their own crumb.
+function breadcrumbSchema(canonicalPath) {
+  const segments = canonicalPath.split("/").filter(Boolean);
+  const crumbs = [{ name: "Home", item: `${SITE}/` }];
+  let acc = "";
+  for (const seg of segments) {
+    acc += `/${seg}`;
+    crumbs.push({ name: prettifySlug(seg), item: `${SITE}${acc}/` });
+  }
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
+  });
+}
+
 function faqHtml(items) {
   return `<section class="faq page">
   <h2>Frequently Asked Questions</h2>
@@ -147,9 +178,11 @@ function page({ slug, title, description, eyebrow, h1, sub, keywords, resumeCard
 <link rel="icon" href="/favicon.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/></noscript>
 <link rel="stylesheet" href="${cssRel}"/>
 <script type="application/ld+json">${faqSchema(faqs)}</script>
+<script type="application/ld+json">${breadcrumbSchema(canonicalPath)}</script>
 <script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebPage",

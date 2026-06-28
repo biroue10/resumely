@@ -102,10 +102,76 @@
     }
     </script>
 
-    <!-- Fonts -->
+    <!-- JSON-LD: FAQ (mirrors the "Common questions" section) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is ApplyCraft really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The core builder, templates, language options, previews, and PDF or DOCX downloads are available without a paid tier, account, or credit card."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you store or sell my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ApplyCraft does not require an account profile to build a resume. Standard editing and export are browser-first; optional AI and translation helpers may process the text you choose to submit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are the templates ATS-compatible?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The templates are designed with readable typography, clear section headings, and ATS-conscious layouts to improve parsing compatibility."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I really use 99 document languages?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Type directly in any language, switch document labels and date formats across 99 document languages, and use the Translate button to convert an existing CV to a different language without rebuilding from scratch. RTL languages like Arabic are fully supported."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What download formats are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PDF and DOCX. PDF is ideal for most applications. DOCX is available for recruiters or employers who need an editable file."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to create an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. There is no sign-up, no login, no email address required. Open the app and start building immediately."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Fonts (loaded without blocking render to improve LCP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+    </noscript>
 
     <style>
       *, *::before, *::after { box-sizing: border-box; }
