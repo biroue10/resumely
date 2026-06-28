@@ -2422,7 +2422,8 @@ Awards: ${form.awards}`;
   );
 
   const coverFormContent = coverTpl ? (
-    <div style={{ padding: isMobile ? "8px 4px" : "10px 16px" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%",
+      boxSizing: "border-box", padding: isMobile ? "8px 4px" : "10px 16px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
         marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
         <button onClick={() => setCoverStep("templates")} style={backBtn}>← Back</button>
@@ -2430,9 +2431,11 @@ Awards: ${form.awards}`;
           Template: <strong style={{ color: coverTpl.accent }}>{coverTpl.name}</strong>
         </div>
       </div>
-      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, alignItems: "stretch" }}>
+      <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+        gap: 16, flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
         {/* Left: form */}
-        <div style={{ padding: isMobile ? "16px 12px" : "20px 20px 32px" }}>
+        <div className="ac-panel-noscroll" style={{ ...(isMobile ? { padding: "16px 12px" } : { overflowY: "auto", height: "100%",
+          padding: "20px 20px 32px" }) }}>
           {/* Section heading helper */}
           {(() => {
             const sh = (label) => (
@@ -2490,7 +2493,8 @@ Awards: ${form.awards}`;
           })()}
         </div>
         {/* Right: live preview */}
-        <div style={{ minWidth: 0, padding: isMobile ? "16px 12px" : "20px 20px 32px", marginTop: isMobile ? 16 : 0 }}>
+        <div className="ac-panel-noscroll" style={{ minWidth: 0, ...(isMobile ? { padding: "16px 12px", marginTop: 16 } : { overflowY: "auto", height: "100%",
+          padding: "20px 20px 32px" }) }}>
           <div style={{ fontSize: 12, color: C.text2, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ ...badge, ...badgeLive, background: C.elevated, color: C.text2 }}>● Live preview</span>
           </div>
@@ -3591,7 +3595,10 @@ Awards: ${form.awards}`;
   else pageBody = <ComingSoon id={navPage} label={NAV.find(n => n.id === navPage)?.label || ""} />;
 
   // Two-column independent scroll: only on desktop, resume form view
-  const isFormView = !isMobile && navPage === "resume" && step === "form" && !!tpl;
+  const isFormView = !isMobile && (
+    (navPage === "resume" && step === "form" && !!tpl) ||
+    (navPage === "cover" && coverStep === "form" && !!coverTpl)
+  );
 
   // ── Landing page ──────────────────────────────────────────────────
   if (appView === "landing") {
