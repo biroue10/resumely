@@ -3937,9 +3937,9 @@ Awards: ${form.awards}`;
         {/* Nav */}
         <nav style={{ position: "fixed", top: 0,
           left: 0, right: 0, zIndex: 100, background: C.bg + "ee", backdropFilter: "blur(12px)" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
+          <div className="ac-nav-inner" style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
             display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button onClick={() => setAppView("landing")}
+          <button className="ac-nav-logo" onClick={() => setAppView("landing")}
             style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               border: "none", cursor: "pointer", padding: 0, flexShrink: 0,
               fontSize: isMobile ? 20 : 26, fontWeight: 800, letterSpacing: "-0.8px", fontFamily: "inherit" }}>
@@ -3948,7 +3948,7 @@ Awards: ${form.awards}`;
 
           <div style={{ flex: 1 }} />
 
-          <button onClick={() => startResume("nav_cta")}
+          <button className="ac-nav-cta" onClick={() => startResume("nav_cta")}
             style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
               padding: isMobile ? "8px 14px" : "10px 24px", fontSize: isMobile ? 13 : 14, fontWeight: 700,
               cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
