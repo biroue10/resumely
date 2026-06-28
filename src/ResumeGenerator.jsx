@@ -1675,8 +1675,8 @@ Awards: ${form.awards}`;
   const completion  = Math.round(filledCount / totalCount * 100);
 
   const formContent = tpl ? (
-    <div style={{ ...rShell, display: "flex", flexDirection: "column", height: "100%",
-      boxSizing: "border-box" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%",
+      boxSizing: "border-box", padding: isMobile ? "8px 4px" : "10px 16px" }}>
 
       {/* ── Form header ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -1741,7 +1741,7 @@ Awards: ${form.awards}`;
 
       <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
         gap: 16, flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
-        <div className="ac-panel-noscroll" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
+        <div className="ac-panel-noscroll" style={{ background: C.surface, borderRadius: 12,
           ...(isMobile ? { padding: "16px 12px" } : { overflowY: "auto", height: "100%",
           padding: "20px 20px 32px" }) }}>
 
@@ -2199,7 +2199,7 @@ Awards: ${form.awards}`;
         </div>
 
         {/* ── Preview column ── */}
-        <div className="ac-panel-noscroll" style={{ minWidth: 0, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
+        <div className="ac-panel-noscroll" style={{ minWidth: 0, background: C.surface, borderRadius: 12,
           ...(isMobile ? { padding: "16px 12px", marginTop: 16 } : { overflowY: "auto", height: "100%",
           padding: "20px 20px 32px" }) }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
@@ -4608,10 +4608,10 @@ Awards: ${form.awards}`;
 
       {/* ── Main content ── */}
       <div style={{ flex: 1, minWidth: 0, overflow: isFormView ? "hidden" : "auto",
-        padding: isMobile ? "8px 4px" : "16px 24px",
+        padding: isFormView ? 0 : (isMobile ? "8px 4px" : "16px 24px"),
         ...(isFormView ? { display: "flex", flexDirection: "column" } : {}) }}>
-        <div style={{ maxWidth: 1320, margin: "0 auto", width: "100%",
-          ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } : {}) }}>
+        <div style={{ width: "100%",
+          ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } : { maxWidth: 1320, margin: "0 auto" }) }}>
 
         {/* Persistent top bar: language picker + auth */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center",
