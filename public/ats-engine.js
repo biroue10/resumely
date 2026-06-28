@@ -101,6 +101,25 @@ function setGauge(score) {
   return color;
 }
 
+function clearNode(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+function appendPill(parent, text, className, styleText) {
+  const pill = document.createElement('span');
+  pill.className = className;
+  if (styleText) pill.setAttribute('style', styleText);
+  pill.textContent = text;
+  parent.appendChild(pill);
+}
+
+function appendKeywordTag(parent, text, className) {
+  const tag = document.createElement('span');
+  tag.className = className;
+  tag.textContent = text;
+  parent.appendChild(tag);
+}
+
 function runCheck(locale) {
   const text   = document.getElementById('resume-text').value.trim();
   const jdText = document.getElementById('jd-text').value.trim();
@@ -126,12 +145,12 @@ function runCheck(locale) {
     const critCount = issues.filter(i => i.level === 'critical').length;
     const warnCount = issues.filter(i => i.level === 'warning').length;
     const infoCount = issues.filter(i => i.level === 'info').length;
-    document.getElementById('summary-pills').innerHTML = [
-      critCount ? `<span class="pill pill-red">${critCount} ${locale.pills.critical}</span>`   : '',
-      warnCount ? `<span class="pill pill-amber">${warnCount} ${locale.pills.warning}</span>` : '',
-      infoCount ? `<span class="pill pill-blue">${infoCount} ${locale.pills.info}</span>`     : '',
-      !critCount && !warnCount ? `<span class="pill" style="background:#14532d44;color:#4ade80;border-color:#16a34a44">${locale.pills.allGood}</span>` : '',
-    ].join('');
+    const summaryPills = document.getElementById('summary-pills');
+    clearNode(summaryPills);
+    if (critCount) appendPill(summaryPills, `${critCount} ${locale.pills.critical}`, 'pill pill-red');
+    if (warnCount) appendPill(summaryPills, `${warnCount} ${locale.pills.warning}`, 'pill pill-amber');
+    if (infoCount) appendPill(summaryPills, `${infoCount} ${locale.pills.info}`, 'pill pill-blue');
+    if (!critCount && !warnCount) appendPill(summaryPills, locale.pills.allGood, 'pill', 'background:#14532d44;color:#4ade80;border-color:#16a34a44');
 
     if (kwGap) {
       document.getElementById('kw-section').style.display = 'block';
@@ -139,12 +158,23 @@ function runCheck(locale) {
       document.getElementById('kw-present-count').textContent = kwGap.present.length;
       document.getElementById('kw-missing-count').textContent = kwGap.missing.length;
       setTimeout(() => { document.getElementById('kw-fill').style.width = kwGap.pct + '%'; }, 100);
-      document.getElementById('kw-present-tags').innerHTML =
-        `<span style="font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px">${locale.matchedKw}</span>` +
-        kwGap.present.map(w => `<span class="tag-present">✓ ${w}</span>`).join('');
-      document.getElementById('kw-missing-tags').innerHTML =
-        kwGap.missing.map(w => `<span class="tag-missing">✗ ${w}</span>`).join('') ||
-        `<span style="color:#4ade80;font-size:13px">${locale.noMissingKw}</span>`;
+      const presentTags = document.getElementById('kw-present-tags');
+      const missingTags = document.getElementById('kw-missing-tags');
+      clearNode(presentTags);
+      clearNode(missingTags);
+      const label = document.createElement('span');
+      label.setAttribute('style', 'font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px');
+      label.textContent = locale.matchedKw;
+      presentTags.appendChild(label);
+      kwGap.present.forEach(w => appendKeywordTag(presentTags, `✓ ${w}`, 'tag-present'));
+      if (kwGap.missing.length) {
+        kwGap.missing.forEach(w => appendKeywordTag(missingTags, `✗ ${w}`, 'tag-missing'));
+      } else {
+        const ok = document.createElement('span');
+        ok.setAttribute('style', 'color:#4ade80;font-size:13px');
+        ok.textContent = locale.noMissingKw;
+        missingTags.appendChild(ok);
+      }
     } else {
       document.getElementById('kw-section').style.display = 'none';
     }
@@ -152,23 +182,36 @@ function runCheck(locale) {
     const nonKwIssues = issues.filter(i => i.type !== 'kw');
     const list = document.getElementById('issues-list');
     if (nonKwIssues.length === 0) {
-      list.innerHTML = '';
+      clearNode(list);
       const ac = document.getElementById('all-clear');
       ac.style.display = 'block';
       ac.textContent = locale.allClear;
     } else {
       document.getElementById('all-clear').style.display = 'none';
-      list.innerHTML = nonKwIssues.map(issue => `
-        <div class="issue-card">
-          <div class="issue-icon">${issue.icon}</div>
-          <div class="issue-body">
-            <div class="issue-title">
-              <span>${issue.title}</span>
-              <span class="badge badge-${issue.level}">${locale.badgeLabels[issue.level]}</span>
-            </div>
-            <div class="issue-detail">${issue.detail}</div>
-          </div>
-        </div>`).join('');
+      clearNode(list);
+      nonKwIssues.forEach(issue => {
+        const card = document.createElement('div');
+        card.className = 'issue-card';
+        const icon = document.createElement('div');
+        icon.className = 'issue-icon';
+        icon.textContent = issue.icon;
+        const body = document.createElement('div');
+        body.className = 'issue-body';
+        const title = document.createElement('div');
+        title.className = 'issue-title';
+        const titleText = document.createElement('span');
+        titleText.textContent = issue.title;
+        const badge = document.createElement('span');
+        badge.className = `badge badge-${issue.level}`;
+        badge.textContent = locale.badgeLabels[issue.level];
+        const detail = document.createElement('div');
+        detail.className = 'issue-detail';
+        detail.textContent = issue.detail;
+        title.append(titleText, badge);
+        body.append(title, detail);
+        card.append(icon, body);
+        list.appendChild(card);
+      });
     }
 
     try { localStorage.setItem('ac_ats_text', text); } catch(e) {}

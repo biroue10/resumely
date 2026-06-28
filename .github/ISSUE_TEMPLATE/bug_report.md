@@ -10,6 +10,8 @@ assignees: biroue10
 
 A clear description of the bug.
 
+> Security note: do not report unpatched vulnerabilities or sensitive data exposure in a public issue. Use GitHub private vulnerability reporting instead. Do not attach real resume data, API keys, tokens, or other secrets.
+
 ## Steps to reproduce
 
 1. Go to '...'

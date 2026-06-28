@@ -739,6 +739,87 @@ function useIsMobile(bp = 768) {
   return mobile;
 }
 
+const LOCAL_STORAGE_KEYS = ["ac_resume_draft", "ac_resume_draft_saved_at", "ac_master", "ac_tracker", "ac_ats_text"];
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const MAX_RESUME_UPLOAD_BYTES = 8 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_RESUME_IMPORT_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+]);
+const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+const RECOMMENDED_TEMPLATE_ID = "modern";
+const UX_MEASUREMENT_ENABLED = false;
+
+function hasDangerousKey(value) {
+  if (!value || typeof value !== "object") return false;
+  if (Array.isArray(value)) return value.some(hasDangerousKey);
+  return Object.keys(value).some((key) => DANGEROUS_KEYS.has(key) || hasDangerousKey(value[key]));
+}
+
+function safeParseStoredJson(raw, fallback) {
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return hasDangerousKey(parsed) ? fallback : parsed;
+  } catch {
+    return fallback;
+  }
+}
+
+function sanitizeFilename(value, fallback = "resume") {
+  const cleaned = String(value || fallback)
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^\w .-]/g, "")
+    .replace(/[./\\:*?"<>|]+/g, " ")
+    .replace(/\s+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80)
+    .toLowerCase();
+  return cleaned || fallback;
+}
+
+function validateProfilePhoto(file) {
+  return !!file && ALLOWED_PHOTO_TYPES.has(file.type) && file.size > 0 && file.size <= MAX_PHOTO_BYTES;
+}
+
+function validateResumeImport(file) {
+  if (!file || file.size <= 0 || file.size > MAX_RESUME_UPLOAD_BYTES) return false;
+  const lowerName = file.name.toLowerCase();
+  const extensionOk = lowerName.endsWith(".pdf") || lowerName.endsWith(".docx");
+  const mimeOk = !file.type || ALLOWED_RESUME_IMPORT_TYPES.has(file.type);
+  return extensionOk && mimeOk;
+}
+
+function clearApplyCraftLocalData() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    LOCAL_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+  } catch {}
+}
+
+function trackUxEvent(name, data = {}) {
+  if (!UX_MEASUREMENT_ENABLED) return;
+  const safeData = Object.fromEntries(
+    Object.entries(data).filter(([, value]) => ["string", "number", "boolean"].includes(typeof value))
+  );
+  window.dispatchEvent(new CustomEvent("applycraft:ux", { detail: { name, ...safeData } }));
+}
+
+async function callAi(action, text, language = "en", context = "") {
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, text, language, ...(context ? { context } : {}) }),
+  });
+  if (!res.ok) throw new Error("api-error");
+  const data = await res.json();
+  if (!data || typeof data.result !== "string") throw new Error("api-response");
+  return data.result.trim();
+}
+
 // Build resume data straight from the form so the preview updates as the user types.
 function buildLiveData(form, t) {
   const lines = (s) => s.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -775,14 +856,20 @@ export default function ResumeGenerator() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sideSearch, setSideSearch] = useState("");
   const [tplSearch, setTplSearch] = useState("");
+  const [tplFilter, setTplFilter] = useState("recommended");
   const [step, setStep] = useState("templates");
   const [selectedLang, setSelectedLang] = useState(() => WORLD_LANGUAGES.find(l => l.code === "en"));
   const [tpl, setTpl] = useState(null);
-  const [form, setForm] = useState({
+  const emptyResumeForm = {
     name: "", title: "", email: "", phone: "", location: "",
     linkedin: "", website: "",
     summary: "", experience: "", education: "", skills: "",
     certifications: "", languages: "", projects: "", volunteer: "", awards: "",
+  };
+  const [form, setForm] = useState(() => {
+    if (typeof localStorage === "undefined") return emptyResumeForm;
+    const saved = safeParseStoredJson(localStorage.getItem("ac_resume_draft"), null);
+    return saved && typeof saved === "object" ? { ...emptyResumeForm, ...saved } : emptyResumeForm;
   });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -800,6 +887,10 @@ export default function ResumeGenerator() {
   const [shakeField, setShakeField] = useState("");
   const [phoneCode, setPhoneCode] = useState(() => LANG_CODE[selectedLang?.code] || "+1");
   const [zoomed, setZoomed] = useState(false);
+  const [mobileResumeMode, setMobileResumeMode] = useState("edit");
+  const [showOptionalSections, setShowOptionalSections] = useState(false);
+  const [exporting, setExporting] = useState("");
+  const [exportSuccess, setExportSuccess] = useState("");
   const [aiPolished, setAiPolished] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -817,8 +908,15 @@ export default function ResumeGenerator() {
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!validateProfilePhoto(file)) {
+      setStatusMsg("Profile photo must be JPG, PNG, or WebP and under 2 MB.");
+      e.target.value = "";
+      setTimeout(() => setStatusMsg(""), 2500);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => setPhotoUrl(ev.target.result);
+    reader.onerror = () => setStatusMsg("Could not read the selected image.");
     reader.readAsDataURL(file);
   };
   const [uploadedResume, setUploadedResume] = useState(null);
@@ -832,7 +930,9 @@ export default function ResumeGenerator() {
   const [coachResult, setCoachResult] = useState("");
   const [coachLoading, setCoachLoading] = useState(false);
   const [atsOpen, setAtsOpen] = useState(false);
-  const [master, setMaster] = useState(() => { try { return JSON.parse(localStorage.getItem("ac_master") || "null") || {...defaultMaster}; } catch { return {...defaultMaster}; } });
+  const [master, setMaster] = useState(() => (
+    typeof localStorage === "undefined" ? {...defaultMaster} : safeParseStoredJson(localStorage.getItem("ac_master"), {...defaultMaster})
+  ));
   const [masterTab, setMasterTab] = useState("personal");
   const [masterOpen, setMasterOpen] = useState({});
   const [tailorOpen, setTailorOpen] = useState(false);
@@ -851,11 +951,30 @@ export default function ResumeGenerator() {
     return () => clearTimeout(id);
   }, [master]);
   const [trackerCards, setTrackerCards] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("ac_tracker") || "[]"); } catch { return []; }
+    if (typeof localStorage === "undefined") return [];
+    const parsed = safeParseStoredJson(localStorage.getItem("ac_tracker"), []);
+    return Array.isArray(parsed) ? parsed : [];
   });
   const [trackerModal, setTrackerModal] = useState({ open: false, card: null });
   const [trackerDragId, setTrackerDragId] = useState(null);
   const [trackerDragOver, setTrackerDragOver] = useState(null);
+  const [draftSavedAt, setDraftSavedAt] = useState(() => {
+    if (typeof localStorage === "undefined") return "";
+    return localStorage.getItem("ac_resume_draft_saved_at") || "";
+  });
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem("ac_resume_draft", JSON.stringify(form));
+        const stamp = new Date().toISOString();
+        localStorage.setItem("ac_resume_draft_saved_at", stamp);
+        setDraftSavedAt(stamp);
+      } catch {
+        setStatusMsg("Could not save this draft in your browser.");
+      }
+    }, 700);
+    return () => clearTimeout(id);
+  }, [form]);
   useEffect(() => {
     const id = setTimeout(() => {
       try { localStorage.setItem("ac_tracker", JSON.stringify(trackerCards)); } catch {}
@@ -899,6 +1018,25 @@ export default function ResumeGenerator() {
   const isMobile = useIsMobile();
   const rPage  = isMobile ? rPageMobile  : rPageDesktop;
   const rShell = isMobile ? rShellMobile : rShellDesktop;
+  const recommendedTemplate = TEMPLATES.find((template) => template.id === RECOMMENDED_TEMPLATE_ID) || TEMPLATES.find((template) => !template.blank);
+
+  const startResume = useCallback((source = "primary") => {
+    if (!tpl && recommendedTemplate) setTpl(recommendedTemplate);
+    setStep("form");
+    setNavPage("resume");
+    setAppView("app");
+    setMobileResumeMode("edit");
+    trackUxEvent("resume_editor_started", { source });
+  }, [tpl, recommendedTemplate]);
+
+  const startWithTemplate = useCallback((template, source = "template") => {
+    setTpl(template);
+    setStep("form");
+    setNavPage("resume");
+    setAppView("app");
+    setMobileResumeMode("edit");
+    trackUxEvent("resume_editor_started", { source, template: template.id });
+  }, []);
 
   function validateEmail(val) {
     if (!val.trim()) return "";
@@ -941,19 +1079,7 @@ export default function ResumeGenerator() {
         fieldKeys.filter(k => form[k]?.trim()).map(k => [k, form[k]])
       );
       if (Object.keys(toTranslate).length === 0) return;
-      const prompt = `Translate the following resume fields into ${langName}. Use professional resume language. Keep formatting (line breaks, bullet points) intact. Return ONLY valid JSON with the exact same keys.\n\n${JSON.stringify(toTranslate)}`;
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 2000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      if (!res.ok) throw new Error("api-error");
-      const data = await res.json();
-      const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+      const text = await callAi("translate-resume", JSON.stringify(toTranslate), langCode);
       const clean = text.replace(/```json|```/g, "").trim();
       const translated = JSON.parse(clean);
       setForm(f => ({ ...f, ...translated }));
@@ -1005,14 +1131,7 @@ export default function ResumeGenerator() {
     if (firstErr) { scrollToError(firstErr[1]); return; }
     setLoading(true); setResult(null); setAiPolished(false);
     const langName = selectedLang.name;
-    const prompt = `You are an expert resume writer. Using the candidate details below, write a polished, ATS-friendly resume entirely in ${langName} (every word, including section headings, in ${langName}). Improve weak phrasing and use strong action verbs.
-
-Return ONLY valid JSON, no markdown, in this exact shape:
-{"name":"","title":"","contact":["email","phone","location"],"summary":"","sections":[{"heading":"","items":["bullet or line"]}]}
-
-Use sections for Experience, Education, Skills (and any other relevant section). Each item is a single concise line.
-
-Candidate details:
+    const resumeText = `Candidate details:
 Name: ${form.name}
 Title: ${form.title}
 Email: ${form.email}
@@ -1031,18 +1150,7 @@ Volunteer: ${form.volunteer}
 Awards: ${form.awards}`;
 
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      if (!res.ok) throw new Error("no-backend");
-      const data = await res.json();
-      const text = data.content.filter((b) => b.type === "text").map((b) => b.text).join("").trim();
+      const text = await callAi("generate-resume", resumeText, selectedLang.code || "en");
       const clean = text.replace(/```json|```/g, "").trim();
       setResult(JSON.parse(clean));
       setAiPolished(true);
@@ -1066,8 +1174,16 @@ Awards: ${form.awards}`;
   }
 
   async function downloadPDF() {
+    if (exporting) return;
     const src = result || liveData;
     if (!src) return;
+    if (!form.name.trim() || !form.experience.trim() || !form.skills.trim()) {
+      setStatusMsg("Downloaded resume may be incomplete. Add name, experience, and skills when ready.");
+      setTimeout(() => setStatusMsg(""), 3500);
+    }
+    setExporting("pdf");
+    setExportSuccess("");
+    try {
     const { jsPDF } = await import("jspdf");
     // jsPDF built-in fonts only cover Latin-1; normalise text to avoid garbled output
     const safe = (str = "") =>
@@ -1177,13 +1293,31 @@ Awards: ${form.awards}`;
       doc.text(`${i} / ${totalPages}`, pageW - margin, 291, { align: "right" });
     }
 
-    const fname = safe(src.name || "resume").replace(/\s+/g, "_").toLowerCase() || "resume";
+    const fname = sanitizeFilename(safe(src.name || "resume"), "resume");
     doc.save(`${fname}.pdf`);
+    setExportSuccess("PDF downloaded. You can keep editing or create a matching cover letter.");
+    setStatusMsg("PDF downloaded.");
+    trackUxEvent("pdf_export_completed");
+    setTimeout(() => { setExportSuccess(""); setStatusMsg(""); }, 4500);
+    } catch {
+      setStatusMsg("PDF download failed. Your resume is still saved in this browser.");
+      setTimeout(() => setStatusMsg(""), 3500);
+    } finally {
+      setExporting("");
+    }
   }
 
   async function downloadDOCX() {
+    if (exporting) return;
     const src = result || liveData;
     if (!src) return;
+    if (!form.name.trim() || !form.experience.trim() || !form.skills.trim()) {
+      setStatusMsg("Downloaded resume may be incomplete. Add name, experience, and skills when ready.");
+      setTimeout(() => setStatusMsg(""), 3500);
+    }
+    setExporting("docx");
+    setExportSuccess("");
+    try {
     const { Document, Packer, Paragraph, TextRun, BorderStyle, AlignmentType } = await import("docx");
 
     const accent = tpl.accent.replace("#", "").toUpperCase();
@@ -1246,10 +1380,50 @@ Awards: ${form.awards}`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(src.name || "resume").replace(/\s+/g, "_").toLowerCase()}.docx`;
+    a.download = `${sanitizeFilename(src.name, "resume")}.docx`;
     a.click();
     URL.revokeObjectURL(url);
+    setExportSuccess("DOCX downloaded. You can keep editing or create a matching cover letter.");
+    setStatusMsg("DOCX downloaded.");
+    trackUxEvent("docx_export_completed");
+    setTimeout(() => { setExportSuccess(""); setStatusMsg(""); }, 4500);
+    } catch {
+      setStatusMsg("DOCX download failed. Your resume is still saved in this browser.");
+      setTimeout(() => setStatusMsg(""), 3500);
+    } finally {
+      setExporting("");
+    }
   }
+
+  const TEMPLATE_FILTERS = [
+    { id: "recommended", label: "Recommended" },
+    { id: "ats", label: "ATS-friendly" },
+    { id: "modern", label: "Modern" },
+    { id: "traditional", label: "Traditional" },
+    { id: "compact", label: "Compact" },
+    { id: "rtl", label: "RTL-friendly" },
+  ];
+  const TEMPLATE_META = {
+    classic: "Traditional one-column layout. Strong for conservative roles and long resumes.",
+    modern: "Recommended two-column layout. Good balance of scanability, ATS clarity, and visual polish.",
+    minimal: "Quiet one-column layout for focused, text-heavy resumes.",
+    bold: "High-contrast layout for confident applications with shorter content.",
+    elegant: "Refined serif style for academic, legal, or senior professional roles.",
+    executive: "Structured senior-profile layout with strong section hierarchy.",
+    creative: "Expressive layout for design, brand, and creative roles.",
+    tech: "Technical visual style. Best for tech portfolios, not the safest ATS default.",
+    compact: "Dense two-column layout for fitting more content on one page.",
+  };
+  const filterTemplates = (template) => {
+    if (template.blank) return false;
+    if (tplFilter === "recommended") return ["modern", "minimal", "classic", "compact", "executive", "academy"].includes(template.id);
+    if (tplFilter === "ats") return ["modern", "minimal", "classic", "compact", "academy", "sharp"].includes(template.id);
+    if (tplFilter === "traditional") return ["classic", "elegant", "academy", "ivy", "stone", "sharp"].includes(template.id);
+    if (tplFilter === "modern") return ["modern", "minimal", "executive", "vertex", "horizon", "carbon", "pulse"].includes(template.id);
+    if (tplFilter === "compact") return ["compact", "sharp", "slate", "carbon", "tech"].includes(template.id);
+    if (tplFilter === "rtl") return ["classic", "modern", "minimal", "bold", "creative", "compact"].includes(template.id);
+    return true;
+  };
 
   const mainContent = step === "templates" ? (
     <div style={{ ...rShell }}>
@@ -1257,22 +1431,74 @@ Awards: ${form.awards}`;
         eyebrow="Resume Builder"
         icon="📄"
         title={t.heading}
-        sub={t.chooseTpl}
-        pill={`${TEMPLATES.length - 1} templates`}
+        sub="Start with the recommended template now, or browse by style. You can switch later without losing content."
+        pill="Recommended default"
         isMobile={isMobile}
       />
+      <div style={{ background: C.elevated, border: `1px solid ${C.border}`,
+        borderRadius: 8, padding: 16, marginBottom: 16, display: "flex",
+        alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.text1, marginBottom: 4 }}>
+            Recommended: Modern
+          </div>
+          <div style={{ fontSize: 12.5, color: C.text2, lineHeight: 1.55 }}>
+            ATS-conscious, easy to scan, and flexible for one-page or two-page resumes.
+          </div>
+        </div>
+        <button onClick={() => startWithTemplate(recommendedTemplate, "recommended_template")}
+          style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 6,
+            padding: "10px 16px", fontSize: 13.5, fontWeight: 800, cursor: "pointer",
+            fontFamily: "inherit" }}>
+          Use recommended template
+        </button>
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+        {TEMPLATE_FILTERS.map((filter) => (
+          <button key={filter.id} onClick={() => setTplFilter(filter.id)}
+            style={{ border: `1px solid ${tplFilter === filter.id ? C.accent : C.border}`,
+              background: tplFilter === filter.id ? `${C.accent}18` : C.elevated,
+              color: tplFilter === filter.id ? C.accent2 : C.text2,
+              borderRadius: 999, padding: "6px 12px", fontSize: 12.5, fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit" }}>
+            {filter.label}
+          </button>
+        ))}
+      </div>
       <div style={{ ...tplGrid, gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, minmax(0, 1fr))" }}>
-        {TEMPLATES.map((tp) => (
-          <button key={tp.id} onClick={() => { setTpl(tp); setStep("form"); }}
+        {TEMPLATES.filter(filterTemplates).map((tp) => (
+          <button key={tp.id} onClick={() => startWithTemplate(tp)}
             aria-label={`Use ${tp.name} template${tp.tag ? ` — ${tp.tag}` : ""}`}
-            style={tplCard}
+            style={{ ...tplCard, border: tp.id === RECOMMENDED_TEMPLATE_ID ? `1.5px solid ${C.accent}` : tplCard.border }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "none"; }}>
             <ThumbPreview tp={tp} isMobile={isMobile} />
             <div style={{ padding: isMobile ? "8px 10px" : "10px 4px", textAlign: rtl ? "right" : "left",
               visibility: tp.blank ? "hidden" : "visible" }}>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: C.text1 }}>{tp.name}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: C.text1 }}>{tp.name}</div>
+                {tp.id === RECOMMENDED_TEMPLATE_ID && <span style={{ fontSize: 9.5, color: C.accent2,
+                  background: `${C.accent}18`, borderRadius: 999, padding: "1px 6px", fontWeight: 800 }}>
+                  Recommended
+                </span>}
+              </div>
               <div style={{ fontSize: isMobile ? 11 : 12, color: C.text2, marginTop: 2 }}>{tp.tag}</div>
+              <div style={{ fontSize: 11, color: C.text3, marginTop: 6, lineHeight: 1.45 }}>
+                {TEMPLATE_META[tp.id] || "Professional layout with clear sections and export support."}
+              </div>
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 8 }}>
+                <span style={{ fontSize: 9.5, color: C.text3, border: `1px solid ${C.border}`, borderRadius: 999, padding: "1px 6px" }}>
+                  {["modern","compact","creative","vertex","slate","carbon","pulse"].includes(tp.id) ? "Two column" : "One column"}
+                </span>
+                <span style={{ fontSize: 9.5, color: C.text3, border: `1px solid ${C.border}`, borderRadius: 999, padding: "1px 6px" }}>
+                  ATS-conscious
+                </span>
+                {["classic","modern","minimal","bold","creative","compact"].includes(tp.id) && (
+                  <span style={{ fontSize: 9.5, color: C.text3, border: `1px solid ${C.border}`, borderRadius: 999, padding: "1px 6px" }}>
+                    RTL-friendly
+                  </span>
+                )}
+              </div>
             </div>
           </button>
         ))}
@@ -1763,13 +1989,24 @@ Awards: ${form.awards}`;
   const filledCount = trackFields.filter(k => form[k]?.trim()).length + (photoUrl ? 1 : 0);
   const totalCount  = trackFields.length + 1;
   const completion  = Math.round(filledCount / totalCount * 100);
+  const resumeChecklist = [
+    { id: "contact", label: "Add contact details", done: !!(form.name && form.email && form.location), target: "field-name" },
+    { id: "summary", label: "Write a short summary", done: !!form.summary.trim(), target: "field-summary" },
+    { id: "experience", label: "Add work experience", done: !!form.experience.trim(), target: "field-experience" },
+    { id: "education", label: "Add education", done: !!form.education.trim(), target: "field-education" },
+    { id: "skills", label: "Add 5+ relevant skills", done: form.skills.split(",").filter(s => s.trim()).length >= 5, target: "field-skills" },
+    { id: "download", label: "Review and download", done: !!exportSuccess, target: null },
+  ];
+  const completedChecklist = resumeChecklist.filter(item => item.done).length;
+  const nextChecklistItem = resumeChecklist.find(item => !item.done);
+  const readyForReview = completedChecklist >= 5;
 
   const formContent = tpl ? (
     <div style={{ display: "flex", flexDirection: "column", height: "100%",
       boxSizing: "border-box", padding: isMobile ? "8px 4px" : "10px 16px" }}>
 
       {/* ── Form header ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
         <button onClick={() => setStep("templates")} style={backBtn}>← {t.back}</button>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
           <div style={{ width: 12, height: 12, borderRadius: "50%", background: tpl.accent, flexShrink: 0 }} />
@@ -1804,14 +2041,47 @@ Awards: ${form.awards}`;
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 120 }}>
             <div style={{ flex: 1, height: 6, borderRadius: 999, background: C.elevated,
               border: `1px solid ${C.border}`, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${completion}%`,
-                background: completion >= 80 ? "#4ade80" : completion >= 40 ? C.grad : `${tpl.accent}`,
+              <div style={{ height: "100%", width: `${Math.round((completedChecklist / resumeChecklist.length) * 100)}%`,
+                background: readyForReview ? "#4ade80" : C.grad,
                 borderRadius: 999, transition: "width 0.4s ease" }} />
             </div>
             <span style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, whiteSpace: "nowrap",
-              minWidth: 36 }}>{completion}%</span>
+              minWidth: 58 }}>{completedChecklist}/{resumeChecklist.length}</span>
           </div>
         </div>
+      </div>
+      <div style={{ background: C.elevated, border: `1px solid ${readyForReview ? "#4ade8044" : C.border}`,
+        borderRadius: 10, padding: "10px 12px", marginBottom: 14, display: "flex",
+        alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: readyForReview ? "#4ade80" : C.text1 }}>
+            {readyForReview ? "Your resume is ready for review" : `Next: ${nextChecklistItem?.label || "Review your resume"}`}
+          </div>
+          <div style={{ fontSize: 11.5, color: C.text3, marginTop: 3 }}>
+            Saved locally in this browser{draftSavedAt ? ` · ${new Date(draftSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. No account or cloud backup required.
+          </div>
+        </div>
+        {nextChecklistItem?.target && (
+          <button onClick={() => scrollToError(nextChecklistItem.target)}
+            style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text2,
+              borderRadius: 7, padding: "7px 10px", fontSize: 12, fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit" }}>
+            Go to section
+          </button>
+        )}
+        {isMobile && (
+          <div style={{ display: "flex", border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
+            {["edit", "preview"].map(mode => (
+              <button key={mode} onClick={() => setMobileResumeMode(mode)}
+                style={{ border: "none", background: mobileResumeMode === mode ? C.grad : C.surface,
+                  color: mobileResumeMode === mode ? "#fff" : C.text2,
+                  padding: "7px 11px", fontSize: 12, fontWeight: 800, cursor: "pointer",
+                  fontFamily: "inherit", textTransform: "capitalize" }}>
+                {mode}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Uploaded resume reference banner */}
@@ -1831,7 +2101,7 @@ Awards: ${form.awards}`;
 
       <div style={{ ...splitGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
         gap: 16, flex: 1, minHeight: 0, overflow: "hidden", alignItems: "stretch" }}>
-        <div className="ac-panel-noscroll" style={{ ...(isMobile ? { padding: "16px 12px" } : { overflowY: "auto", height: "100%",
+        <div className="ac-panel-noscroll" style={{ ...(isMobile ? { padding: "16px 12px", display: mobileResumeMode === "edit" ? "block" : "none" } : { overflowY: "auto", height: "100%",
           padding: "20px 20px 32px" }) }}>
 
           {/* ── SECTION: Personal Info ── */}
@@ -1974,7 +2244,7 @@ Awards: ${form.awards}`;
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                       <div style={{ fontSize: 12.5, fontWeight: 800, color: C.accent2,
                         textTransform: "uppercase", letterSpacing: "1px" }}>
-                        ✦ Achievement Coach
+                        Improve this achievement
                       </div>
                       {weakBullets.length > 1 && (
                         <span style={{ fontSize: 10.5, color: C.text3 }}>
@@ -1982,8 +2252,8 @@ Awards: ${form.awards}`;
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 11.5, color: C.text3, marginBottom: 10 }}>
-                      Weak bullet detected — let's make it measurable:
+                    <div style={{ fontSize: 11.5, color: C.text3, marginBottom: 10, lineHeight: 1.5 }}>
+                      Only this bullet and the context you enter below are sent to the AI service. Review any suggested numbers or claims before accepting.
                     </div>
                     <div style={{ fontSize: 12.5, color: C.text2, background: C.bg,
                       border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 10px",
@@ -2032,19 +2302,7 @@ Awards: ${form.awards}`;
                         .filter(([, v]) => v?.trim())
                         .map(([k, v]) => `${k}: ${v}`)
                         .join("\n");
-                      const prompt = `You are an expert resume writer. Rewrite this weak job experience bullet into a single powerful, quantified achievement bullet using strong action verbs.\n\nOriginal bullet: "${coachBullet}"\n${extras ? `\nAdditional context:\n${extras}` : ""}\n\nReturn ONLY the single improved bullet as plain text. No explanation, no quotes, no punctuation outside the bullet.`;
-                      const res = await fetch("/api/ai", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          model: "claude-sonnet-4-6",
-                          max_tokens: 150,
-                          messages: [{ role: "user", content: prompt }],
-                        }),
-                      });
-                      if (!res.ok) throw new Error("api-error");
-                      const data = await res.json();
-                      const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+                      const text = await callAi("rewrite-achievement", coachBullet, selectedLang.code || "en", extras);
                       setCoachResult(text);
                     } catch {
                       const bullet = buildStrongBullet(coachBullet, coachAnswers, ctx);
@@ -2057,7 +2315,7 @@ Awards: ${form.awards}`;
                     border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700,
                     cursor: coachLoading ? "not-allowed" : "pointer", opacity: coachLoading ? 0.7 : 1,
                     fontFamily: "inherit", marginBottom: coachResult ? 12 : 0 }}>
-                  {coachLoading ? "Generating…" : "✦ Generate strong bullet"}
+                  {coachLoading ? "Creating suggestion…" : "Create achievement suggestion"}
                 </button>
 
                 {/* Result */}
@@ -2065,7 +2323,7 @@ Awards: ${form.awards}`;
                   <div style={{ marginTop: 12 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: C.text3,
                       textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>
-                      Suggested bullet:
+                      Suggested version:
                     </div>
                     <div style={{ background: `${C.accent}0a`, border: `1px solid ${C.accent}30`,
                       borderRadius: 8, padding: "10px 14px", marginBottom: 10 }}>
@@ -2082,13 +2340,13 @@ Awards: ${form.awards}`;
                         style={{ flex: 1, padding: "8px 0", background: C.grad, color: "#fff",
                           border: "none", borderRadius: 7, fontSize: 12.5, fontWeight: 700,
                           cursor: "pointer", fontFamily: "inherit" }}>
-                        ✓ Replace in my resume
+                        Accept suggestion
                       </button>
                       <button onClick={() => { setCoachResult(""); setCoachAnswers({}); }}
                         style={{ padding: "8px 14px", background: "transparent",
                           border: `1px solid ${C.border}`, borderRadius: 7, fontSize: 12,
                           color: C.text2, cursor: "pointer", fontFamily: "inherit" }}>
-                        Try again
+                        Retry
                       </button>
                     </div>
                   </div>
@@ -2120,12 +2378,24 @@ Awards: ${form.awards}`;
           </div>
 
           {/* ── SECTION: Additional ── */}
-          <SectionHeader icon="➕" title="Additional (optional)" filled={!!(form.certifications || form.projects || form.volunteer || form.awards)} />
-
-          <label htmlFor="field-certifications" style={lbl}>{t.certifications}</label>{field("certifications", true, t.placeholderCerts)}
-          <label htmlFor="field-projects" style={lbl}>{t.projects}</label>{field("projects", true, t.placeholderProjects)}
-          <label htmlFor="field-volunteer" style={lbl}>{t.volunteer}</label>{field("volunteer", true, t.placeholderVolunteer)}
-          <label htmlFor="field-awards" style={lbl}>{t.awards}</label>{field("awards", true, t.placeholderAwards)}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <SectionHeader icon="➕" title="Additional (optional)" filled={!!(form.certifications || form.projects || form.volunteer || form.awards)} />
+            <button type="button" onClick={() => setShowOptionalSections(v => !v)}
+              aria-expanded={showOptionalSections}
+              style={{ border: `1px solid ${C.border}`, background: C.elevated, color: C.text2,
+                borderRadius: 7, padding: "6px 10px", fontSize: 12, fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+              {showOptionalSections ? "Hide optional" : "Add projects, awards, more"}
+            </button>
+          </div>
+          {showOptionalSections && (
+            <>
+              <label htmlFor="field-certifications" style={lbl}>{t.certifications}</label>{field("certifications", true, t.placeholderCerts)}
+              <label htmlFor="field-projects" style={lbl}>{t.projects}</label>{field("projects", true, t.placeholderProjects)}
+              <label htmlFor="field-volunteer" style={lbl}>{t.volunteer}</label>{field("volunteer", true, t.placeholderVolunteer)}
+              <label htmlFor="field-awards" style={lbl}>{t.awards}</label>{field("awards", true, t.placeholderAwards)}
+            </>
+          )}
 
           {/* ── ATS Checker Panel ── */}
           {atsOpen && (() => {
@@ -2155,7 +2425,7 @@ Awards: ${form.awards}`;
                       </div>
                     </div>
                     <div style={{ fontSize: 11.5, color: C.text3, maxWidth: 360, lineHeight: 1.5 }}>
-                      Designed to improve readability and parsing across common applicant-tracking systems. Scores reflect form completeness and content quality — not a guarantee of ATS passage.
+                      This checks structure, keywords, and readability signals common ATS parsers use. It does not guarantee interviews or employer ranking.
                     </div>
                   </div>
                   <button onClick={() => setAtsOpen(false)} aria-label="Close ATS checker"
@@ -2219,7 +2489,7 @@ Awards: ${form.awards}`;
                     {warnings.length  > 0 && <span style={{ fontSize: 11.5, color: "#fbbf24", fontWeight: 700 }}>● {warnings.length} warnings</span>}
                     {infos.length     > 0 && <span style={{ fontSize: 11.5, color: "#60a5fa", fontWeight: 700 }}>● {infos.length} info</span>}
                     <span style={{ fontSize: 11.5, color: C.text3, marginLeft: "auto" }}>
-                      Fix all issues to reach 100
+                      Start with critical items, then review optional improvements.
                     </span>
                   </div>
                 )}
@@ -2238,57 +2508,63 @@ Awards: ${form.awards}`;
               </button>
             )}
             {(() => {
-              const allFilled = form.name.trim() && form.title.trim() && form.email.trim() &&
-                form.phone.trim() && form.location.trim() && form.summary.trim() &&
-                form.experience.trim() && form.education.trim() && form.skills.trim();
-              const disabled = loading || !allFilled;
+              const hasEnoughForPolish = form.name.trim() && (form.summary.trim() || form.experience.trim() || form.skills.trim());
+              const disabled = loading || !hasEnoughForPolish;
               return (
                 <button onClick={generate} disabled={disabled}
-                  title={!allFilled ? "Please fill in all required fields first" : undefined}
-                  style={{ ...cta, marginTop: 0, background: C.grad,
-                    opacity: disabled ? 0.45 : 1,
+                  title={!hasEnoughForPolish ? "Add your name and at least one resume section first" : undefined}
+                  style={{ ...cta, marginTop: 0, background: "transparent",
+                    border: `1.5px solid ${C.borderHi}`, color: C.text1,
+                    opacity: disabled ? 0.5 : 1,
                     cursor: disabled ? "not-allowed" : "pointer",
-                    boxShadow: disabled ? "none" : `0 6px 28px rgba(99,102,241,0.45)` }}>
-                  {loading ? t.generating : "✨ " + t.generate}
+                    boxShadow: "none" }}>
+                  {loading ? "Polishing…" : "Improve wording with AI"}
                 </button>
               );
             })()}
+            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+              <button onClick={downloadPDF} disabled={!!exporting}
+                style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
+                  alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13,
+                  borderColor: tpl.accent, color: tpl.accent, opacity: exporting ? 0.65 : 1,
+                  cursor: exporting ? "not-allowed" : "pointer" }}>
+                {exporting === "pdf" ? "Preparing PDF…" : "Download PDF"}
+              </button>
+              <button onClick={downloadDOCX} disabled={!!exporting}
+                style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
+                  alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13,
+                  borderColor: tpl.accent, color: tpl.accent, opacity: exporting ? 0.65 : 1,
+                  cursor: exporting ? "not-allowed" : "pointer" }}>
+                {exporting === "docx" ? "Preparing DOCX…" : "Download DOCX"}
+              </button>
+            </div>
+            {exportSuccess && (
+              <div style={{ marginTop: 10, background: "#4ade8012", border: "1px solid #4ade8040",
+                color: "#4ade80", borderRadius: 8, padding: "9px 11px", fontSize: 12.5,
+                lineHeight: 1.5 }}>
+                {exportSuccess}
+              </div>
+            )}
             {result && (
-              <>
-                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                  <button onClick={downloadPDF}
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button onClick={() => { setNavPage("cover"); setCoverStep("form"); }}
                     style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
-                      alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13,
-                      borderColor: tpl.accent, color: tpl.accent }}>
-                    ↓ PDF
-                  </button>
-                  <button onClick={downloadDOCX}
-                    style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
-                      alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13,
-                      borderColor: tpl.accent, color: tpl.accent }}>
-                    ↓ DOCX
-                  </button>
-                </div>
-                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                  <button onClick={() => setComingSoonFeature("Translate Resume")}
-                    style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
-                      alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13 }}>
-                    🌍 Translate resume
-                  </button>
-                  <button onClick={() => setComingSoonFeature("Spelling & Grammar Check")}
-                    style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
-                      alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13 }}>
-                    ✏️ Check spelling
-                  </button>
-                </div>
-              </>
+                    alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13 }}>
+                  Create matching cover letter
+                </button>
+                <button onClick={() => setAtsOpen(true)}
+                  style={{ ...dlBtn, flex: 1, justifyContent: "center", display: "flex",
+                    alignItems: "center", gap: 5, padding: "10px 8px", fontSize: 13 }}>
+                  Review ATS tips
+                </button>
+              </div>
             )}
           </div>
 
         </div>
 
         {/* ── Preview column ── */}
-        <div className="ac-panel-noscroll" style={{ minWidth: 0, ...(isMobile ? { padding: "16px 12px", marginTop: 16 } : { overflowY: "auto", height: "100%",
+        <div className="ac-panel-noscroll" style={{ minWidth: 0, ...(isMobile ? { padding: "16px 12px", marginTop: 0, display: mobileResumeMode === "preview" ? "block" : "none" } : { overflowY: "auto", height: "100%",
           padding: "20px 20px 32px" }) }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
             marginTop: isMobile ? 24 : 0, flexWrap: "wrap" }}>
@@ -2297,16 +2573,14 @@ Awards: ${form.awards}`;
               color: aiPolished ? tpl.accent : C.text2 }}>
               {aiPolished ? "✦ AI-polished" : "● Live preview"}
             </span>
-            {result && (
-              <>
-                <button onClick={downloadPDF} style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent }}>
-                  ↓ {t.dlPdf}
-                </button>
-                <button onClick={downloadDOCX} style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent }}>
-                  ↓ {t.dlDocx}
-                </button>
-              </>
-            )}
+            <button onClick={downloadPDF} disabled={!!exporting}
+              style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent, opacity: exporting ? 0.65 : 1 }}>
+              {exporting === "pdf" ? "Preparing…" : t.dlPdf}
+            </button>
+            <button onClick={downloadDOCX} disabled={!!exporting}
+              style={{ ...dlBtn, borderColor: tpl.accent, color: tpl.accent, opacity: exporting ? 0.65 : 1 }}>
+              {exporting === "docx" ? "Preparing…" : t.dlDocx}
+            </button>
           </div>
           <div
             onClick={() => setZoomed(z => !z)}
@@ -2343,6 +2617,33 @@ Awards: ${form.awards}`;
           </div>
         </div>
       </div>
+      {isMobile && (
+        <div style={{ position: "sticky", bottom: 0, zIndex: 20, margin: "12px -4px -8px",
+          padding: "10px 12px", background: `${C.bg}f2`, backdropFilter: "blur(10px)",
+          borderTop: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+          gap: 8 }}>
+          <button onClick={() => setMobileResumeMode(mobileResumeMode === "edit" ? "preview" : "edit")}
+            style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text1,
+              borderRadius: 8, padding: "9px 6px", fontSize: 12, fontWeight: 800,
+              cursor: "pointer", fontFamily: "inherit" }}>
+            {mobileResumeMode === "edit" ? "Preview" : "Edit"}
+          </button>
+          <button onClick={downloadPDF} disabled={!!exporting}
+            style={{ border: "none", background: C.grad, color: "#fff",
+              borderRadius: 8, padding: "9px 6px", fontSize: 12, fontWeight: 800,
+              cursor: exporting ? "not-allowed" : "pointer", fontFamily: "inherit",
+              opacity: exporting ? 0.7 : 1 }}>
+            {exporting === "pdf" ? "PDF..." : "PDF"}
+          </button>
+          <button onClick={downloadDOCX} disabled={!!exporting}
+            style={{ border: `1px solid ${C.borderHi}`, background: C.surface, color: C.text1,
+              borderRadius: 8, padding: "9px 6px", fontSize: 12, fontWeight: 800,
+              cursor: exporting ? "not-allowed" : "pointer", fontFamily: "inherit",
+              opacity: exporting ? 0.7 : 1 }}>
+            {exporting === "docx" ? "DOCX..." : "DOCX"}
+          </button>
+        </div>
+      )}
     </div>
   ) : null;
 
@@ -2414,7 +2715,7 @@ Awards: ${form.awards}`;
       doc.text(`${i} / ${totalPages2}`, pageW2 - margin, 291, { align: "right" });
     }
 
-    doc.save(`${safe(d.name || "cover-letter").replace(/\s+/g,"_").toLowerCase()}-cover-letter.pdf`);
+    doc.save(`${sanitizeFilename(safe(d.name || "cover-letter"), "cover-letter")}-cover-letter.pdf`);
   }
 
   const coverTemplatesContent = (
@@ -3628,7 +3929,10 @@ Awards: ${form.awards}`;
 
   // ── Landing page ──────────────────────────────────────────────────
   if (appView === "landing") {
-    const enter = (page) => { setNavPage(page); setAppView("app"); };
+    const enter = (page) => {
+      if (page === "resume") startResume("landing_link");
+      else { setNavPage(page); setAppView("app"); }
+    };
     return (
       <div style={{ background: C.bg, color: C.text1, minHeight: "100vh", fontFamily: "'Inter', system-ui, sans-serif", overflowX: "hidden" }}>
         <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">{statusMsg}</div>
@@ -3644,76 +3948,19 @@ Awards: ${form.awards}`;
             ApplyCraft
           </button>
 
-          {/* Nav search */}
-          <div style={{ flex: 1, maxWidth: 340, margin: "0 24px" }}>
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-                color: C.text3, fontSize: 14, pointerEvents: "none" }}>🔍</span>
-              <input
-                aria-label="Search templates"
-                value={tplSearch}
-                onChange={e => setTplSearch(e.target.value)}
-                placeholder="Search 22 templates..."
-                style={{ width: "100%", background: C.surface, border: `1px solid ${C.border}`,
-                  borderRadius: 8, padding: "8px 32px 8px 38px", fontSize: 13, color: C.text1,
-                  fontFamily: "inherit", outline: "none", boxSizing: "border-box",
-                  transition: "border-color 0.2s" }}
-                onFocus={e => { e.target.style.borderColor = C.accent; }}
-                onBlur={e => { e.target.style.borderColor = C.border; }}
-              />
-              {tplSearch && (
-                <button onClick={() => setTplSearch("")} aria-label="Clear template search"
-                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                    background: "none", border: "none", color: C.text3, cursor: "pointer",
-                    fontSize: 14, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
-              )}
-            </div>
+          <div style={{ flex: 1, display: isMobile ? "none" : "flex", justifyContent: "center", gap: 18,
+            fontSize: 13, color: C.text3 }}>
+            <span>No signup</span>
+            <span>No watermark</span>
+            <span>PDF & DOCX included</span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            {currentUser ? (
-              <div ref={userMenuRef} style={{ position: "relative" }}>
-                <button onClick={() => setUserMenuOpen(o => !o)}
-                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 12px",
-                    background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8,
-                    cursor: "pointer", fontFamily: "inherit", color: C.text1 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.grad,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                    {currentUser.name.charAt(0).toUpperCase()}
-                  </div>
-                  <span style={{ fontSize: 13.5, fontWeight: 600 }}>{currentUser.name}</span>
-                  <span style={{ fontSize: 10, color: C.text3 }}>▾</span>
-                </button>
-                {userMenuOpen && (
-                  <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, minWidth: 180,
-                    background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.5)", overflow: "hidden", zIndex: 9999 }}>
-                    <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{currentUser.name}</div>
-                      <div style={{ fontSize: 12, color: C.text3, marginTop: 2 }}>{currentUser.email}</div>
-                    </div>
-                    <button onClick={() => { setCurrentUser(null); setUserMenuOpen(false); }}
-                      style={{ display: "block", width: "100%", padding: "11px 16px", textAlign: "left",
-                        background: "none", border: "none", color: "#f87171", fontSize: 13.5,
-                        fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                      Sign out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button onClick={() => { setAuthModalTab("login"); setAuthModal(true); }}
-                style={{ padding: "9px 20px", background: "transparent", border: `1px solid ${C.border}`,
-                  borderRadius: 3, color: C.text1, fontSize: 14, fontWeight: 600,
-                  cursor: "pointer", fontFamily: "inherit", transition: "border-color 0.15s" }}>
-                Sign In
-              </button>
-            )}
-            <button onClick={() => enter("resume")}
+            <span style={{ display: isMobile ? "none" : "inline", fontSize: 13, color: C.text3 }}>No signup needed</span>
+            <button onClick={() => startResume("nav_cta")}
               style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
                 padding: "10px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-              Get Started — Free
+              Create my resume
             </button>
           </div>
           </div>
@@ -3749,42 +3996,36 @@ Awards: ${form.awards}`;
 
         {/* Hero */}
         <div style={{ background: `radial-gradient(ellipse 80% 50% at 50% -10%, ${C.glow} 0%, transparent 70%)` }}>
-          <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center", padding: "166px 24px 80px" }}>
-            <div style={{ animation: "acFadeUp 0.6s ease 0.05s both", display: "inline-block",
-              fontSize: 12, fontWeight: 600, letterSpacing: "2px",
-              textTransform: "uppercase", color: C.accent2, background: `${C.accent}18`,
-              border: `1px solid ${C.accent}44`, borderRadius: 999, padding: "4px 14px", marginBottom: 28 }}>
-              Free · No sign-up required
-            </div>
-            <h1 style={{ animation: "acFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both",
-              fontSize: "clamp(36px, 6vw, 72px)", fontWeight: 800, lineHeight: 1.1,
-              letterSpacing: "-2px", margin: "0 0 24px",
-              background: "linear-gradient(135deg, #EEF2FF 0%, #94A3B8 100%)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              The CV builder that actually<br />works in Arabic, French, and 50+ languages.
-            </h1>
-            <p style={{ animation: "acFadeUp 0.65s ease 0.34s both",
-              fontSize: "clamp(16px, 2vw, 20px)", color: C.text2, maxWidth: 520,
-              margin: "0 auto 44px", lineHeight: 1.65 }}>
-              ATS-conscious templates, live preview, PDF & DOCX export. Build for free
-              with no sign-up, no watermark, and no credit card required.
-            </p>
-            <div style={{ animation: "acFadeUp 0.65s ease 0.5s both",
-              display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <button onClick={() => enter("resume")}
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "144px 24px 72px",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.02fr 0.98fr",
+            gap: isMobile ? 34 : 52, alignItems: "center" }}>
+            <div style={{ textAlign: isMobile ? "center" : "left" }}>
+              <div style={{ animation: "acFadeUp 0.6s ease 0.05s both", display: "inline-block",
+                fontSize: 12, fontWeight: 600, letterSpacing: "2px",
+                textTransform: "uppercase", color: C.accent2, background: `${C.accent}18`,
+                border: `1px solid ${C.accent}44`, borderRadius: 999, padding: "4px 14px", marginBottom: 24 }}>
+                Free resume builder
+              </div>
+              <h1 style={{ animation: "acFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both",
+                fontSize: "clamp(34px, 5.4vw, 64px)", fontWeight: 800, lineHeight: 1.08,
+                letterSpacing: "-1.5px", margin: "0 0 22px",
+                background: "linear-gradient(135deg, #EEF2FF 0%, #94A3B8 100%)",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                Create a job-ready resume without signing up.
+              </h1>
+              <p style={{ animation: "acFadeUp 0.65s ease 0.34s both",
+                fontSize: "clamp(16px, 2vw, 19px)", color: C.text2, maxWidth: 590,
+                margin: isMobile ? "0 auto 34px" : "0 0 34px", lineHeight: 1.65 }}>
+                Free resume builder with no signup, no watermark, and unlimited PDF or DOCX downloads. Editing and export happen in your browser unless you deliberately use an AI helper.
+              </p>
+              <div style={{ animation: "acFadeUp 0.65s ease 0.5s both",
+                display: "flex", gap: 12, justifyContent: isMobile ? "center" : "flex-start", flexWrap: "wrap" }}>
+              <button onClick={() => startResume("hero_primary")}
                 style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
                   padding: "14px 32px", fontSize: 15, fontWeight: 700, cursor: "pointer",
                   animation: "acPulse 2.8s ease-in-out 1.4s infinite",
                   transition: "opacity 0.2s" }}>
-                Build My Resume →
-              </button>
-              <button onClick={() => enter("cover")}
-                style={{ background: "transparent", color: C.text1, border: `1.5px solid ${C.borderHi}`,
-                  borderRadius: 3, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer",
-                  transition: "border-color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.background = `${C.borderHi}18`; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                Write Cover Letter
+                Create my resume
               </button>
               <button onClick={() => enter("ats")}
                 style={{ background: "transparent", color: C.text2, border: `1.5px solid ${C.border}`,
@@ -3792,19 +4033,21 @@ Awards: ${form.awards}`;
                   transition: "border-color 0.2s, color 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent2; e.currentTarget.style.color = C.accent2; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.text2; }}>
-                🎯 Check ATS Score
+                Check my existing resume
               </button>
-            </div>
-            {/* Trust row */}
-            <div style={{ animation: "acFadeUp 0.5s ease 0.65s both",
-              display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap", marginTop: 28 }}>
-              {["🔒 Browser-first editing", "⚡ No sign-up", "💳 No credit card", "📄 PDF & DOCX"].map(t => (
-                <span key={t} style={{ fontSize: 12.5, color: C.text3, display: "flex", alignItems: "center", gap: 5 }}>{t}</span>
-              ))}
-            </div>
+              </div>
+              {/* Trust row */}
+              <div style={{ animation: "acFadeUp 0.5s ease 0.65s both",
+                display: "flex", gap: 16, justifyContent: isMobile ? "center" : "flex-start",
+                flexWrap: "wrap", marginTop: 24 }}>
+                {["Browser-first editing", "No signup", "No credit card", "PDF & DOCX"].map(t => (
+                  <span key={t} style={{ fontSize: 12.5, color: C.text3 }}>{t}</span>
+                ))}
+              </div>
 
-            {/* Upload existing resume */}
-            <div style={{ animation: "acFadeUp 0.5s ease 0.8s both", marginTop: 40, maxWidth: 420, margin: "40px auto 0" }}>
+              {/* Upload existing resume */}
+              <div style={{ animation: "acFadeUp 0.5s ease 0.8s both", marginTop: 34, maxWidth: 430,
+                marginLeft: isMobile ? "auto" : 0, marginRight: isMobile ? "auto" : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
                 <span style={{ fontSize: 11, fontWeight: 700, color: C.text3, letterSpacing: "1px",
@@ -3819,9 +4062,12 @@ Awards: ${form.awards}`;
                   e.preventDefault();
                   setUploadDragOver(false);
                   const file = e.dataTransfer.files?.[0];
-                  if (file && (file.name.endsWith(".pdf") || file.name.endsWith(".docx"))) {
+                  if (validateResumeImport(file)) {
                     setUploadedResume(file);
-                    enter("resume");
+                    startResume("resume_upload");
+                  } else {
+                    setStatusMsg("Resume upload must be a PDF or DOCX under 8 MB.");
+                    setTimeout(() => setStatusMsg(""), 2500);
                   }
                 }}
                 style={{ display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
@@ -3849,9 +4095,31 @@ Awards: ${form.awards}`;
                   style={{ display: "none" }}
                   onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) { setUploadedResume(file); enter("resume"); }
+                    if (validateResumeImport(file)) {
+                      setUploadedResume(file);
+                      startResume("resume_upload");
+                    } else if (file) {
+                      setStatusMsg("Resume upload must be a PDF or DOCX under 8 MB.");
+                      e.target.value = "";
+                      setTimeout(() => setStatusMsg(""), 2500);
+                    }
                   }} />
               </label>
+              </div>
+            </div>
+            <div style={{ animation: "acFadeUp 0.65s ease 0.42s both" }}>
+              <div style={{ background: C.surface, border: `1px solid ${C.border}`,
+                borderRadius: 10, padding: 12, boxShadow: "0 24px 70px rgba(0,0,0,0.42)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+                  marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>Live resume preview</span>
+                  <span style={{ fontSize: 11, color: C.accent2, background: `${C.accent}18`,
+                    borderRadius: 999, padding: "2px 8px", fontWeight: 800 }}>Updates as you type</span>
+                </div>
+                <div style={{ maxHeight: isMobile ? 360 : 520, overflow: "hidden", borderRadius: 8 }}>
+                  <ResumePaper tpl={recommendedTemplate} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -3908,7 +4176,7 @@ Awards: ${form.awards}`;
                 experience: demoExp || f.experience,
               }));
             }
-            enter("resume");
+            startResume("demo_resume");
           };
 
           const inputS = {
@@ -4156,7 +4424,7 @@ Awards: ${form.awards}`;
                     ))}
                   </div>
                   <div style={{ textAlign: "center", marginTop: 24 }}>
-                    <button onClick={() => enter("resume")}
+                    <button onClick={() => startWithTemplate(tp, "landing_template")}
                       style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 8,
                         padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer",
                         fontFamily: "inherit" }}
@@ -4247,14 +4515,14 @@ Awards: ${form.awards}`;
               ))}
             </div>
             <FadeIn delay={400} style={{ textAlign: "center", marginTop: 44 }}>
-              <button onClick={() => enter("resume")}
+              <button onClick={() => { setStep("templates"); setNavPage("resume"); setAppView("app"); }}
                 style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
                   padding: "13px 30px", fontSize: 14.5, fontWeight: 700, cursor: "pointer",
                   boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
                   transition: "opacity 0.2s, transform 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "none"; }}>
-                Start now — it's free
+                Browse templates
               </button>
             </FadeIn>
           </div>
@@ -4288,7 +4556,7 @@ Awards: ${form.awards}`;
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 32 }}>
               {visible.map((tp, i) => (
                 <FadeIn key={tp.id} delay={i * 60}>
-                  <button onClick={() => enter("resume")}
+                  <button onClick={() => startWithTemplate(tp, "landing_template")}
                     style={{ background: "transparent", border: "none", borderRadius: 0,
                       overflow: "visible", cursor: "pointer", padding: 0, width: "100%",
                       transition: "transform 0.22s cubic-bezier(0.22,1,0.36,1)",
@@ -4309,7 +4577,7 @@ Awards: ${form.awards}`;
               ))}
             </div>
             <FadeIn delay={420} style={{ textAlign: "center", marginTop: 48 }}>
-              <button onClick={() => enter("resume")}
+              <button onClick={() => startResume("how_it_works")}
                 style={{ background: "transparent", border: `1.5px solid ${C.borderHi}`,
                   borderRadius: 3, padding: "13px 36px", fontSize: 14.5, fontWeight: 600,
                   color: C.text1, cursor: "pointer", fontFamily: "inherit",
@@ -4411,7 +4679,7 @@ Awards: ${form.awards}`;
                 { icon: "🔒", title: "No account required", body: "ApplyCraft does not require an email, password, or account profile to use the core resume builder." },
                 { icon: "🤖", title: "Optional AI helpers", body: "Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text." },
                 { icon: "🇪🇺", title: "Privacy-conscious design", body: "The builder is designed to reduce the amount of personal data handled by the service." },
-                { icon: "🗑️", title: "Clear your session", body: "Because no account profile is required, you can close the browser tab when you are done and start fresh later." },
+                { icon: "🗑️", title: "Delete local data", body: "Remove ApplyCraft-created master profile, job tracker, and ATS checker records from this browser." },
                 { icon: "📍", title: "Browser-side export", body: "The standard PDF and DOCX export flow runs in the browser using JavaScript." },
                 { icon: "🔓", title: "No account profile", body: "No email, password, or personal dashboard is required before creating and downloading a resume." },
               ].map((f, i) => (
@@ -4427,6 +4695,24 @@ Awards: ${form.awards}`;
                   </div>
                 </FadeIn>
               ))}
+            </div>
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <button
+                onClick={() => {
+                  clearApplyCraftLocalData();
+                  setForm(emptyResumeForm);
+                  setMaster({...defaultMaster});
+                  setTrackerCards([]);
+                  setAtsFromChecker("");
+                  setDraftSavedAt("");
+                  setStatusMsg("ApplyCraft local data deleted from this browser.");
+                  setTimeout(() => setStatusMsg(""), 2500);
+                }}
+                style={{ background: "transparent", color: C.text2, border: `1px solid ${C.borderHi}`,
+                  borderRadius: 6, padding: "10px 18px", fontSize: 13, fontWeight: 700,
+                  cursor: "pointer", fontFamily: "inherit" }}>
+                Delete local data
+              </button>
             </div>
             <FadeIn style={{ textAlign: "center" }}>
               <a href="/privacy/" style={{ fontSize: 13.5, color: C.accent2, textDecoration: "none",
@@ -4502,14 +4788,14 @@ Awards: ${form.awards}`;
               </p>
             </FadeIn>
             <FadeIn delay={120}>
-              <button onClick={() => enter("resume")}
+              <button onClick={() => startResume("final_cta")}
                 style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
                   padding: "16px 40px", fontSize: 16, fontWeight: 700, cursor: "pointer",
                   boxShadow: "0 4px 24px rgba(99,102,241,0.35)",
                   transition: "opacity 0.2s, transform 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "none"; }}>
-                Build My Resume — It's Free
+                Create my resume
               </button>
             </FadeIn>
           </div>
@@ -4764,13 +5050,11 @@ Awards: ${form.awards}`;
               )}
             </div>
           ) : (
-            <button onClick={() => { setAuthModalTab("login"); setAuthModal(true); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 13px",
-                background: C.surface, border: `1px solid ${C.border}`, borderRadius: 9,
-                color: C.text1, fontSize: 13.5, fontWeight: 600, cursor: "pointer",
-                fontFamily: "inherit", transition: "border-color 0.15s" }}>
-              Sign In
-            </button>
+            <span style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 11px",
+              background: C.surface, border: `1px solid ${C.border}`, borderRadius: 9,
+              color: C.text2, fontSize: 12.5, fontWeight: 700 }}>
+              Saved locally
+            </span>
           )}
         </div>
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}

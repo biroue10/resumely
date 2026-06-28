@@ -2,6 +2,11 @@
   "name": "applycraft",
   "main": "worker.js",
   "compatibility_date": "2024-09-23",
+  "vars": {
+    "ALLOWED_ORIGINS": "https://applycraft.io",
+    "ENVIRONMENT": "production",
+    "ENABLE_DEV_ORIGINS": "false"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
