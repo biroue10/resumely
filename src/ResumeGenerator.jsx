@@ -872,6 +872,7 @@ export default function ResumeGenerator() {
   const t = UI[lang];
   const rtl = selectedLang.rtl || false;
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const fullPhone = form.phone.trim() ? `${phoneCode} ${form.phone.trim()}` : "";
   const liveData = buildLiveData({ ...form, phone: fullPhone, photo: photoUrl }, t);
   const isMobile = useIsMobile();
@@ -1256,12 +1257,84 @@ Awards: ${form.awards}`;
     </div>
   ) : null;
 
+  const applyFormat = (key, marker, endMarker) => {
+    const el = document.getElementById(`field-${key}`);
+    if (!el) return;
+    const val = form[key];
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = val.slice(start, end);
+    const close = endMarker !== undefined ? endMarker : marker;
+    if (selected.startsWith(marker) && selected.endsWith(close)) {
+      const inner = selected.slice(marker.length, selected.length - close.length);
+      setField(key, val.slice(0, start) + inner + val.slice(end));
+      setTimeout(() => { el.focus(); el.setSelectionRange(start, start + inner.length); }, 0);
+    } else {
+      setField(key, val.slice(0, start) + marker + selected + close + val.slice(end));
+      setTimeout(() => { el.focus(); el.setSelectionRange(start + marker.length, end + marker.length); }, 0);
+    }
+  };
+
+  const applyLinePrefix = (key, prefix, numbered) => {
+    const el = document.getElementById(`field-${key}`);
+    if (!el) return;
+    const val = form[key];
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const lineStart = val.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = val.indexOf("\n", end);
+    const block = val.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+    const lines = block.split("\n");
+    const allPrefixed = lines.every(l => l.startsWith(prefix) || (numbered && /^\d+\. /.test(l)));
+    let counter = 1;
+    const updated = lines.map(l => {
+      if (allPrefixed) return l.replace(/^[•\-] |^\d+\. /, "");
+      if (numbered) return `${counter++}. ${l}`;
+      return l.startsWith(prefix) ? l : `${prefix}${l}`;
+    }).join("\n");
+    const newVal = val.slice(0, lineStart) + updated + (lineEnd === -1 ? "" : val.slice(lineEnd));
+    setField(key, newVal);
+    setTimeout(() => { el.focus(); }, 0);
+  };
+
+  const clearFormat = (key) => {
+    setField(key, (form[key] || "").replace(/\*\*|__|\*|~~/g, ""));
+  };
+
+  const FormattingBar = ({ fieldKey }) => {
+    const btn = (label, title, onClick, extraStyle = {}) => (
+      <button type="button" title={title} onClick={onClick}
+        style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 5,
+          padding: "2px 7px", fontSize: 12, fontWeight: 700, color: C.text2,
+          cursor: "pointer", fontFamily: "inherit", lineHeight: 1.5, ...extraStyle }}>
+        {label}
+      </button>
+    );
+    return (
+      <div style={{ display: "flex", gap: 3, marginBottom: 5, flexWrap: "wrap" }}>
+        {btn("B", "Bold", () => applyFormat(fieldKey, "**"), { fontWeight: 900 })}
+        {btn("I", "Italic", () => applyFormat(fieldKey, "*"), { fontStyle: "italic", fontWeight: 400 })}
+        {btn("U", "Underline", () => applyFormat(fieldKey, "__"), { textDecoration: "underline" })}
+        {btn("~~S~~", "Strikethrough", () => applyFormat(fieldKey, "~~"), { textDecoration: "line-through", fontSize: 10 })}
+        <div style={{ width: 1, background: C.border, margin: "2px 1px" }} />
+        {btn("•", "Bullet list", () => applyLinePrefix(fieldKey, "• "))}
+        {btn("1.", "Numbered list", () => applyLinePrefix(fieldKey, "1. ", true))}
+        <div style={{ width: 1, background: C.border, margin: "2px 1px" }} />
+        {btn("—", "Insert dash", () => applyFormat(fieldKey, " — ", ""), { fontWeight: 400 })}
+        {btn("✕", "Clear formatting", () => clearFormat(fieldKey), { fontSize: 10, color: C.text3 })}
+      </div>
+    );
+  };
+
   const field = (key, multiline, ph, id, error) => {
     const errStyle = error ? { borderColor: "#f87171", boxShadow: "0 0 0 3px rgba(248,113,113,0.15)" } : {};
     const onChange = (e) => { set(key)(e); if (error) clearFieldError(key); };
     return multiline ? (
-      <textarea id={id || `field-${key}`} value={form[key]} onChange={onChange} placeholder={ph || ""} rows={5}
-        style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit", ...errStyle }} />
+      <>
+        <FormattingBar fieldKey={key} />
+        <textarea id={id || `field-${key}`} value={form[key]} onChange={onChange} placeholder={ph || ""} rows={5}
+          style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit", ...errStyle }} />
+      </>
     ) : (
       <input id={id || `field-${key}`} value={form[key]} onChange={onChange} placeholder={ph || ""} style={{ ...inputStyle, ...errStyle }} />
     );
