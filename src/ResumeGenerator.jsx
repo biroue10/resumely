@@ -1313,6 +1313,38 @@ function FieldCard({ icon, title, children, collapsed, onToggleCollapse, rtl, eu
   );
 }
 
+// Fit-to-page thumbnail: render the full resume at A4 document width, then scale
+// it down with a CSS transform so the WHOLE page is visible (never cropped).
+// SSR-safe: layout is only read inside an effect via ResizeObserver.
+function ScaledResumePreview({ tpl, result, pageWidth = 794 }) {
+  const wrapRef = useRef(null);
+  const pageRef = useRef(null);
+  const [scale, setScale] = useState(0.46);          // sensible SSR default
+  const [pageH, setPageH] = useState(Math.round(pageWidth * 1.414)); // A4 ratio default
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof ResizeObserver === "undefined") return;
+    const wrap = wrapRef.current, page = pageRef.current;
+    if (!wrap || !page) return;
+    const update = () => {
+      const w = wrap.clientWidth;
+      if (w > 0) setScale(w / pageWidth);
+      const h = page.scrollHeight;
+      if (h > 0) setPageH(h);
+    };
+    update();
+    const roW = new ResizeObserver(update); roW.observe(wrap);
+    const roP = new ResizeObserver(update); roP.observe(page);
+    return () => { roW.disconnect(); roP.disconnect(); };
+  }, [pageWidth, result, tpl]);
+  return (
+    <div ref={wrapRef} style={{ width: "100%", overflow: "hidden", borderRadius: 8, height: Math.round(pageH * scale) }}>
+      <div ref={pageRef} style={{ width: pageWidth, transform: `scale(${scale})`, transformOrigin: "top left" }}>
+        <ResumePaper tpl={tpl} result={result} rtl={false} placeholder={false} />
+      </div>
+    </div>
+  );
+}
+
 const defaultMaster = {
   name: "", email: "", phone: "", location: "", linkedin: "", website: "",
   headline: "", summary: "",
@@ -4767,9 +4799,7 @@ Awards: ${form.awards}`;
                   <span style={{ fontSize: 11, color: C.accent2, background: `${C.accent}18`,
                     borderRadius: 999, padding: "2px 8px", fontWeight: 800 }}>Updates as you type</span>
                 </div>
-                <div style={{ maxHeight: 520, overflow: "hidden", borderRadius: 8 }}>
-                  <ResumePaper tpl={recommendedTemplate} result={SAMPLE_RESUME} rtl={false} placeholder={false} preview />
-                </div>
+                <ScaledResumePreview tpl={recommendedTemplate} result={SAMPLE_RESUME} />
               </div>
             </div>
             )}
