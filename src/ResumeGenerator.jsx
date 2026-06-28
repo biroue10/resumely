@@ -1340,6 +1340,73 @@ Awards: ${form.awards}`;
     );
   };
 
+  // ── Cover-letter formatting helpers ───────────────────────────────────────
+  const setCoverField = (k, v) => setCoverForm(f => ({ ...f, [k]: v }));
+
+  const coverApplyFormat = (key, marker, endMarker) => {
+    const el = document.getElementById(`cover-field-${key}`);
+    if (!el) return;
+    const val = coverForm[key];
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = val.slice(start, end);
+    const close = endMarker !== undefined ? endMarker : marker;
+    if (selected.startsWith(marker) && selected.endsWith(close)) {
+      const inner = selected.slice(marker.length, selected.length - close.length);
+      setCoverField(key, val.slice(0, start) + inner + val.slice(end));
+      setTimeout(() => { el.focus(); el.setSelectionRange(start, start + inner.length); }, 0);
+    } else {
+      setCoverField(key, val.slice(0, start) + marker + selected + close + val.slice(end));
+      setTimeout(() => { el.focus(); el.setSelectionRange(start + marker.length, end + marker.length); }, 0);
+    }
+  };
+
+  const coverApplyLinePrefix = (key, prefix, numbered) => {
+    const el = document.getElementById(`cover-field-${key}`);
+    if (!el) return;
+    const val = coverForm[key];
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const lineStart = val.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = val.indexOf("\n", end);
+    const block = val.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+    const lines = block.split("\n");
+    const allPrefixed = lines.every(l => l.startsWith(prefix) || (numbered && /^\d+\. /.test(l)));
+    let counter = 1;
+    const updated = lines.map(l => {
+      if (allPrefixed) return l.replace(/^[•\-] |^\d+\. /, "");
+      if (numbered) return `${counter++}. ${l}`;
+      return l.startsWith(prefix) ? l : `${prefix}${l}`;
+    }).join("\n");
+    setCoverField(key, val.slice(0, lineStart) + updated + (lineEnd === -1 ? "" : val.slice(lineEnd)));
+    setTimeout(() => { el.focus(); }, 0);
+  };
+
+  const CoverFormattingBar = ({ fieldKey }) => {
+    const btn = (label, title, onClick, extraStyle = {}) => (
+      <button type="button" title={title} onClick={onClick}
+        style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 5,
+          padding: "2px 7px", fontSize: 12, fontWeight: 700, color: C.text2,
+          cursor: "pointer", fontFamily: "inherit", lineHeight: 1.5, ...extraStyle }}>
+        {label}
+      </button>
+    );
+    return (
+      <div style={{ display: "flex", gap: 3, marginBottom: 5, flexWrap: "wrap" }}>
+        {btn("B", "Bold", () => coverApplyFormat(fieldKey, "**"), { fontWeight: 900 })}
+        {btn("I", "Italic", () => coverApplyFormat(fieldKey, "*"), { fontStyle: "italic", fontWeight: 400 })}
+        {btn("U", "Underline", () => coverApplyFormat(fieldKey, "__"), { textDecoration: "underline" })}
+        {btn("~~S~~", "Strikethrough", () => coverApplyFormat(fieldKey, "~~"), { textDecoration: "line-through", fontSize: 10 })}
+        <div style={{ width: 1, background: C.border, margin: "2px 1px" }} />
+        {btn("•", "Bullet list", () => coverApplyLinePrefix(fieldKey, "• "))}
+        {btn("1.", "Numbered list", () => coverApplyLinePrefix(fieldKey, "1. ", true))}
+        <div style={{ width: 1, background: C.border, margin: "2px 1px" }} />
+        {btn("—", "Insert dash", () => coverApplyFormat(fieldKey, " — ", ""), { fontWeight: 400 })}
+        {btn("✕", "Clear formatting", () => setCoverField(fieldKey, (coverForm[fieldKey] || "").replace(/\*\*|__|\*|~~/g, "")), { fontSize: 10, color: C.text3 })}
+      </div>
+    );
+  };
+
   // ── Achievement coach helpers ──────────────────────────────────────────────
   const WEAK_OPENERS = /^(responsible for|helped?( to)?|assisted?( with)?|worked on|was part of|involved in|supported?|participated in|contributed to|did |handled |performed |undertook |was involved)/i;
   const isWeakBullet = (line) => {
@@ -2263,8 +2330,11 @@ Awards: ${form.awards}`;
   // ── Cover letter helpers ──────────────────────────────────────────
   const coverField = (key, multiline, ph) =>
     multiline ? (
-      <textarea value={coverForm[key]} onChange={e => setCoverForm(f => ({ ...f, [key]: e.target.value }))}
-        placeholder={ph} rows={4} style={{ ...inputStyle, resize: "vertical", minHeight: 90 }} />
+      <>
+        <CoverFormattingBar fieldKey={key} />
+        <textarea id={`cover-field-${key}`} value={coverForm[key]} onChange={e => setCoverForm(f => ({ ...f, [key]: e.target.value }))}
+          placeholder={ph} rows={4} style={{ ...inputStyle, resize: "vertical", minHeight: 90 }} />
+      </>
     ) : (
       <input value={coverForm[key]} onChange={e => setCoverForm(f => ({ ...f, [key]: e.target.value }))}
         placeholder={ph} style={inputStyle} />
@@ -2401,11 +2471,13 @@ Awards: ${form.awards}`;
                   <span style={{ fontSize: 13.5, color: C.text2 }}>,</span>
                 </div>
                 <label style={lbl}>Opening &amp; Body Paragraphs</label>
-                <textarea value={coverForm.body} onChange={e => setCoverForm(f => ({ ...f, body: e.target.value }))}
+                <CoverFormattingBar fieldKey="body" />
+                <textarea id="cover-field-body" value={coverForm.body} onChange={e => setCoverForm(f => ({ ...f, body: e.target.value }))}
                   placeholder={"Write your paragraphs here.\n\nSeparate paragraphs with a blank line."}
                   rows={8} style={{ ...inputStyle, resize: "vertical", minHeight: 160 }} />
                 <label style={lbl}>Closing Paragraph</label>
-                <textarea value={coverForm.closing} onChange={e => setCoverForm(f => ({ ...f, closing: e.target.value }))}
+                <CoverFormattingBar fieldKey="closing" />
+                <textarea id="cover-field-closing" value={coverForm.closing} onChange={e => setCoverForm(f => ({ ...f, closing: e.target.value }))}
                   placeholder="Thank you for your time and consideration. I look forward to speaking with you."
                   rows={3} style={{ ...inputStyle, resize: "vertical", minHeight: 80 }} />
                 <label style={lbl}>Sign-off</label>
