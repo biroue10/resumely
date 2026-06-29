@@ -2672,7 +2672,7 @@ function TemplatePreviewModal({ template, meta, onClose, onUse, isMobile, rtl, k
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 0.72fr) minmax(260px, 0.28fr)",
           gap: isMobile ? 18 : 24, padding: isMobile ? 16 : 24, alignItems: "start" }}>
-          <div style={{ background: "#e8edf5", borderRadius: 16, padding: isMobile ? 12 : 22,
+          <div style={{ background: "transparent", borderRadius: 0, padding: 0,
             overflow: "auto", display: "flex", justifyContent: "center" }}>
             {kind === "cover" ? (
               <div style={{ width: "min(100%, 700px)", minWidth: isMobile ? 0 : 520 }}>
@@ -3825,12 +3825,12 @@ Awards: ${form.awards}`;
                   onFocusCapture={() => setTemplateFocus(tp.id)}
                   onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setTemplateFocus(""); }}
                   style={{ position: "relative", minWidth: 0 }}>
-                  <div style={{ position: "relative", borderRadius: 12, overflow: "visible", background: "#eef2f7",
-                    border: `1px solid ${selected ? C.accent : recommended ? `${C.accent}66` : "rgba(226,232,240,0.16)"}`,
-                    boxShadow: active || selected
-                      ? `0 24px 70px rgba(0,0,0,0.34), 0 0 0 3px ${C.accent}24`
-                      : "0 18px 44px rgba(0,0,0,0.28)",
-                    transition: "box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
+                  <div style={{ position: "relative", borderRadius: 0, overflow: "visible", background: "transparent",
+                    border: "none",
+                    outline: selected ? `2px solid ${C.accent}` : recommended ? `1px solid ${C.accent}66` : "none",
+                    outlineOffset: 4,
+                    boxShadow: active || selected ? `0 0 0 4px ${C.accent}18` : "none",
+                    transition: "box-shadow 0.2s ease, outline-color 0.2s ease, transform 0.2s ease",
                     transform: active ? "translateY(-3px)" : "none" }}>
                       <ThumbPreview tp={tp} isMobile={isMobile} />
                       {(selected || recommended) && (
@@ -5211,12 +5211,12 @@ Awards: ${form.awards}`;
                   onFocusCapture={() => setCoverTemplateFocus(tp.id)}
                   onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setCoverTemplateFocus(""); }}
                   style={{ position: "relative", minWidth: 0 }}>
-                  <div style={{ position: "relative", borderRadius: 12, overflow: "visible", background: "#eef2f7",
-                    border: `1px solid ${selected ? C.accent : recommended ? `${C.accent}66` : "rgba(226,232,240,0.16)"}`,
-                    boxShadow: active || selected
-                      ? `0 24px 70px rgba(0,0,0,0.34), 0 0 0 3px ${C.accent}24`
-                      : "0 18px 44px rgba(0,0,0,0.28)",
-                    transition: "box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
+                  <div style={{ position: "relative", borderRadius: 0, overflow: "visible", background: "transparent",
+                    border: "none",
+                    outline: selected ? `2px solid ${C.accent}` : recommended ? `1px solid ${C.accent}66` : "none",
+                    outlineOffset: 4,
+                    boxShadow: active || selected ? `0 0 0 4px ${C.accent}18` : "none",
+                    transition: "box-shadow 0.2s ease, outline-color 0.2s ease, transform 0.2s ease",
                     transform: active ? "translateY(-3px)" : "none" }}>
                       <CoverThumbPreview tp={tp} isMobile={isMobile} />
                       {(selected || recommended) && (
@@ -8532,18 +8532,18 @@ const DOCUMENT_PREVIEW_PAGE_HEIGHT = 990;
 
 function DocumentThumbnailPreview({ type = "resume", template, isMobile, rtl = false }) {
   const frameRef = useRef(null);
-  const pageRef = useRef(null);
+  const contentRef = useRef(null);
   const [fit, setFit] = useState({
     scale: isMobile ? 0.28 : 0.38,
     left: 0,
     top: 0,
-    pageHeight: DOCUMENT_PREVIEW_PAGE_HEIGHT,
+    pageCount: 1,
   });
 
   useEffect(() => {
     const frame = frameRef.current;
-    const page = pageRef.current;
-    if (!frame || !page || typeof ResizeObserver === "undefined") return undefined;
+    const content = contentRef.current;
+    if (!frame || !content || typeof ResizeObserver === "undefined") return undefined;
 
     let raf = 0;
     const measure = () => {
@@ -8554,24 +8554,23 @@ function DocumentThumbnailPreview({ type = "resume", template, isMobile, rtl = f
         const frameHeight = frameRect.height;
         if (!frameWidth || !frameHeight) return;
 
-        const inset = isMobile ? 10 : 14;
-        const pageHeight = Math.max(DOCUMENT_PREVIEW_PAGE_HEIGHT, page.scrollHeight || 0);
-        const availableWidth = Math.max(1, frameWidth - inset * 2);
-        const availableHeight = Math.max(1, frameHeight - inset * 2);
-        const scale = Math.min(availableWidth / DOCUMENT_PREVIEW_WIDTH, availableHeight / pageHeight);
+        const scale = Math.min(frameWidth / DOCUMENT_PREVIEW_WIDTH, frameHeight / DOCUMENT_PREVIEW_PAGE_HEIGHT);
         const scaledWidth = DOCUMENT_PREVIEW_WIDTH * scale;
-        const scaledHeight = pageHeight * scale;
+        const contentHeight = content.scrollHeight || DOCUMENT_PREVIEW_PAGE_HEIGHT;
+        const pageCount = contentHeight > DOCUMENT_PREVIEW_PAGE_HEIGHT + 12
+          ? Math.ceil(contentHeight / DOCUMENT_PREVIEW_PAGE_HEIGHT)
+          : 1;
         const next = {
           scale,
-          left: Math.max(inset, (frameWidth - scaledWidth) / 2),
-          top: Math.max(inset, (frameHeight - scaledHeight) / 2),
-          pageHeight,
+          left: Math.max(0, (frameWidth - scaledWidth) / 2),
+          top: 0,
+          pageCount,
         };
         setFit((prev) => (
           Math.abs(prev.scale - next.scale) < 0.001 &&
           Math.abs(prev.left - next.left) < 0.5 &&
           Math.abs(prev.top - next.top) < 0.5 &&
-          Math.abs(prev.pageHeight - next.pageHeight) < 1
+          prev.pageCount === next.pageCount
             ? prev
             : next
         ));
@@ -8579,9 +8578,9 @@ function DocumentThumbnailPreview({ type = "resume", template, isMobile, rtl = f
     };
 
     const frameObserver = new ResizeObserver(measure);
-    const pageObserver = new ResizeObserver(measure);
+    const contentObserver = new ResizeObserver(measure);
     frameObserver.observe(frame);
-    pageObserver.observe(page);
+    contentObserver.observe(content);
     measure();
 
     if (document.fonts?.ready) document.fonts.ready.then(measure).catch(() => {});
@@ -8589,54 +8588,59 @@ function DocumentThumbnailPreview({ type = "resume", template, isMobile, rtl = f
     return () => {
       if (raf) cancelAnimationFrame(raf);
       frameObserver.disconnect();
-      pageObserver.disconnect();
+      contentObserver.disconnect();
       window.removeEventListener("resize", measure);
     };
   }, [isMobile, template?.id, type]);
 
-  const pageCount = Math.max(1, Math.ceil(fit.pageHeight / DOCUMENT_PREVIEW_PAGE_HEIGHT));
-
   if (template.blank) {
     return (
       <div ref={frameRef} aria-label={`Blank ${type} template preview`}
-        style={{ aspectRatio: "210 / 297", background: "#f3f4f6",
+        style={{ position: "relative", aspectRatio: "210 / 297", background: "transparent",
           display: "flex", alignItems: "center", justifyContent: "center",
-          borderRadius: 12, border: "1px solid rgba(15,23,42,0.08)" }}>
-        <svg width="38%" height="38%" viewBox="0 0 100 100"
-          fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
-          <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
+          borderRadius: 0, border: 0, overflow: "visible" }}>
+        <div style={{ width: "100%", height: "100%", background: "#fff", borderRadius: 6,
+          border: "1px solid rgba(148,163,184,0.24)", boxShadow: "0 18px 40px rgba(0,0,0,0.22)",
+          display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="38%" height="38%" viewBox="0 0 100 100"
+            fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+            <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
+          </svg>
+        </div>
       </div>
     );
   }
 
   return (
     <div ref={frameRef} aria-label={`${template.name} ${type} template preview`}
-      style={{ position: "relative", aspectRatio: "210 / 297", background: "#eef2f7",
-        borderRadius: 12, border: "1px solid rgba(15,23,42,0.08)",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.5)", overflow: "visible" }}>
-      <div ref={pageRef}
-        style={{ width: DOCUMENT_PREVIEW_WIDTH, position: "absolute", left: fit.left, top: fit.top,
+      style={{ position: "relative", aspectRatio: "210 / 297", background: "transparent",
+        borderRadius: 0, border: 0, boxShadow: "none", overflow: "visible" }}>
+      <div
+        style={{ width: DOCUMENT_PREVIEW_WIDTH, height: DOCUMENT_PREVIEW_PAGE_HEIGHT,
+          position: "absolute", left: fit.left, top: fit.top,
           transform: `scale(${fit.scale})`, transformOrigin: "top left",
-          pointerEvents: "none", userSelect: "none",
-          boxShadow: "0 18px 40px rgba(15,23,42,0.18)" }}>
-        {type === "cover" ? (
-          <CoverLetterPaper tpl={template} data={COVER_THUMB_SAMPLES[template.id] || SAMPLE_COVER} preview />
-        ) : (
-          <ResumePaper tpl={template}
-            result={THUMB_SAMPLES[template.id]?.result || SAMPLE_RESUME}
-            rtl={rtl}
-            placeholder={false}
-            preview />
-        )}
+          pointerEvents: "none", userSelect: "none", background: "#fff",
+          borderRadius: 6, border: "1px solid rgba(148,163,184,0.24)",
+          boxShadow: "0 18px 40px rgba(0,0,0,0.22)", overflow: "hidden" }}>
+        <div ref={contentRef} style={{ width: "100%" }}>
+          {type === "cover" ? (
+            <CoverLetterPaper tpl={template} data={COVER_THUMB_SAMPLES[template.id] || SAMPLE_COVER} preview />
+          ) : (
+            <ResumePaper tpl={template}
+              result={THUMB_SAMPLES[template.id]?.result || SAMPLE_RESUME}
+              rtl={rtl}
+              placeholder={false}
+              preview />
+          )}
+        </div>
       </div>
-      {pageCount > 1 && (
-        <span style={{ position: "absolute", right: 10, bottom: 10, zIndex: 1,
+      {fit.pageCount > 1 && (
+        <span style={{ position: "absolute", right: 8, bottom: 8, zIndex: 1,
           background: "rgba(15,23,42,0.82)", color: "#fff", border: "1px solid rgba(255,255,255,0.24)",
           borderRadius: 999, padding: "4px 8px", fontSize: 10.5, fontWeight: 900,
           boxShadow: "0 8px 20px rgba(15,23,42,0.18)" }}>
-          {pageCount} pages
+          {fit.pageCount} pages
         </span>
       )}
     </div>
