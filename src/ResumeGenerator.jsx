@@ -1408,7 +1408,7 @@ function EntryDescriptionEditor({ value, onChange, placeholder, rtl }) {
       <textarea ref={ref} value={v} onChange={(e) => onChange(e.target.value)} placeholder={placeholder || ""} rows={4}
         dir={rtl ? "rtl" : "ltr"}
         style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", background: C.elevated,
-          border: `1px solid ${C.border}`, borderRadius: 8, color: C.text1, fontSize: 14, outline: "none",
+          border: `1px solid ${SECTION_TOKENS.inputEdge}`, borderRadius: 8, color: C.text1, fontSize: 14, outline: "none",
           resize: "vertical", fontFamily: "inherit", lineHeight: 1.6 }} />
     </div>
   );
@@ -1427,8 +1427,8 @@ function EntryRow({ sectionKey, entry, index, eui, rtl, expanded, onToggleExpand
   };
   const iconBtn = (content, title, onClick, extra = {}) => (
     <button type="button" title={title} aria-label={title} onClick={(e) => { e.stopPropagation(); onClick(); }}
-      style={{ background: SECTION_TOKENS.iconBtnBg, border: "none", borderRadius: SECTION_TOKENS.iconBtnRadius,
-        width: 30, height: 30, display: "inline-flex", alignItems: "center", justifyContent: "center",
+      style={{ background: "transparent", border: "none", borderRadius: SECTION_TOKENS.iconBtnRadius,
+        width: 34, height: 34, display: "inline-flex", alignItems: "center", justifyContent: "center",
         cursor: "pointer", color: C.text2, fontSize: 14, lineHeight: 1, flexShrink: 0, ...extra }}>
       {content}
     </button>
@@ -1471,7 +1471,7 @@ function EntryRow({ sectionKey, entry, index, eui, rtl, expanded, onToggleExpand
                   <input value={entry[f] || ""} onChange={(e) => onChange({ [f]: e.target.value })} placeholder={labelFor(f)}
                     dir={rtl ? "rtl" : "ltr"}
                     style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", background: C.elevated,
-                      border: `1px solid ${C.border}`, borderRadius: 8, color: C.text1, fontSize: 14, outline: "none", fontFamily: "inherit" }} />
+                      border: `1px solid ${SECTION_TOKENS.inputEdge}`, borderRadius: 8, color: C.text1, fontSize: 14, outline: "none", fontFamily: "inherit" }} />
                 </div>
               ))}
             </div>
@@ -1518,16 +1518,16 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
   };
   const commitHeading = () => { setEditingHeading(false); const h = headingDraft.trim(); if (h && h !== heading) onEditHeading(h); else setHeadingDraft(heading); };
   return (
-    <section style={{ background: collapsed ? "transparent" : C.surface,
-      border: collapsed ? `1px solid ${C.border}` : `1px solid ${C.border}`,
-      borderRadius: 12, boxShadow: collapsed ? "none" : "0 10px 34px rgba(0,0,0,0.16)",
+    <section style={{ background: collapsed ? SECTION_TOKENS.rowBg : SECTION_TOKENS.expandedBg,
+      border: "none",
+      borderRadius: 12, boxShadow: collapsed ? "none" : SECTION_TOKENS.expandedShadow,
       padding: 0, overflow: "visible", marginTop: 10 }}>
       <header role="button" tabIndex={0} aria-expanded={!collapsed}
         aria-label={collapsed ? eui.expand : eui.collapse}
         onClick={() => { if (!editingHeading && !menuOpen) onToggleCollapse(); }}
         onKeyDown={(e) => { if (!editingHeading && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onToggleCollapse(); } }}
         style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none",
-          padding: collapsed ? "12px 14px" : "14px 16px", borderBottom: collapsed ? "none" : `1px solid ${C.border}` }}>
+          padding: collapsed ? "12px 14px" : "14px 16px", borderBottom: collapsed ? "none" : `1px solid ${SECTION_TOKENS.rowDivider}` }}>
         <span aria-hidden style={{ fontSize: 16, flexShrink: 0 }}>{schema.icon}</span>
         {editingHeading ? (
           <input autoFocus value={headingDraft} onChange={(e) => setHeadingDraft(e.target.value)}
@@ -1545,13 +1545,13 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
         <div style={{ position: "relative" }}>
           <button type="button" aria-label={`${heading} options`} aria-expanded={menuOpen}
             onClick={(e) => { e.stopPropagation(); setMenuOpen(o => !o); }}
-            style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.border}`,
-              background: C.elevated, color: C.text2, cursor: "pointer", fontFamily: "inherit", fontSize: 18, lineHeight: 1 }}>
+            style={{ width: 40, height: 40, borderRadius: 10, border: "none",
+              background: "transparent", color: C.text2, cursor: "pointer", fontFamily: "inherit", fontSize: 18, lineHeight: 1 }}>
             …
           </button>
           {menuOpen && (
             <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, minWidth: 170, zIndex: 20,
-              background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
+              background: C.surface, border: `1px solid ${SECTION_TOKENS.popoverEdge}`, borderRadius: 10,
               boxShadow: "0 12px 36px rgba(0,0,0,0.45)", overflow: "hidden" }}>
               <button type="button" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); setHeadingDraft(heading); setEditingHeading(true); }}
                 style={{ display: "block", width: "100%", padding: "10px 12px", textAlign: "left",
@@ -1559,7 +1559,7 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
                   cursor: "pointer", fontFamily: "inherit" }}>
                 Rename section
               </button>
-              <div style={{ padding: "9px 12px", borderTop: `1px solid ${C.border}`, color: C.text3,
+              <div style={{ padding: "9px 12px", borderTop: `1px solid ${SECTION_TOKENS.rowDivider}`, color: C.text3,
                 fontSize: 11.5, lineHeight: 1.4 }}>
                 Reorder, hide, and delete are available on individual entries.
               </div>
@@ -1586,8 +1586,8 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: SECTION_TOKENS.gap3 }}>
             <button type="button" onClick={() => { const id = onAdd(); if (id) setExpandedId(id); }}
-              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${C.accent}14`,
-                border: `1px solid ${C.accent}44`, borderRadius: 999, padding: "8px 18px", fontSize: 13, fontWeight: 700,
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${C.accent}18`,
+                border: "none", borderRadius: 999, padding: "8px 18px", fontSize: 13, fontWeight: 700,
                 color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>
               + {eui.addEntry}
             </button>
@@ -1602,19 +1602,19 @@ function SectionCard({ sectionKey, heading, entries, eui, rtl, collapsed, onTogg
 // Summary) that aren't entry lists. Collapsible, no add/reorder/edit-heading.
 function FieldCard({ icon, title, children, collapsed, onToggleCollapse, rtl, eui }) {
   return (
-    <section style={{ background: collapsed ? "transparent" : C.surface, border: `1px solid ${C.border}`,
-      borderRadius: 12, boxShadow: collapsed ? "none" : "0 10px 34px rgba(0,0,0,0.16)",
+    <section style={{ background: collapsed ? SECTION_TOKENS.rowBg : SECTION_TOKENS.expandedBg, border: "none",
+      borderRadius: 12, boxShadow: collapsed ? "none" : SECTION_TOKENS.expandedShadow,
       padding: 0, overflow: "hidden", marginTop: 10 }}>
       <header role="button" tabIndex={0} aria-expanded={!collapsed}
         aria-label={collapsed ? eui.expand : eui.collapse}
         onClick={onToggleCollapse}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggleCollapse(); } }}
         style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none",
-          padding: collapsed ? "12px 14px" : "14px 16px", borderBottom: collapsed ? "none" : `1px solid ${C.border}` }}>
+          padding: collapsed ? "12px 14px" : "14px 16px", borderBottom: collapsed ? "none" : `1px solid ${SECTION_TOKENS.rowDivider}` }}>
         <span aria-hidden style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 800, color: C.text1, textAlign: rtl ? "right" : "left", lineHeight: 1.25 }}>{title}</h3>
-          <div style={{ marginTop: 2, color: C.text3, fontSize: 12 }}>{collapsed ? "Collapsed" : "Editing"}</div>
+          <div style={{ marginTop: 2, color: C.text3, fontSize: 12 }}>{collapsed ? "Not started" : "In progress"}</div>
         </div>
         <span aria-hidden style={{ color: C.text2, fontSize: 22, lineHeight: 1, padding: "0 2px", flexShrink: 0 }}>
           {collapsed ? "▸" : "▾"}
@@ -4446,9 +4446,9 @@ Awards: ${form.awards}`;
       {/* ── Builder top bar ── */}
       <div style={{ position: "sticky", top: 0, zIndex: 60, margin: isMobile ? "-8px -4px 12px" : "-10px -16px 14px",
         padding: isMobile ? "10px 12px" : "11px 18px", background: `${C.bg}f4`, backdropFilter: "blur(14px)",
-        borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
+        boxShadow: "0 10px 28px rgba(0,0,0,0.14)", display: "flex", alignItems: "center", gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
         <button onClick={() => setStep("templates")} aria-label="Back to templates"
-          style={{ ...backBtn, minHeight: 38, padding: "8px 11px", margin: 0 }}>←</button>
+          style={{ ...ghostIconBtn, margin: 0, fontSize: 18 }}>←</button>
         <div style={{ minWidth: 0, flex: "1 1 220px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
             <h1 style={{ margin: 0, color: C.text1, fontSize: isMobile ? 16 : 18, lineHeight: 1.15,
@@ -4469,16 +4469,14 @@ Awards: ${form.awards}`;
           <div style={{ position: "relative" }}>
             <button type="button" onClick={() => setCustomizeOpen(o => !o)}
               aria-expanded={customizeOpen}
-              style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text1,
-                borderRadius: 9, minHeight: 38, padding: "0 12px", fontSize: 13, fontWeight: 800,
-                cursor: "pointer", fontFamily: "inherit" }}>Customize</button>
+              style={{ ...softBtn }}>Customize</button>
             {customizeOpen && (
               <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 100,
-                width: 300, maxWidth: "calc(100vw - 24px)", background: C.surface, border: `1px solid ${C.border}`,
+                width: 300, maxWidth: "calc(100vw - 24px)", background: C.surface, border: `1px solid ${SECTION_TOKENS.popoverEdge}`,
                 borderRadius: 12, boxShadow: "0 18px 54px rgba(0,0,0,0.5)", padding: 14 }}>
                 <div style={{ fontSize: 13, fontWeight: 900, color: C.text1, marginBottom: 8 }}>Document settings</div>
                 <button onClick={() => { setCustomizeOpen(false); setStep("templates"); }}
-                  style={{ width: "100%", textAlign: "left", background: C.elevated, border: `1px solid ${C.border}`,
+                  style={{ width: "100%", textAlign: "left", background: C.elevated, border: "none",
                     color: C.text1, borderRadius: 9, padding: "10px 12px", cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
                   <strong style={{ display: "block", fontSize: 13 }}>Template</strong>
                   <span style={{ color: C.text3, fontSize: 12 }}>{tpl.name} · ATS-conscious</span>
@@ -4499,16 +4497,12 @@ Awards: ${form.awards}`;
             )}
           </div>
           <button onClick={() => setAtsOpen(o => !o)} aria-expanded={atsOpen}
-            style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text1,
-              borderRadius: 9, minHeight: 38, padding: "0 12px", fontSize: 13, fontWeight: 900,
-              cursor: "pointer", fontFamily: "inherit" }}>
+            style={{ ...softBtn, fontWeight: 900 }}>
             ATS {atsScore}
           </button>
           {isMobile && (
             <button onClick={() => setMobileResumeMode(mobileResumeMode === "edit" ? "preview" : "edit")}
-              style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text1,
-                borderRadius: 9, minHeight: 38, padding: "0 12px", fontSize: 13, fontWeight: 800,
-                cursor: "pointer", fontFamily: "inherit" }}>
+              style={{ ...softBtn }}>
               {mobileResumeMode === "edit" ? "Preview" : "Edit"}
             </button>
           )}
@@ -4521,9 +4515,9 @@ Awards: ${form.awards}`;
             </button>
             {exportMenuOpen && (
               <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 100,
-                minWidth: 230, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
+                minWidth: 230, background: C.surface, border: `1px solid ${SECTION_TOKENS.popoverEdge}`, borderRadius: 12,
                 boxShadow: "0 18px 54px rgba(0,0,0,0.5)", overflow: "hidden" }}>
-                <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ padding: "12px 14px", borderBottom: `1px solid ${SECTION_TOKENS.rowDivider}` }}>
                   <div style={{ color: C.text1, fontSize: 13.5, fontWeight: 900 }}>Export your resume</div>
                   <div style={{ color: C.text3, fontSize: 11.5, marginTop: 3 }}>
                     {readyForReview ? "Ready to export." : `${resumeChecklist.length - completedChecklist} recommended improvements remain.`}
@@ -4536,7 +4530,7 @@ Awards: ${form.awards}`;
                 </button>
                 <button onClick={() => { setExportMenuOpen(false); downloadDOCX(); }}
                   style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 14px",
-                    background: "none", border: "none", color: C.text1, cursor: "pointer", fontFamily: "inherit", borderTop: `1px solid ${C.border}` }}>
+                    background: "none", border: "none", color: C.text1, cursor: "pointer", fontFamily: "inherit", borderTop: `1px solid ${SECTION_TOKENS.rowDivider}` }}>
                   <strong>Download DOCX</strong><br /><span style={{ color: C.text3, fontSize: 12 }}>Editable Word document</span>
                 </button>
               </div>
@@ -4546,8 +4540,9 @@ Awards: ${form.awards}`;
       </div>
 
       {!guidanceDismissed && (
-        <div style={{ background: C.surface, border: `1px solid ${readyForReview ? "#4ade8044" : C.border}`,
-          borderRadius: 12, padding: "11px 13px", marginBottom: 14, display: "flex",
+        <div style={{ background: readyForReview ? "rgba(74,222,128,0.08)" : C.surface,
+          borderLeft: `3px solid ${readyForReview ? "#4ade80" : C.accent}`, borderRadius: 12,
+          padding: "10px 13px", marginBottom: 14, display: "flex",
           alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: 220 }}>
             <div style={{ fontSize: 13, fontWeight: 900, color: readyForReview ? "#86efac" : C.text1 }}>
@@ -4559,9 +4554,7 @@ Awards: ${form.awards}`;
           </div>
           {nextChecklistItem?.target && !isMobile && (
             <button onClick={() => scrollToError(nextChecklistItem.target)}
-              style={{ border: `1px solid ${C.border}`, background: C.elevated, color: C.text1,
-                borderRadius: 8, padding: "8px 11px", fontSize: 12, fontWeight: 800,
-                cursor: "pointer", fontFamily: "inherit" }}>
+              style={{ ...softBtn, minHeight: 34, padding: "0 11px", fontSize: 12 }}>
               Go there
             </button>
           )}
@@ -4574,7 +4567,7 @@ Awards: ${form.awards}`;
       {/* Uploaded resume reference banner */}
       {uploadedResume && (
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
-          background: `${C.accent}10`, border: `1px solid ${C.accent}30`, borderRadius: 8,
+          background: `${C.accent}10`, border: "none", borderRadius: 8,
           marginBottom: 14 }}>
           <span style={{ fontSize: 15 }}>📂</span>
           <span style={{ fontSize: 12.5, color: C.text2, flex: 1 }}>
@@ -4597,12 +4590,12 @@ Awards: ${form.awards}`;
 
           {/* Photo upload */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18,
-            padding: "14px 16px", background: C.elevated, border: `1px solid ${C.border}`,
+            padding: "14px 16px", background: C.elevated, border: "none",
             borderRadius: 10 }}>
             <div style={{ width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
-              overflow: "hidden", background: C.surface, border: `2px dashed ${photoUrl ? tpl.accent : C.border}`,
+              overflow: "hidden", background: C.surface, outline: `2px dashed ${photoUrl ? tpl.accent : "rgba(148,163,184,0.22)"}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "border-color 0.2s" }}>
+              transition: "outline-color 0.2s" }}>
               {photoUrl
                 ? <img src={photoUrl} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <span style={{ fontSize: 22, opacity: 0.3 }}>👤</span>
@@ -4615,7 +4608,7 @@ Awards: ${form.awards}`;
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <label htmlFor="photo-upload"
                   style={{ cursor: "pointer", fontSize: 12, fontWeight: 700, color: C.accent2,
-                    padding: "5px 12px", borderRadius: 4, border: `1px solid ${C.accent}44`,
+                    padding: "5px 12px", borderRadius: 4, border: "none",
                     background: `${C.accent}10`, display: "inline-block" }}>
                   {photoUrl ? "Change" : "Upload"}
                 </label>
@@ -4709,7 +4702,7 @@ Awards: ${form.awards}`;
             <div style={{ display: "flex", justifyContent: rtl ? "flex-start" : "flex-end", marginTop: 10 }}>
               <button onClick={() => openCoach(0)}
                 style={{ fontSize: 11.5, fontWeight: 700, color: C.accent2,
-                  background: `${C.accent}14`, border: `1px solid ${C.accent}33`,
+                  background: `${C.accent}14`, border: "none",
                   borderRadius: 999, padding: "3px 12px", cursor: "pointer",
                   fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
                 ✦ Coach me · {weakBullets.length} weak {weakBullets.length === 1 ? "bullet" : "bullets"}
@@ -4724,7 +4717,7 @@ Awards: ${form.awards}`;
             const ctx = detectCoachContext(coachBullet);
             const questions = COACH_QUESTIONS[ctx] || COACH_QUESTIONS.general;
             return (
-              <div style={{ background: C.elevated, border: `1.5px solid ${C.accent}44`,
+              <div style={{ background: C.elevated, border: "none", boxShadow: `inset 3px 0 0 ${C.accent}`,
                 borderRadius: 12, padding: "18px 20px", marginTop: 8 }}>
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
@@ -4744,7 +4737,7 @@ Awards: ${form.awards}`;
                       Only this bullet and the context you enter below are sent to the AI service. Review any suggested numbers or claims before accepting.
                     </div>
                     <div style={{ fontSize: 12.5, color: C.text2, background: C.bg,
-                      border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 10px",
+                      border: "none", borderRadius: 6, padding: "6px 10px",
                       fontStyle: "italic" }}>
                       "{coachBullet.trim()}"
                     </div>
@@ -4759,7 +4752,7 @@ Awards: ${form.awards}`;
                   {["Action", "Task", "Result", "Number", "Impact"].map((f, i) => (
                     <span key={f} style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px",
                       borderRadius: 999, background: `${C.accent}${["22","1a","14","0e","08"][i]}`,
-                      border: `1px solid ${C.accent}33`, color: C.accent2, letterSpacing: "0.5px" }}>
+                      border: "none", color: C.accent2, letterSpacing: "0.5px" }}>
                       {f}
                     </span>
                   ))}
@@ -4813,7 +4806,7 @@ Awards: ${form.awards}`;
                       textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>
                       Suggested version:
                     </div>
-                    <div style={{ background: `${C.accent}0a`, border: `1px solid ${C.accent}30`,
+                    <div style={{ background: `${C.accent}0a`, border: "none",
                       borderRadius: 8, padding: "10px 14px", marginBottom: 10 }}>
                       <textarea
                         value={coachResult}
@@ -4831,8 +4824,8 @@ Awards: ${form.awards}`;
                         Accept suggestion
                       </button>
                       <button onClick={() => { setCoachResult(""); setCoachAnswers({}); }}
-                        style={{ padding: "8px 14px", background: "transparent",
-                          border: `1px solid ${C.border}`, borderRadius: 7, fontSize: 12,
+                        style={{ padding: "8px 14px", background: C.surface,
+                          border: "none", borderRadius: 7, fontSize: 12,
                           color: C.text2, cursor: "pointer", fontFamily: "inherit" }}>
                         Retry
                       </button>
@@ -4861,7 +4854,7 @@ Awards: ${form.awards}`;
           <div style={{ display: "flex", justifyContent: rtl ? "flex-start" : "flex-end", marginTop: 16 }}>
             <button type="button" onClick={() => setAddContentOpen(true)}
               style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.surface, color: C.text1,
-                border: `1px solid ${C.borderHi}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 800,
+                border: "none", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 800,
                 cursor: "pointer", fontFamily: "inherit" }}>
               <span aria-hidden style={{ fontSize: 16, lineHeight: 1, fontWeight: 800 }}>+</span> Add section
             </button>
@@ -4884,7 +4877,7 @@ Awards: ${form.awards}`;
               info:     { label: "Info",     color: "#60a5fa", bg: "#60a5fa10" },
             };
             return (
-              <div style={{ background: C.elevated, border: `1.5px solid ${scoreColor}44`,
+              <div style={{ background: C.elevated, border: "none", boxShadow: `inset 3px 0 0 ${scoreColor}`,
                 borderRadius: 12, padding: "18px 20px", marginTop: 20, marginBottom: 4 }}>
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
@@ -4920,7 +4913,7 @@ Awards: ${form.awards}`;
                     {issues.map((issue, idx) => {
                       const meta = LEVEL_META[issue.level];
                       return (
-                        <div key={idx} style={{ background: meta.bg, border: `1px solid ${meta.color}28`,
+                        <div key={idx} style={{ background: meta.bg, border: "none",
                           borderRadius: 8, padding: "10px 12px" }}>
                           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                             <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{issue.icon}</span>
@@ -4939,7 +4932,7 @@ Awards: ${form.awards}`;
                               {issue.fix && issue.fixFn && (
                                 <button onClick={issue.fixFn}
                                   style={{ fontSize: 11.5, fontWeight: 700, color: meta.color,
-                                    background: `${meta.color}18`, border: `1px solid ${meta.color}33`,
+                                    background: `${meta.color}18`, border: "none",
                                     borderRadius: 6, padding: "3px 10px", cursor: "pointer",
                                     fontFamily: "inherit" }}>
                                   → {issue.fix}
@@ -4956,7 +4949,7 @@ Awards: ${form.awards}`;
                 {/* Summary counts */}
                 {issues.length > 0 && (
                   <div style={{ display: "flex", gap: 12, marginTop: 14, paddingTop: 12,
-                    borderTop: `1px solid ${C.border}`, flexWrap: "wrap" }}>
+                    borderTop: `1px solid ${SECTION_TOKENS.rowDivider}`, flexWrap: "wrap" }}>
                     {criticals.length > 0 && <span style={{ fontSize: 11.5, color: "#f87171", fontWeight: 700 }}>● {criticals.length} critical</span>}
                     {warnings.length  > 0 && <span style={{ fontSize: 11.5, color: "#fbbf24", fontWeight: 700 }}>● {warnings.length} warnings</span>}
                     {infos.length     > 0 && <span style={{ fontSize: 11.5, color: "#60a5fa", fontWeight: 700 }}>● {infos.length} info</span>}
@@ -4972,7 +4965,7 @@ Awards: ${form.awards}`;
           {/* ── Follow-up actions ── */}
           <div style={{ marginTop: 28, padding: "14px 0 4px" }}>
             {exportSuccess && (
-              <div style={{ marginTop: 10, background: "#4ade8012", border: "1px solid #4ade8040",
+              <div style={{ marginTop: 10, background: "#4ade8012", border: "none",
                 color: "#4ade80", borderRadius: 8, padding: "9px 11px", fontSize: 12.5,
                 lineHeight: 1.5 }}>
                 {exportSuccess}
@@ -5006,7 +4999,8 @@ Awards: ${form.awards}`;
               color: aiPolished ? tpl.accent : C.text2 }}>
               {aiPolished ? "✦ AI-polished" : "● Live preview"}
             </span>
-            <div aria-label="Preview controls" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div aria-label="Preview controls" style={{ display: "flex", alignItems: "center", gap: 4,
+              background: C.surface, borderRadius: 10, padding: 3 }}>
               <button type="button" onClick={() => setPreviewZoom(z => Math.max(60, z - 10))}
                 aria-label="Zoom preview out" style={{ ...previewToolBtn }}>−</button>
               <span style={{ color: C.text3, fontSize: 12, minWidth: 42, textAlign: "center" }}>{previewZoom}%</span>
@@ -5046,7 +5040,7 @@ Awards: ${form.awards}`;
               <button
                 onClick={(e) => { e.stopPropagation(); setZoomed(false); }}
                 style={{ position: "fixed", top: 14, right: 14, zIndex: 9001,
-                  width: 34, height: 34, borderRadius: "50%", border: `1px solid ${C.border}`,
+                  width: 34, height: 34, borderRadius: "50%", border: "none",
                   background: C.surface, color: C.text2, fontSize: 16,
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   fontFamily: "inherit" }}>
@@ -5059,10 +5053,10 @@ Awards: ${form.awards}`;
       {isMobile && (
         <div style={{ position: "sticky", bottom: 0, zIndex: 20, margin: "12px -4px -8px",
           padding: "10px 12px", background: `${C.bg}f2`, backdropFilter: "blur(10px)",
-          borderTop: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: "1fr 1fr",
+          boxShadow: "0 -12px 28px rgba(0,0,0,0.18)", display: "grid", gridTemplateColumns: "1fr 1fr",
           gap: 8 }}>
           <button onClick={() => setMobileResumeMode(mobileResumeMode === "edit" ? "preview" : "edit")}
-            style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text1,
+            style={{ border: "none", background: C.surface, color: C.text1,
               borderRadius: 8, padding: "10px 6px", fontSize: 12, fontWeight: 800,
               cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center",
               justifyContent: "center", gap: 4 }}>
@@ -7208,6 +7202,17 @@ Awards: ${form.awards}`;
 
   return (
     <div dir={rtl ? "rtl" : "ltr"} style={{ ...rPage, display: "flex", padding: 0, height: "100vh", overflow: "hidden" }}>
+      <style>{`
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible,
+        [role="button"]:focus-visible {
+          outline: 2px solid ${C.accent2};
+          outline-offset: 3px;
+          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+        }
+      `}</style>
       <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">{statusMsg}</div>
 
       {/* ── Sidebar (desktop) ── */}
@@ -8499,7 +8504,7 @@ function PageHeader({ eyebrow, icon, title, sub, pill, isMobile }) {
 function SectionHeader({ icon, title, filled }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "28px 0 16px",
-      paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
+      paddingBottom: 2 }}>
       <span style={{ fontSize: 15 }}>{icon}</span>
       <span style={{ fontSize: 11.5, fontWeight: 800, textTransform: "uppercase",
         letterSpacing: "1px", color: C.text2, flex: 1 }}>{title}</span>
@@ -9905,8 +9910,13 @@ const SECTION_TOKENS = {
   shadow: "0 1px 2px rgba(0,0,0,0.35), 0 10px 28px rgba(0,0,0,0.30)",
   padCard: 22,
   gap1: 8, gap2: 12, gap3: 16, gap4: 24,
-  rowDivider: C.border,
-  iconBtnBg: `${C.elevated}`,
+  rowBg: "rgba(30,41,59,0.64)",
+  expandedBg: "rgba(30,41,59,0.86)",
+  rowDivider: "rgba(148,163,184,0.10)",
+  inputEdge: "rgba(148,163,184,0.16)",
+  popoverEdge: "rgba(148,163,184,0.16)",
+  expandedShadow: "0 10px 26px rgba(0,0,0,0.16)",
+  iconBtnBg: "transparent",
   iconBtnRadius: 8,
   accent: C.accent,
 };
@@ -9968,7 +9978,7 @@ const lbl = {
 };
 const inputStyle = {
   width: "100%", boxSizing: "border-box", padding: "11px 14px",
-  background: C.elevated, border: `1px solid ${C.border}`,
+  background: C.elevated, border: `1px solid rgba(148,163,184,0.16)`,
   borderRadius: C.radiusMd, color: C.text1, fontSize: 14.5, outline: "none",
   transition: "border-color .15s, box-shadow .15s",
 };
@@ -9985,29 +9995,39 @@ const cta = {
   transition: "box-shadow .2s, opacity .15s",
 };
 const backBtn = {
-  padding: "7px 14px", background: C.elevated, border: `1px solid ${C.border}`,
+  padding: "7px 14px", background: "transparent", border: "none",
   borderRadius: C.radiusSm, color: C.text2, fontSize: 13.5, cursor: "pointer",
   fontFamily: "inherit",
 };
 const copyBtn = {
   position: "absolute", top: 12, insetInlineEnd: 12, zIndex: 2, padding: "6px 12px",
   background: `${C.surface}cc`, backdropFilter: "blur(8px)",
-  border: `1px solid ${C.border}`, borderRadius: C.radiusSm, color: C.text2, fontSize: 12.5, cursor: "pointer",
+  border: "none", borderRadius: C.radiusSm, color: C.text2, fontSize: 12.5, cursor: "pointer",
   fontFamily: "inherit",
 };
 const badge = { fontSize: 11.5, fontWeight: 700, padding: "4px 10px", borderRadius: 999, letterSpacing: "0.4px" };
-const badgeLive  = { border: `1px solid ${C.border}`, color: C.text2, background: `${C.elevated}` };
-const badgePolished = { border: `1px solid ${C.accent}44`, background: `${C.accent}14` };
+const badgeLive  = { border: "none", color: C.text2, background: "transparent" };
+const badgePolished = { border: "none", background: `${C.accent}14` };
 const dlBtn = {
-  padding: "5px 13px", background: `${C.accent}14`, border: `1px solid ${C.accent}44`,
+  padding: "5px 13px", background: `${C.accent}16`, border: "none",
   borderRadius: C.radiusSm, fontSize: 12, fontWeight: 700, cursor: "pointer",
   color: C.accent2, transition: "background .15s", fontFamily: "inherit",
 };
 const previewToolBtn = {
-  width: 32, height: 32, borderRadius: 8, background: C.surface,
-  border: `1px solid ${C.border}`, color: C.text2, cursor: "pointer",
+  width: 32, height: 32, borderRadius: 8, background: "transparent",
+  border: "none", color: C.text2, cursor: "pointer",
   fontSize: 14, fontWeight: 800, fontFamily: "inherit",
   display: "inline-flex", alignItems: "center", justifyContent: "center",
+};
+const softBtn = {
+  border: "none", background: C.surface, color: C.text1,
+  borderRadius: 9, minHeight: 38, padding: "0 12px", fontSize: 13, fontWeight: 800,
+  cursor: "pointer", fontFamily: "inherit",
+};
+const ghostIconBtn = {
+  border: "none", background: "transparent", color: C.text2,
+  borderRadius: 10, minHeight: 40, minWidth: 40, padding: 0,
+  cursor: "pointer", fontFamily: "inherit",
 };
 const fieldErr  = { color: "#f87171", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 };
 const codeSelect = {
