@@ -825,6 +825,33 @@ const COVER_TEMPLATES = [
   { id: "elegant", name: "Elegant", tag: "Soft sidebar, refined serif type",  accent: "#7c3aed", font: "'Georgia', 'Palatino Linotype', serif" },
 ];
 
+const COVER_GALLERY_META = {
+  blank: {
+    description: "A plain-text letter for conservative applications and easy copying.",
+    attributes: ["Plain text", "Flexible"],
+  },
+  classic: {
+    description: "A formal block-letter layout with traditional spacing and serif type.",
+    attributes: ["Traditional", "Formal"],
+  },
+  modern: {
+    description: "A polished sidebar layout that pairs well with modern resume templates.",
+    attributes: ["Recommended", "Sidebar"],
+  },
+  minimal: {
+    description: "A spacious letter style focused on clean reading and simple hierarchy.",
+    attributes: ["Minimal", "Readable"],
+  },
+  bold: {
+    description: "A confident accent-header design for concise, high-impact applications.",
+    attributes: ["Header-led", "Distinctive"],
+  },
+  elegant: {
+    description: "A refined cover letter with soft sidebar details and editorial typography.",
+    attributes: ["Refined", "Serif"],
+  },
+};
+
 const SAMPLE_COVER = {
   name: "Alexandra Johnson", jobTitle: "Senior Product Designer",
   email: "alex.johnson@email.com", phone: "+1 415 555 0192", location: "San Francisco, CA",
@@ -3427,6 +3454,64 @@ Awards: ${form.awards}`;
     { id: "ats", label: "ATS Checker" },
   ];
 
+  const AppToolHeader = ({ toolName = "Resume Builder" }) => (
+    <header style={{ position: "sticky", top: 0, zIndex: 50,
+      background: `linear-gradient(180deg, ${C.bg}f7 0%, ${C.bg}e8 100%)`,
+      backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
+      borderBottom: `1px solid ${C.border}` }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto", minHeight: isMobile ? 64 : 72,
+        padding: isMobile ? "0 12px" : "0 28px", display: "flex", alignItems: "center", gap: 14 }}>
+        <button type="button" onClick={() => setAppView("landing")}
+          style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: rtl ? "flex-end" : "flex-start", fontFamily: "inherit" }}>
+          <span style={{ fontSize: isMobile ? 18 : 21, fontWeight: 900, letterSpacing: "-0.5px",
+            background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ApplyCraft</span>
+          {!isMobile && <span style={{ fontSize: 11.5, color: C.text3, marginTop: 1 }}>{toolName}</span>}
+        </button>
+        {!isMobile && (
+          <nav aria-label="Primary tools" style={{ display: "flex", gap: 4, marginLeft: rtl ? 0 : 18, marginRight: rtl ? 18 : 0 }}>
+            {primaryToolNav.map((item) => (
+              <button key={item.id} type="button" onClick={() => {
+                  setNavPage(item.id);
+                  if (item.id === "resume") setStep("templates");
+                  if (item.id === "cover") setCoverStep("templates");
+                }}
+                aria-current={navPage === item.id ? "page" : undefined}
+                style={{ border: "none", borderRadius: 8, padding: "9px 12px",
+                  background: navPage === item.id ? `${C.accent}18` : "transparent",
+                  color: navPage === item.id ? C.accent2 : C.text2, cursor: "pointer",
+                  fontSize: 13.5, fontWeight: navPage === item.id ? 800 : 650, fontFamily: "inherit" }}>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        )}
+        <div style={{ flex: 1 }} />
+        {!isMobile && (
+          <span title="Saved locally in this browser and not backed up to the cloud."
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.text3, fontSize: 12.5, fontWeight: 700 }}>
+            <LineIcon name="check" size={14} color={C.text3} /> Saved locally
+          </span>
+        )}
+        <LanguageDropdown
+          selected={selectedLang}
+          onSelect={(l) => {
+            setSelectedLang(l);
+            setPhoneCode(LANG_CODE[l.code] || "+1");
+          }}
+        />
+        {isMobile && (
+          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open tools menu"
+            style={{ width: 44, height: 44, borderRadius: 10, border: `1px solid ${C.border}`,
+              background: C.surface, color: C.text2, cursor: "pointer", fontFamily: "inherit",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+            ☰
+          </button>
+        )}
+      </div>
+    </header>
+  );
+
   const mainContent = step === "templates" ? (
     <div style={{ minHeight: isMobile ? "auto" : "calc(100vh - 32px)", padding: isMobile ? "0 8px 28px" : "0 0 44px" }}>
       <header style={{ position: "sticky", top: 0, zIndex: 50, margin: isMobile ? "0 -4px 24px" : "0 0 42px",
@@ -4934,29 +5019,111 @@ Awards: ${form.awards}`;
   }
 
   const coverTemplatesContent = (
-    <div style={rShell}>
-      <PageHeader
-        eyebrow="Cover Letter"
-        icon="✉️"
-        title="Cover Letter Templates"
-        sub="Choose a template to start writing your cover letter."
-        pill={`${COVER_TEMPLATES.length - 1} templates`}
-        isMobile={isMobile}
-      />
-      <div style={{ ...tplGrid, gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, minmax(0, 1fr))" }}>
-        {COVER_TEMPLATES.map((tp) => (
-          <button key={tp.id} onClick={() => { setCoverTpl(tp); setCoverStep("form"); }}
-            style={tplCard}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "none"; }}>
-            <CoverThumbPreview tp={tp} isMobile={isMobile} />
-            <div style={{ padding: isMobile ? "8px 10px" : "10px 4px", visibility: tp.blank ? "hidden" : "visible" }}>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: C.text1 }}>{tp.name}</div>
-              <div style={{ fontSize: isMobile ? 11 : 12, color: C.text2, marginTop: 2 }}>{tp.tag}</div>
+    <div style={{ minHeight: isMobile ? "auto" : "calc(100vh - 32px)", padding: isMobile ? "0 8px 28px" : "0 0 44px" }}>
+      <AppToolHeader toolName="Cover Letter Builder" />
+      <section aria-labelledby="cover-gallery-title" style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "24px 4px 0" : "42px 28px 0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 0.95fr) minmax(280px, 0.42fr)",
+          gap: isMobile ? 18 : 40, alignItems: "end", marginBottom: isMobile ? 22 : 30 }}>
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999,
+              background: `${C.accent}12`, border: `1px solid ${C.accent}2E`,
+              color: C.accent2, padding: "5px 12px", fontSize: 11, fontWeight: 900,
+              letterSpacing: "1.4px", textTransform: "uppercase", marginBottom: 14 }}>
+              Cover letter templates
             </div>
-          </button>
-        ))}
-      </div>
+            <h1 id="cover-gallery-title" style={{ margin: "0 0 12px", color: C.text1,
+              fontSize: isMobile ? 30 : 40, lineHeight: 1.08, letterSpacing: "-0.8px", fontWeight: 900 }}>
+              Choose a cover letter style that matches your resume
+            </h1>
+            <p style={{ margin: 0, maxWidth: 650, color: C.text2, fontSize: isMobile ? 15 : 16.5, lineHeight: 1.65 }}>
+              Start with a professional letter layout, then edit the content beside a live preview. You can download as PDF when ready.
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: 10, justifyContent: isMobile ? "stretch" : "end" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: isMobile ? "flex-start" : "flex-end",
+              color: C.text2, fontSize: 13.5 }}>
+              <LineIcon name="document" size={16} color={C.accent2} />
+              <span>{COVER_TEMPLATES.length} letter styles available.</span>
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: isMobile ? "flex-start" : "flex-end" }}>
+              {["Live preview", "PDF export", "Resume matching"].map((item) => (
+                <span key={item} style={{ border: `1px solid ${C.border}`, background: C.surface, color: C.text3,
+                  borderRadius: 999, padding: "6px 10px", fontSize: 12.5, fontWeight: 700 }}>
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: isMobile ? 18 : 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))",
+            gap: isMobile ? 16 : 22 }}>
+            {COVER_TEMPLATES.map((tp) => {
+              const meta = COVER_GALLERY_META[tp.id] || { description: tp.tag, attributes: ["Professional"] };
+              const recommended = tp.id === "modern";
+              const selected = coverTpl?.id === tp.id;
+              return (
+                <article key={tp.id} aria-labelledby={`cover-template-${tp.id}-title`}
+                  style={{ display: "flex", flexDirection: "column", minWidth: 0, borderRadius: 16,
+                    border: `1px solid ${recommended ? `${C.accent}70` : selected ? C.accent : C.border}`,
+                    background: recommended ? `linear-gradient(180deg, ${C.elevated} 0%, ${C.surface} 100%)` : C.surface,
+                    boxShadow: recommended ? `0 22px 60px ${C.accent}18` : "0 14px 36px rgba(0,0,0,0.22)",
+                    overflow: "hidden" }}>
+                  <div style={{ padding: isMobile ? 14 : 16, borderBottom: `1px solid ${C.border}`,
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))" }}>
+                    <div style={{ borderRadius: 12, overflow: "hidden", background: "#eef2f7",
+                      boxShadow: "0 18px 38px rgba(0,0,0,0.24)" }}>
+                      <CoverThumbPreview tp={tp} isMobile={isMobile} />
+                    </div>
+                  </div>
+                  <div style={{ padding: isMobile ? "16px 16px 18px" : "18px 18px 20px",
+                    display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 5 }}>
+                          <h2 id={`cover-template-${tp.id}-title`} style={{ margin: 0, color: C.text1,
+                            fontSize: 18, fontWeight: 900, letterSpacing: "-0.2px" }}>{tp.name}</h2>
+                          {recommended && (
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: C.accent2,
+                              background: `${C.accent}18`, border: `1px solid ${C.accent}35`,
+                              borderRadius: 999, padding: "3px 8px", fontSize: 11, fontWeight: 900 }}>
+                              <LineIcon name="check" size={12} color={C.accent2} /> Recommended
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ margin: 0, color: C.text2, fontSize: 13.8, lineHeight: 1.55 }}>{meta.description}</p>
+                      </div>
+                      {selected && (
+                        <span aria-label="Selected cover letter template" title="Selected template"
+                          style={{ width: 28, height: 28, borderRadius: "50%", display: "inline-flex",
+                            alignItems: "center", justifyContent: "center", background: `${C.accent}22`,
+                            border: `1px solid ${C.accent}60`, flexShrink: 0 }}>
+                          <LineIcon name="check" size={15} color={C.accent2} />
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+                      {(meta.attributes || []).map((attr) => (
+                        <span key={attr} style={{ color: C.text3, border: `1px solid ${C.border}`,
+                          borderRadius: 999, padding: "4px 8px", fontSize: 11.5, fontWeight: 750 }}>
+                          {attr}
+                        </span>
+                      ))}
+                    </div>
+                    <button type="button" aria-label={recommended ? "Use recommended cover letter template" : `Use ${tp.name} cover letter template`}
+                      onClick={() => { setCoverTpl(tp); setCoverStep("form"); }}
+                      style={{ marginTop: "auto", minHeight: 42, background: recommended ? C.grad : C.elevated,
+                        color: recommended ? "#fff" : C.text1, border: recommended ? "none" : `1px solid ${C.border}`,
+                        borderRadius: 9, fontSize: 13.5, fontWeight: 900, cursor: "pointer", fontFamily: "inherit" }}>
+                      Use template
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
     </div>
   );
 
@@ -5148,10 +5315,24 @@ Awards: ${form.awards}`;
     };
 
     return (
-      <div style={{ padding: isMobile ? 16 : 32, maxWidth: 900 }}>
-        <PageHeader eyebrow="Free Tool" icon="🎯" title="ATS Resume Checker"
-          sub="Paste your resume and get an instant ATS score, keyword gap analysis, and a prioritized fix list. Nothing is uploaded — runs entirely in your browser."
-          isMobile={isMobile} />
+      <div style={{ minHeight: isMobile ? "auto" : "calc(100vh - 32px)", padding: isMobile ? "0 8px 28px" : "0 0 44px" }}>
+        <AppToolHeader toolName="ATS Checker" />
+        <section aria-labelledby="ats-checker-title" style={{ maxWidth: 960, margin: "0 auto", padding: isMobile ? "24px 4px 0" : "42px 28px 0" }}>
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999,
+            background: `${C.accent}12`, border: `1px solid ${C.accent}2E`,
+            color: C.accent2, padding: "5px 12px", fontSize: 11, fontWeight: 900,
+            letterSpacing: "1.4px", textTransform: "uppercase", marginBottom: 14 }}>
+            Free tool
+          </div>
+          <h1 id="ats-checker-title" style={{ margin: "0 0 12px", color: C.text1,
+            fontSize: isMobile ? 30 : 40, lineHeight: 1.08, letterSpacing: "-0.8px", fontWeight: 900 }}>
+            ATS Resume Checker
+          </h1>
+          <p style={{ margin: 0, maxWidth: 720, color: C.text2, fontSize: isMobile ? 15 : 16.5, lineHeight: 1.65 }}>
+            Paste your resume and get an instant ATS score, keyword gap analysis, and a prioritized fix list. Nothing is uploaded; the check runs in your browser.
+          </p>
+        </div>
 
         {atsFromChecker && (
           <div style={{ background: `${C.accent}14`, border: `1.5px solid ${C.accent}40`,
@@ -5292,6 +5473,7 @@ Awards: ${form.awards}`;
             </button>
           </div>
         </>)}
+        </section>
       </div>
     );
   };
@@ -5446,16 +5628,29 @@ Awards: ${form.awards}`;
     const editCard = trackerModal.card;
 
     return (
-      <div style={{ padding: isMobile ? "16px 8px" : "24px 20px" }}>
+      <div style={{ minHeight: isMobile ? "auto" : "calc(100vh - 32px)", padding: isMobile ? "0 8px 28px" : "0 0 44px" }}>
+        <AppToolHeader toolName="Job Tracker" />
+        <section aria-labelledby="job-tracker-title" style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "24px 4px 0" : "34px 28px 0" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
           marginBottom: 24, gap: 12, flexWrap: "wrap" }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 800,
-              color: C.text1, letterSpacing: "-0.5px" }}>Job Tracker</h2>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: C.text2 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999,
+              background: `${C.accent}12`, border: `1px solid ${C.accent}2E`,
+              color: C.accent2, padding: "5px 12px", fontSize: 11, fontWeight: 900,
+              letterSpacing: "1.4px", textTransform: "uppercase", marginBottom: 14 }}>
+              Application pipeline
+            </div>
+            <h1 id="job-tracker-title" style={{ margin: 0, fontSize: isMobile ? 30 : 40, lineHeight: 1.08,
+              fontWeight: 900, color: C.text1, letterSpacing: "-0.8px" }}>Job Tracker</h1>
+            <p style={{ margin: "8px 0 0", fontSize: isMobile ? 14.5 : 16, color: C.text2, lineHeight: 1.6 }}>
+              Track every opportunity from saved role to offer without leaving your career workspace.
+            </p>
+            <p style={{ margin: "6px 0 0", fontSize: 13, color: C.text3 }}>
               {trackerCards.length} application{trackerCards.length !== 1 ? "s" : ""} tracked
             </p>
+            <h2 style={{ display: "none", margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 800,
+              color: C.text1, letterSpacing: "-0.5px" }}>Job Tracker</h2>
           </div>
           {/* Stats chips */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -5709,6 +5904,7 @@ Awards: ${form.awards}`;
             </div>
           );
         })()}
+        </section>
       </div>
     );
   })();
@@ -6178,7 +6374,11 @@ Awards: ${form.awards}`;
     ),
     [isMobile, navPage, step, tpl, coverStep, coverTpl]
   );
-  const isImmersiveAppView = isFormView || isTemplateGalleryView;
+  const isFocusedToolView = isTemplateGalleryView ||
+    (navPage === "cover" && coverStep === "templates") ||
+    navPage === "tracker" ||
+    navPage === "ats";
+  const isImmersiveAppView = isFormView || isFocusedToolView;
 
   // ── Landing page ──────────────────────────────────────────────────
   if (appView === "landing") {
@@ -6950,14 +7150,14 @@ Awards: ${form.awards}`;
 
       {/* ── Main content ── */}
       <main id="main-content" style={{ flex: 1, minWidth: 0, overflow: isFormView ? "hidden" : "auto",
-        padding: isFormView || isTemplateGalleryView ? 0 : (isMobile ? "8px 4px" : "16px 24px"),
+        padding: isFormView || isFocusedToolView ? 0 : (isMobile ? "8px 4px" : "16px 24px"),
         ...(isFormView ? { display: "flex", flexDirection: "column" } : {}) }}>
         <div style={{ width: "100%",
           ...(isFormView ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0 } :
-            isTemplateGalleryView ? { maxWidth: "none", margin: 0 } : { maxWidth: 1320, margin: "0 auto" }) }}>
+            isFocusedToolView ? { maxWidth: "none", margin: 0 } : { maxWidth: 1320, margin: "0 auto" }) }}>
 
         {/* Persistent top bar: language picker + auth (desktop only) */}
-        <div style={{ display: isMobile || isFormView || isTemplateGalleryView ? "none" : "flex", justifyContent: "flex-end", alignItems: "center",
+        <div style={{ display: isMobile || isFormView || isFocusedToolView ? "none" : "flex", justifyContent: "flex-end", alignItems: "center",
           marginBottom: 10, gap: 8, flexWrap: "wrap" }}>
           <LanguageDropdown
             selected={selectedLang}
@@ -7012,7 +7212,7 @@ Awards: ${form.awards}`;
         {ACCOUNTS_ENABLED && <UpsellModal feature={upsell} onClose={() => setUpsell(null)} onGetPass={handleStartCheckout} at={at} rtl={rtl} C={C} />}
 
         {/* Mobile top bar */}
-        {isMobile && !isTemplateGalleryView && (
+        {isMobile && !isFocusedToolView && (
           <div style={{ display: "flex", alignItems: "center", gap: 0,
             borderBottom: `1px solid ${C.border}`, marginBottom: 12, paddingBottom: 8 }}>
             {/* Scrollable: hamburger + nav items */}
