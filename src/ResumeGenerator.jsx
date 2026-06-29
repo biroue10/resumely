@@ -2683,8 +2683,7 @@ function TemplatePreviewModal({ template, meta, onClose, onUse, isMobile, rtl, k
                 <ResumePaper tpl={template}
                   result={sample.result || SAMPLE_RESUME}
                   rtl={isRtlPreview}
-                  placeholder={false}
-                  preview />
+                  placeholder={false} />
               </div>
             )}
           </div>
@@ -3826,7 +3825,7 @@ Awards: ${form.awards}`;
                   onFocusCapture={() => setTemplateFocus(tp.id)}
                   onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setTemplateFocus(""); }}
                   style={{ position: "relative", minWidth: 0 }}>
-                  <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", background: "#eef2f7",
+                  <div style={{ position: "relative", borderRadius: 12, overflow: "visible", background: "#eef2f7",
                     border: `1px solid ${selected ? C.accent : recommended ? `${C.accent}66` : "rgba(226,232,240,0.16)"}`,
                     boxShadow: active || selected
                       ? `0 24px 70px rgba(0,0,0,0.34), 0 0 0 3px ${C.accent}24`
@@ -5212,7 +5211,7 @@ Awards: ${form.awards}`;
                   onFocusCapture={() => setCoverTemplateFocus(tp.id)}
                   onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setCoverTemplateFocus(""); }}
                   style={{ position: "relative", minWidth: 0 }}>
-                  <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", background: "#eef2f7",
+                  <div style={{ position: "relative", borderRadius: 12, overflow: "visible", background: "#eef2f7",
                     border: `1px solid ${selected ? C.accent : recommended ? `${C.accent}66` : "rgba(226,232,240,0.16)"}`,
                     boxShadow: active || selected
                       ? `0 24px 70px rgba(0,0,0,0.34), 0 0 0 3px ${C.accent}24`
@@ -8528,29 +8527,83 @@ function IconInput({ icon, children }) {
   );
 }
 
-function ThumbPreview({ tp, isMobile }) {
-  const INNER_W = 700;
+const DOCUMENT_PREVIEW_WIDTH = 700;
+const DOCUMENT_PREVIEW_PAGE_HEIGHT = 990;
+
+function DocumentThumbnailPreview({ type = "resume", template, isMobile, rtl = false }) {
   const frameRef = useRef(null);
-  const [scale, setScale] = useState(isMobile ? 0.30 : 0.42);
+  const pageRef = useRef(null);
+  const [fit, setFit] = useState({
+    scale: isMobile ? 0.28 : 0.38,
+    left: 0,
+    top: 0,
+    pageHeight: DOCUMENT_PREVIEW_PAGE_HEIGHT,
+  });
 
   useEffect(() => {
-    if (!frameRef.current) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const w = entry.contentRect.width;
-      if (w > 0) setScale(w / INNER_W);
-    });
-    ro.observe(frameRef.current);
-    return () => ro.disconnect();
-  }, []);
+    const frame = frameRef.current;
+    const page = pageRef.current;
+    if (!frame || !page || typeof ResizeObserver === "undefined") return undefined;
 
-  const H = Math.round(scale * 906);
+    let raf = 0;
+    const measure = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const frameRect = frame.getBoundingClientRect();
+        const frameWidth = frameRect.width;
+        const frameHeight = frameRect.height;
+        if (!frameWidth || !frameHeight) return;
 
-  if (tp.blank) {
+        const inset = isMobile ? 10 : 14;
+        const pageHeight = Math.max(DOCUMENT_PREVIEW_PAGE_HEIGHT, page.scrollHeight || 0);
+        const availableWidth = Math.max(1, frameWidth - inset * 2);
+        const availableHeight = Math.max(1, frameHeight - inset * 2);
+        const scale = Math.min(availableWidth / DOCUMENT_PREVIEW_WIDTH, availableHeight / pageHeight);
+        const scaledWidth = DOCUMENT_PREVIEW_WIDTH * scale;
+        const scaledHeight = pageHeight * scale;
+        const next = {
+          scale,
+          left: Math.max(inset, (frameWidth - scaledWidth) / 2),
+          top: Math.max(inset, (frameHeight - scaledHeight) / 2),
+          pageHeight,
+        };
+        setFit((prev) => (
+          Math.abs(prev.scale - next.scale) < 0.001 &&
+          Math.abs(prev.left - next.left) < 0.5 &&
+          Math.abs(prev.top - next.top) < 0.5 &&
+          Math.abs(prev.pageHeight - next.pageHeight) < 1
+            ? prev
+            : next
+        ));
+      });
+    };
+
+    const frameObserver = new ResizeObserver(measure);
+    const pageObserver = new ResizeObserver(measure);
+    frameObserver.observe(frame);
+    pageObserver.observe(page);
+    measure();
+
+    if (document.fonts?.ready) document.fonts.ready.then(measure).catch(() => {});
+    window.addEventListener("resize", measure);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      frameObserver.disconnect();
+      pageObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [isMobile, template?.id, type]);
+
+  const pageCount = Math.max(1, Math.ceil(fit.pageHeight / DOCUMENT_PREVIEW_PAGE_HEIGHT));
+
+  if (template.blank) {
     return (
-      <div ref={frameRef} style={{ height: H, background: "#f3f4f6",
-        display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <svg width={Math.round(H * 0.52)} height={Math.round(H * 0.52)} viewBox="0 0 100 100"
-          fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div ref={frameRef} aria-label={`Blank ${type} template preview`}
+        style={{ aspectRatio: "210 / 297", background: "#f3f4f6",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          borderRadius: 12, border: "1px solid rgba(15,23,42,0.08)" }}>
+        <svg width="38%" height="38%" viewBox="0 0 100 100"
+          fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
           <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
         </svg>
@@ -8559,18 +8612,45 @@ function ThumbPreview({ tp, isMobile }) {
   }
 
   return (
-    <div ref={frameRef} style={{ overflow: "hidden" }}>
-      <div style={{ height: H, overflow: "hidden", position: "relative",
-        background: tp.id === "tech" ? "#0d1117" : tp.id === "dusk" ? "#1a1a1a" : "#fff" }}>
-        <div style={{ width: INNER_W, transform: `scale(${scale})`, transformOrigin: "top left",
-          position: "absolute", top: 0, left: 0, pointerEvents: "none", userSelect: "none" }}>
-          <ResumePaper tpl={tp}
-            result={THUMB_SAMPLES[tp.id]?.result || SAMPLE_RESUME}
-            rtl={THUMB_SAMPLES[tp.id]?.rtl || false}
-            placeholder={false} preview />
-        </div>
+    <div ref={frameRef} aria-label={`${template.name} ${type} template preview`}
+      style={{ position: "relative", aspectRatio: "210 / 297", background: "#eef2f7",
+        borderRadius: 12, border: "1px solid rgba(15,23,42,0.08)",
+        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.5)", overflow: "visible" }}>
+      <div ref={pageRef}
+        style={{ width: DOCUMENT_PREVIEW_WIDTH, position: "absolute", left: fit.left, top: fit.top,
+          transform: `scale(${fit.scale})`, transformOrigin: "top left",
+          pointerEvents: "none", userSelect: "none",
+          boxShadow: "0 18px 40px rgba(15,23,42,0.18)" }}>
+        {type === "cover" ? (
+          <CoverLetterPaper tpl={template} data={COVER_THUMB_SAMPLES[template.id] || SAMPLE_COVER} preview />
+        ) : (
+          <ResumePaper tpl={template}
+            result={THUMB_SAMPLES[template.id]?.result || SAMPLE_RESUME}
+            rtl={rtl}
+            placeholder={false}
+            preview />
+        )}
       </div>
+      {pageCount > 1 && (
+        <span style={{ position: "absolute", right: 10, bottom: 10, zIndex: 1,
+          background: "rgba(15,23,42,0.82)", color: "#fff", border: "1px solid rgba(255,255,255,0.24)",
+          borderRadius: 999, padding: "4px 8px", fontSize: 10.5, fontWeight: 900,
+          boxShadow: "0 8px 20px rgba(15,23,42,0.18)" }}>
+          {pageCount} pages
+        </span>
+      )}
     </div>
+  );
+}
+
+function ThumbPreview({ tp, isMobile }) {
+  return (
+    <DocumentThumbnailPreview
+      type="resume"
+      template={tp}
+      isMobile={isMobile}
+      rtl={THUMB_SAMPLES[tp.id]?.rtl || false}
+    />
   );
 }
 
@@ -8581,9 +8661,9 @@ function ResumePaper({ tpl: rawTpl, result, rtl, placeholder = true, preview = f
   const data = result || { name: "—", title: "", contact: [], summary: "", sections: [] };
   const paper = { background: "#fff", color: "#1a1a1a",
     borderRadius: preview ? 0 : 8, minHeight: preview ? 0 : 900,
-    maxHeight: preview ? 906 : undefined,
+    maxHeight: undefined,
     padding: preview ? 12 : 0,
-    fontFamily: tpl.font, overflow: "hidden",
+    fontFamily: tpl.font, overflow: preview ? "visible" : "hidden",
     boxShadow: preview ? "none" : "0 8px 30px rgba(0,0,0,0.35)",
     width: "100%", boxSizing: "border-box" };
 
@@ -9944,9 +10024,9 @@ function CoverLetterPaper({ tpl: rawTpl, data: d, preview = false }) {
   const paper = {
     background: "#fff", color: "#1a1a1a",
     borderRadius: preview ? 0 : 8, minHeight: preview ? 0 : 900,
-    maxHeight: preview ? 906 : undefined,
+    maxHeight: undefined,
     padding: preview ? 12 : 0,
-    fontFamily: tpl.font, overflow: "hidden",
+    fontFamily: tpl.font, overflow: preview ? "visible" : "hidden",
     boxShadow: preview ? "none" : "0 8px 30px rgba(0,0,0,0.35)",
     width: "100%", boxSizing: "border-box",
   };
@@ -10181,43 +10261,11 @@ function CoverLetterPaper({ tpl: rawTpl, data: d, preview = false }) {
 
 // ── CoverThumbPreview ─────────────────────────────────────────────
 function CoverThumbPreview({ tp, isMobile }) {
-  const INNER_W = 700;
-  const frameRef = useRef(null);
-  const [scale, setScale] = useState(isMobile ? 0.30 : 0.42);
-
-  useEffect(() => {
-    if (!frameRef.current) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const w = entry.contentRect.width;
-      if (w > 0) setScale(w / INNER_W);
-    });
-    ro.observe(frameRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-  const H = Math.round(scale * 906);
-
-  if (tp.blank) {
-    return (
-      <div ref={frameRef} style={{ height: H, background: "#f3f4f6",
-        display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <svg width={Math.round(H * 0.52)} height={Math.round(H * 0.52)} viewBox="0 0 100 100"
-          fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="50" y1="8" x2="50" y2="92" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
-          <line x1="8" y1="50" x2="92" y2="50" stroke="#c0c4cc" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-      </div>
-    );
-  }
-
   return (
-    <div ref={frameRef} style={{ overflow: "hidden" }}>
-      <div style={{ height: H, overflow: "hidden", position: "relative", background: "#fff" }}>
-        <div style={{ width: INNER_W, transform: `scale(${scale})`, transformOrigin: "top left",
-          position: "absolute", top: 0, left: 0, pointerEvents: "none", userSelect: "none" }}>
-          <CoverLetterPaper tpl={tp} data={COVER_THUMB_SAMPLES[tp.id] || SAMPLE_COVER} preview />
-        </div>
-      </div>
-    </div>
+    <DocumentThumbnailPreview
+      type="cover"
+      template={tp}
+      isMobile={isMobile}
+    />
   );
 }
