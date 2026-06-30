@@ -3371,16 +3371,20 @@ export default function ResumeGenerator() {
     const body = encodeURIComponent(`Here's my document, viewable in any browser:\n\n${url}\n\nMade free with ApplyCraft — applycraft.io`);
     if (typeof window !== "undefined") window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
   }, []);
-  const resumeSharePayload = useCallback(() => ({
-    k: "resume", t: tpl?.id || "",
-    d: { name: liveData.name, title: liveData.title, contact: liveData.contact, summary: liveData.summary, sections: liveData.sections },
-  }), [tpl, liveData]);
+  const resumeSharePayload = useCallback(() => {
+    const d = { name: liveData.name };
+    if (liveData.title) d.title = liveData.title;
+    if (liveData.contact && liveData.contact.length) d.contact = liveData.contact;
+    if (liveData.summary) d.summary = liveData.summary;
+    if (liveData.sections && liveData.sections.length) d.sections = liveData.sections;
+    return { k: "resume", t: tpl?.id || "", d };
+  }, [tpl, liveData]);
   const coverSharePayload = useCallback(() => {
-    const f = coverForm;
-    return { k: "cover", t: coverTpl?.id || "",
-      d: { name: f.name, jobTitle: f.jobTitle, email: f.email, phone: f.phone, location: f.location, date: f.date,
-        recipientName: f.recipientName, recipientTitle: f.recipientTitle, company: f.company, companyAddress: f.companyAddress,
-        subject: f.subject, opening: f.opening, body: f.body, closing: f.closing, signoff: f.signoff } };
+    const f = coverForm, d = {};
+    ["name", "jobTitle", "email", "phone", "location", "date", "recipientName", "recipientTitle",
+      "company", "companyAddress", "subject", "opening", "body", "closing", "signoff"]
+      .forEach((k) => { if (f[k] && String(f[k]).trim()) d[k] = f[k]; });
+    return { k: "cover", t: coverTpl?.id || "", d };
   }, [coverForm, coverTpl]);
   // Reusable ⋮ menu (email + shareable link) for either editor.
   const renderMoreMenu = (open, setOpen, getPayload, subject) => (
@@ -9343,12 +9347,12 @@ function ResumePaper({ tpl: rawTpl, result, rtl, placeholder = true, preview = f
   const empty = placeholder && !hasContent;
   const data = result || { name: "—", title: "", contact: [], summary: "", sections: [] };
   const paper = { background: "#fff", color: "#1a1a1a",
-    borderRadius: preview ? 0 : 8, minHeight: preview ? "100%" : 900,
+    borderRadius: 0, minHeight: preview ? "100%" : 900,
     height: preview ? "100%" : undefined,
     maxHeight: undefined,
     padding: preview ? 12 : 0,
     fontFamily: tpl.font, overflow: preview ? "visible" : "hidden",
-    boxShadow: preview ? "none" : "0 8px 30px rgba(0,0,0,0.35)",
+    boxShadow: preview ? "0 2px 12px rgba(0,0,0,0.12)" : "0 4px 16px rgba(0,0,0,0.18)",
     width: "100%", boxSizing: "border-box" };
 
   if (empty) {
@@ -10803,12 +10807,12 @@ function CoverLetterPaper({ tpl: rawTpl, data: d, preview = false }) {
   const tpl = rawTpl.variant ? { ...rawTpl, id: rawTpl.variant } : rawTpl;
   const paper = {
     background: "#fff", color: "#1a1a1a",
-    borderRadius: preview ? 0 : 8, minHeight: preview ? "100%" : 900,
+    borderRadius: 0, minHeight: preview ? "100%" : 900,
     height: preview ? "100%" : undefined,
     maxHeight: undefined,
     padding: preview ? 12 : 0,
     fontFamily: tpl.font, overflow: preview ? "visible" : "hidden",
-    boxShadow: preview ? "none" : "0 8px 30px rgba(0,0,0,0.35)",
+    boxShadow: preview ? "0 2px 12px rgba(0,0,0,0.12)" : "0 4px 16px rgba(0,0,0,0.18)",
     width: "100%", boxSizing: "border-box",
   };
 

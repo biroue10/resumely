@@ -1,26 +1,35 @@
 // ──────────────────────────────────────────────────────────────────────────
-// Shareable-resume links. The whole document is encoded into the URL fragment
-// (after #), so nothing is uploaded to a server — consistent with the
-// browser-first promise. The viewer at /r decodes and renders it.
+// Shareable-resume links. The whole document is LZ-compressed into the URL
+// fragment (after #) — nothing is uploaded to a server (browser-first). The
+// viewer at /r decodes and renders it.
 // ──────────────────────────────────────────────────────────────────────────
 
-function toB64Url(str) {
-  const bytes = new TextEncoder().encode(str);
-  let bin = "";
-  bytes.forEach((b) => { bin += String.fromCharCode(b); });
-  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+import LZString from "lz-string";
+
+// Legacy base64url fallback (links created before LZ compression).
 function fromB64Url(s) {
-  const norm = s.replace(/-/g, "+").replace(/_/g, "/");
-  const bin = atob(norm);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
+  try {
+    const norm = s.replace(/-/g, "+").replace(/_/g, "/");
+    const bin = atob(norm);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  } catch { return null; }
 }
 
-export function encodeShare(payload) { return toB64Url(JSON.stringify(payload)); }
+export function encodeShare(payload) {
+  return LZString.compressToEncodedURIComponent(JSON.stringify(payload));
+}
+
 export function decodeShare(str) {
-  try { return JSON.parse(fromB64Url(str)); } catch { return null; }
+  // Try LZ first; fall back to the old base64url scheme.
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(str);
+    if (json) return JSON.parse(json);
+  } catch { /* try legacy */ }
+  const legacy = fromB64Url(str);
+  if (legacy) { try { return JSON.parse(legacy); } catch { /* noop */ } }
+  return null;
 }
 
 export function buildShareUrl(payload) {
