@@ -7153,6 +7153,55 @@ Awards: ${form.awards}`;
           </div>
         </FadeIn>
 
+        {/* Comparison — why we stand out */}
+        <FadeIn>
+          <div style={{ padding: isMobile ? "56px 16px" : "80px 24px" }}>
+            <div style={{ maxWidth: 820, margin: "0 auto" }}>
+              <div style={{ textAlign: "center", marginBottom: 36 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, textTransform: "uppercase",
+                  letterSpacing: "2.5px", color: C.accent2, marginBottom: 14 }}>How we compare</div>
+                <h2 style={{ fontSize: "clamp(24px, 3.2vw, 38px)", fontWeight: 800,
+                  letterSpacing: "-0.8px", color: C.text1, margin: "0 0 12px", lineHeight: 1.15 }}>
+                  No paywall at the download button.
+                </h2>
+                <p style={{ fontSize: 15.5, color: C.text2, lineHeight: 1.7, margin: "0 auto", maxWidth: 560 }}>
+                  Most builders let you design a resume, then ask for your card the moment you click download. ApplyCraft never does.
+                </p>
+              </div>
+              <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 64px 64px" : "1fr 150px 170px",
+                  alignItems: "center", padding: isMobile ? "12px 12px" : "16px 22px",
+                  borderBottom: `1px solid ${C.border}`, gap: 8 }}>
+                  <span />
+                  <span style={{ textAlign: "center", fontSize: isMobile ? 12 : 13.5, fontWeight: 800, color: C.accent2 }}>ApplyCraft</span>
+                  <span style={{ textAlign: "center", fontSize: isMobile ? 11 : 12.5, fontWeight: 700, color: C.text3, lineHeight: 1.2 }}>Typical builders</span>
+                </div>
+                {[
+                  ["Download PDF & DOCX for free", "Paywalled"],
+                  ["No account required", "Sign-up first"],
+                  ["No credit card at download", "Card required"],
+                  ["No watermarks", "Watermarked"],
+                  ["Unlimited resumes & cover letters", "1 free, then pay"],
+                  ["Built-in ATS checker", "Premium only"],
+                  ["Your data stays in your browser", "Stored on servers"],
+                  ["5 interface languages incl. Arabic (RTL)", "English only"],
+                ].map(([label, other], i, arr) => (
+                  <div key={label} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 64px 64px" : "1fr 150px 170px",
+                    alignItems: "center", padding: isMobile ? "11px 12px" : "13px 22px", gap: 8,
+                    borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : "none" }}>
+                    <span style={{ fontSize: isMobile ? 13 : 14.5, color: C.text1, fontWeight: 600 }}>{label}</span>
+                    <span style={{ textAlign: "center", color: SECTION_TOKENS.statusComplete, fontSize: 17, fontWeight: 800 }} aria-label="Included">✓</span>
+                    <span style={{ textAlign: "center", color: C.text3, fontSize: isMobile ? 11 : 12.5 }}>{other}</span>
+                  </div>
+                ))}
+              </div>
+              <p style={{ textAlign: "center", fontSize: 12.5, color: C.text3, margin: "16px auto 0", maxWidth: 560 }}>
+                “Typical builders” reflects common practices across popular paid resume tools. Optional ApplyCraft power-ups (AI tailoring, cross-device sync) are a one-time 7-day pass — never a subscription.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+
         {/* Multilingual superpowers */}
         <div style={{ background: C.surface, padding: "72px 24px 80px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
