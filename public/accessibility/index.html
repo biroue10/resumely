@@ -150,8 +150,8 @@
         </tr>
         <tr>
           <td>Focus trap in modals</td>
-          <td>Tab order is managed on modal open/close, but a strict focus trap preventing Tab from leaving the modal is not yet implemented for all dialogs.</td>
-          <td>Planned improvement.</td>
+          <td>The main dialogs (sign-in, feedback, upload) trap Tab / Shift+Tab within the dialog and restore focus to the trigger on close. A few smaller pop-overs still rely on open/close focus management without a strict loop.</td>
+          <td>Largely implemented; remaining pop-overs to follow.</td>
         </tr>
       </tbody>
     </table>

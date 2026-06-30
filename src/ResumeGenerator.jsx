@@ -6,6 +6,7 @@ import * as account from "./account.js";
 import { analyzeKeywords, detectLanguage, LANG_LABEL } from "./ats/engine.js";
 import { scoreFromIssues, scoreBand, issueCost, READINESS_EXPLAINER } from "./ats/scoring.js";
 import { pdfSafe, containsNonLatin1 } from "./pdf/text.js";
+import { useFocusTrap } from "./a11y/useFocusTrap.js";
 import { parseResume } from "./ats/parseResume.js";
 import * as resumes from "./resumes.js";
 import { buildShareUrl } from "./share.js";
@@ -8860,11 +8861,13 @@ Awards: ${form.awards}`;
 function UploadResumeModal({ open, onClose, onImprove, lang }) {
   const m = (MODAL_UI[lang] || MODAL_UI.en).upload;
   const [file, setFile] = useState(null);
+  // dialogRef declared below; focus-trap wired after it via useFocusTrap.
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [fileError, setFileError] = useState("");
   const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, open);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -9021,6 +9024,7 @@ function FeedbackModal({ open, onClose, lang }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
   const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, open);
 
   useEffect(() => {
     if (open) {
@@ -9291,6 +9295,7 @@ function AuthModal({ open, initialTab = "login", onClose, onLogin }) {
   const [loading, setLoading] = useState(false);
   const [signupDone, setSignupDone] = useState(false);
   const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, open);
 
   useEffect(() => {
     if (open) {
