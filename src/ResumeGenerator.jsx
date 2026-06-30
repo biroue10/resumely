@@ -3042,6 +3042,8 @@ export default function ResumeGenerator() {
   // Collapse state for the cover-letter section cards (collapsed by default, like the resume builder).
   const [coverCollapsed, setCoverCollapsed] = useState({ recipient: true, sender: true, opening: true, body: true, closing: true });
   const toggleCoverCollapse = useCallback((k) => setCoverCollapsed(c => ({ ...c, [k]: !c[k] })), []);
+  // Landing-page mobile hamburger menu.
+  const [landingMenuOpen, setLandingMenuOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -6787,7 +6789,39 @@ Awards: ${form.awards}`;
               cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
             Create my resume
           </button>
+
+          {isMobile && (
+            <button type="button" aria-label={landingMenuOpen ? "Close menu" : "Open menu"} aria-expanded={landingMenuOpen}
+              onClick={() => setLandingMenuOpen(o => !o)}
+              style={{ marginInlineStart: 8, width: 40, height: 40, borderRadius: 10, border: `1px solid ${C.border}`,
+                background: C.surface, color: C.text1, cursor: "pointer", flexShrink: 0, fontFamily: "inherit",
+                display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, lineHeight: 1 }}>
+              {landingMenuOpen ? "✕" : "☰"}
+            </button>
+          )}
           </div>
+
+          {isMobile && landingMenuOpen && (
+            <nav aria-label="Menu" style={{ boxShadow: `inset 0 1px 0 ${C.border}`, background: `${C.bg}f5`,
+              backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+              padding: "8px 12px 14px", display: "flex", flexDirection: "column", gap: 2 }}>
+              {primaryToolNav.map((item) => (
+                <button key={item.id} type="button"
+                  onClick={() => {
+                    setLandingMenuOpen(false);
+                    setAppView("app");
+                    setNavPage(item.id);
+                    if (item.id === "resume") setStep("templates");
+                    if (item.id === "cover") setCoverStep("templates");
+                  }}
+                  style={{ textAlign: rtl ? "right" : "left", border: "none", background: "transparent",
+                    color: C.text1, padding: "12px 10px", fontSize: 15, fontWeight: 700, cursor: "pointer",
+                    fontFamily: "inherit", borderRadius: 8 }}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          )}
         </nav>
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
           onLogin={user => { setCurrentUser(user); setAuthModal(false); }} />
