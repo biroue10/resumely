@@ -3446,7 +3446,7 @@ Awards: ${form.awards}`;
       doc.setTextColor(90, 90, 90);
       const contactLine = contactItems.join("  |  ");
       const contactWrapped = doc.splitTextToSize(contactLine, colW);
-      doc.text(contactWrapped, margin, y);
+      doc.text(contactWrapped, pageW / 2, y, { align: "center" }); // centered contact (incl. email)
       y += contactWrapped.length * 4.5 + 2;
     }
 
@@ -5177,7 +5177,7 @@ Awards: ${form.awards}`;
     doc.text(safe(d.name), margin, y); y += 7;
     if (d.jobTitle) { doc.setFont("helvetica","italic"); doc.setFontSize(11); doc.setTextColor(ar,ag,ab); doc.text(safe(d.jobTitle), margin, y); y += 5; }
     const contact = [d.email, d.phone, d.location].filter(Boolean).join("   ·   ");
-    if (contact) { doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text(safe(contact), margin, y); y += 5; }
+    if (contact) { doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text(safe(contact), pageW / 2, y, { align: "center" }); y += 5; }
     doc.setDrawColor(ar,ag,ab); doc.setLineWidth(0.4); doc.line(margin, y, pageW-margin, y); y += 7;
     if (d.date) { doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(safe(d.date), margin, y); y += 6; }
     if (d.recipientName) { doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(30,30,30); doc.text(safe(d.recipientName), margin, y); y += 5; }
