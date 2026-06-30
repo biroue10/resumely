@@ -6712,7 +6712,7 @@ Awards: ${form.awards}`;
         {/* Nav */}
         <nav style={{ position: "fixed", top: 0,
           left: 0, right: 0, zIndex: 100, background: C.bg + "cc", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}>
-          <div className="ac-nav-inner" style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
+          <div className="ac-nav-inner" style={{ width: "100%", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
             display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button className="ac-nav-logo" onClick={() => setAppView("landing")}
             style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
