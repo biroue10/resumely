@@ -15,6 +15,7 @@
     "validate:performance": "node scripts/validate-performance.mjs",
     "analyze": "ANALYZE=true npm run build",
     "test:product": "node scripts/product-tests.mjs",
+    "test:ats": "node scripts/ats-tests.mjs",
     "test:a11y": "node scripts/a11y-check.mjs",
     "test:security": "node scripts/security-tests.mjs",
     "test:ux": "node scripts/ux-tests.mjs",

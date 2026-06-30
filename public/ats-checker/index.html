@@ -70,13 +70,13 @@
     },
     {
       "@type": "Question",
-      "name": "What ATS score should I aim for?",
-      "acceptedAnswer": { "@type": "Answer", "text": "A score of 80+ indicates a well-structured, ATS-ready resume. 60–79 means there are fixable issues. Below 60 indicates significant gaps that are likely costing you interviews. The keyword match score (when you paste a job description) is the most actionable number — aim for 40%+ for a strong match." }
+      "name": "How should I read the ApplyCraft ATS Readiness Score?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Treat it as a guide, not a verdict. Within ApplyCraft's heuristic, a higher score means fewer structural, content, and keyword issues were found; a lower score points to fixable gaps. It is not a universal industry threshold and does not predict whether you'll get an interview. When you paste a job description, the keyword-match percentage shows how much of that role's vocabulary your resume already contains." }
     },
     {
       "@type": "Question",
       "name": "Does this checker guarantee ATS passage?",
-      "acceptedAnswer": { "@type": "Answer", "text": "No. Every ATS system is different, and scoring criteria vary by company and software vendor. This checker identifies the most common patterns that hurt ATS performance. Improving your score here will meaningfully increase your chances, but there is no universal standard." }
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Every ATS is different — Greenhouse, Lever, Workday, Taleo and others use different parsing and ranking criteria. This checker flags common patterns that can hurt ATS readability, but there is no universal guarantee." }
     }
   ]
 }
@@ -261,7 +261,7 @@ With it, you'll also see:
       </svg>
       <div class="score-number" id="score-num" style="color:#6366F1">—</div>
       <div class="score-label" id="score-label" style="color:#94A3B8">Checking…</div>
-      <div class="score-sub">ATS Readiness Score — reflects structure, completeness, and content quality. Not a guarantee of ATS passage, since every system differs.</div>
+      <div class="score-sub"><strong>ApplyCraft ATS Readiness Score</strong> — an ApplyCraft heuristic based on common resume structure, content, formatting, and keyword practices. It does not reproduce the private algorithms of Workday, Greenhouse, Taleo, Lever, or any specific applicant tracking system, and it does not guarantee an interview.</div>
       <div class="summary-pills" id="summary-pills"></div>
     </div>
 
@@ -350,8 +350,8 @@ With it, you'll also see:
       <p>Yes — completely free, no sign-up, no email address, no credit card. Your resume text runs entirely in your browser using JavaScript. Nothing is ever sent to a server or stored anywhere.</p>
     </details>
     <details>
-      <summary>What ATS score should I aim for?</summary>
-      <p>A score of 80+ indicates a well-structured, ATS-ready resume. 60–79 means there are fixable issues. Below 60 indicates significant gaps that are likely costing you interviews. When you also paste a job description, the keyword match percentage is the most actionable number — aim for 40%+ for a strong match against a specific role.</p>
+      <summary>How should I read the ApplyCraft ATS Readiness Score?</summary>
+      <p>Treat it as a guide, not a verdict. Within ApplyCraft's heuristic, a higher score means fewer structural, content, and keyword issues were found; a lower score points to fixable gaps worth addressing. It is not a universal industry threshold and does not predict whether you'll get an interview. When you paste a job description, the keyword-match percentage shows how much of that role's vocabulary your resume already contains — useful for tailoring honestly.</p>
     </details>
     <details>
       <summary>Does this tool guarantee I'll pass ATS?</summary>
@@ -427,7 +427,7 @@ const LOCALE = {
   emptyAlert: 'Please paste your resume text first (at least a few lines).',
   analysing:  'Analysing…',
   recheck:    'Re-check →',
-  scoreLabels: { 80: 'ATS Ready', 60: 'Needs Work', 40: 'Action Required', 0: 'Critical Issues' },
+  scoreLabels: { 80: 'Strong', 60: 'Needs work', 40: 'Action required', 0: 'Critical issues' },
   pills:       { critical: 'Critical', warning: 'Warning', info: 'Info', allGood: 'All good' },
   badgeLabels: { critical: 'critical', warning: 'warning', info: 'info' },
   matchedKw:   'Matched keywords',

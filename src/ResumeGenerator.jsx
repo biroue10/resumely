@@ -4,6 +4,7 @@ import { ACCOUNTS_ENABLED, PAYMENTS_ENABLED, ACTIVE_SEARCH_PASS } from "./config
 import { initAnalytics, track, EVENTS } from "./analytics.js";
 import * as account from "./account.js";
 import { analyzeKeywords, detectLanguage, LANG_LABEL } from "./ats/engine.js";
+import { scoreFromIssues, scoreBand, issueCost, READINESS_EXPLAINER } from "./ats/scoring.js";
 import { parseResume } from "./ats/parseResume.js";
 import * as resumes from "./resumes.js";
 import { buildShareUrl } from "./share.js";
@@ -5457,8 +5458,9 @@ Awards: ${form.awards}`;
   };
 
   // ── ATS text scorer (for standalone ATS page — works on raw pasted text) ──
-  const ATS_STOP = new Set(["and","or","the","a","an","in","on","to","for","of","with","at","by","from","as","is","are","was","were","be","been","have","has","had","do","does","did","will","would","can","could","should","may","might","must","shall","not","but","if","then","than","that","this","these","those","it","its","we","our","you","your","they","their","he","she","him","her","i","me","my","us","any","all","more","most","some","such","own","same","other","also","just","into","over","after","before","during","through","between","each","only","very","too","so","up","out","about","no","new","need","work","experience","years","year","role","team","company","skills","ability","strong","proven","excellent","good","great","well","using","use","used","including","include","within","across","multiple","various","key","core","day","days","time","high","low","able","ensure","provide","making","make","take","help","both","per","etc"]);
-  const atsTokenize = s => s.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !ATS_STOP.has(w) && isNaN(w));
+  // Keyword tokenization/matching is handled by the Unicode-aware engine in
+  // src/ats/engine.js (analyzeKeywords); the regex below only flags weak,
+  // passive bullet openers for the readiness checks.
   const WEAK_ATS = /^(responsible for|helped?( to)?|assisted?( with)?|worked on|was part of|involved in|supported?|participated in|contributed to|did |handled |performed |undertook |was involved)/i;
 
   const scoreRawResume = (text, jdText) => {
@@ -5500,15 +5502,12 @@ Awards: ${form.awards}`;
         kwGap = { present: a.present, missing: a.missing, pct, total: a.total,
           crossLanguage: a.crossLanguage, langResume: a.langResume, langJd: a.langJd };
         const xl = a.crossLanguage ? ` (cross-language: ${LANG_LABEL[a.langResume]} resume vs ${LANG_LABEL[a.langJd]} job)` : "";
-        if (pct < 30) issues.unshift({ level:"critical", icon:"🎯", title:`Low keyword match: ${pct}% vs. job description${xl}`, detail:`Only ${pct}% of the JD's meaningful keywords appear in your resume. Target 40%+ for strong ATS ranking.` });
-        else if (pct < 45) issues.unshift({ level:"warning", icon:"🎯", title:`Keyword match: ${pct}%${xl}`, detail:`You match ${pct}% of the JD's keywords. Strong candidates typically hit 45–70% for targeted roles.` });
+        if (pct < 30) issues.unshift({ level:"critical", icon:"🎯", title:`Low keyword match: ${pct}% vs. job description${xl}`, detail:`Only ${pct}% of the meaningful keywords in this job description appear in your resume. Adding more of the role's genuine keywords generally improves overlap.` });
+        else if (pct < 45) issues.unshift({ level:"warning", icon:"🎯", title:`Keyword match: ${pct}%${xl}`, detail:`You match ${pct}% of this job description's keywords. Weaving in more of the role's real terms (where they truly apply) tends to help.` });
       }
     }
 
-    const score = Math.max(0, 100
-      - issues.filter(i => i.level === "critical").length * 20
-      - issues.filter(i => i.level === "warning").length * 8
-      - issues.filter(i => i.level === "info").length * 3);
+    const score = scoreFromIssues(issues);
     return { score, issues, kwGap, wordCount };
   };
 
@@ -5529,10 +5528,7 @@ Awards: ${form.awards}`;
   const nextChecklistItem = resumeChecklist.find(item => !item.done);
   const readyForReview = completedChecklist >= 5;
   const atsIssues = computeATSIssues();
-  const atsScore = Math.max(0, 100
-    - atsIssues.filter(i => i.level === "critical").length * 20
-    - atsIssues.filter(i => i.level === "warning").length * 8
-    - atsIssues.filter(i => i.level === "info").length * 3);
+  const atsScore = scoreFromIssues(atsIssues);
   const resumeTitle = form.name.trim()
     ? `${form.name.trim().split(/\s+/)[0]}'s Resume`
     : "Untitled Resume";
@@ -5973,9 +5969,10 @@ Awards: ${form.awards}`;
             const criticals = issues.filter(i => i.level === "critical");
             const warnings  = issues.filter(i => i.level === "warning");
             const infos     = issues.filter(i => i.level === "info");
-            const score = Math.max(0, 100 - criticals.length * 20 - warnings.length * 8 - infos.length * 3);
-            const scoreColor = score >= 90 ? "#4ade80" : score >= 70 ? "#fbbf24" : score >= 50 ? "#fb923c" : "#f87171";
-            const scoreLabel = score >= 90 ? "ATS Ready" : score >= 70 ? "Good" : score >= 50 ? "Needs attention" : "Action required";
+            const score = scoreFromIssues(issues);
+            const band = scoreBand(score);
+            const scoreColor = band.color;
+            const scoreLabel = band.label;
             const LEVEL_META = {
               critical: { label: "Critical", color: "#f87171", bg: "#f8717110" },
               warning:  { label: "Warning",  color: "#fbbf24", bg: "#fbbf2410" },
@@ -5991,11 +5988,11 @@ Awards: ${form.awards}`;
                       <div style={{ fontSize: 28, fontWeight: 900, color: scoreColor, lineHeight: 1 }}>{score}</div>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 800, color: scoreColor }}>{scoreLabel}</div>
-                        <div style={{ fontSize: 10.5, color: C.text3 }}>ATS Compatibility Score</div>
+                        <div style={{ fontSize: 10.5, color: C.text3 }}>ApplyCraft ATS Readiness Score</div>
                       </div>
                     </div>
                     <div style={{ fontSize: 11.5, color: C.text3, maxWidth: 360, lineHeight: 1.5 }}>
-                      This checks structure, keywords, and readability signals common ATS parsers use. It does not guarantee interviews or employer ranking.
+                      An ApplyCraft heuristic for resume structure, content, and keywords. It does not reproduce any specific ATS (Workday, Greenhouse, Taleo, Lever…) and does not guarantee interviews.
                     </div>
                   </div>
                   <button onClick={() => setAtsOpen(false)} aria-label="Close ATS checker"
@@ -6727,12 +6724,9 @@ Awards: ${form.awards}`;
       setTimeout(() => setStatusMsg(""), 2500);
     };
 
-    const scoreColor = !result ? C.accent2
-      : result.score >= 80 ? "#4ade80"
-      : result.score >= 60 ? "#fbbf24"
-      : result.score >= 40 ? "#fb923c" : "#f87171";
-
-    const scoreLabel = !result ? "" : result.score >= 80 ? "ATS Ready" : result.score >= 60 ? "Needs Work" : result.score >= 40 ? "Action Required" : "Critical Issues";
+    const band = result ? scoreBand(result.score) : null;
+    const scoreColor = band ? band.color : C.accent2;
+    const scoreLabel = band ? band.label : "";
 
     const IssueRow = ({ issue }) => {
       const bColor = issue.level === "critical" ? "#f87171" : issue.level === "warning" ? "#fbbf24" : "#60a5fa";
@@ -6748,7 +6742,7 @@ Awards: ${form.awards}`;
               <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 999,
                 background: bBg, color: bColor, border: `1px solid ${bColor}22`,
                 textTransform: "uppercase", letterSpacing: ".8px", flexShrink: 0 }}>
-                {issue.level}
+                {issue.level} · −{issueCost(issue)}
               </span>
             </div>
             <div style={{ fontSize: 12.5, color: C.text2, lineHeight: 1.6 }}>{issue.detail}</div>
@@ -6834,13 +6828,20 @@ Awards: ${form.awards}`;
           {/* Score */}
           <div style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 14,
             padding: "28px 24px", textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1.2px", color: C.accent2, marginBottom: 6 }}>
+              ApplyCraft ATS Readiness Score
+            </div>
             <div style={{ fontSize: 64, fontWeight: 800, color: scoreColor, letterSpacing: "-2px", lineHeight: 1 }}>
               {result.score}
             </div>
             <div style={{ fontSize: 15, fontWeight: 700, color: scoreColor, marginTop: 6 }}>{scoreLabel}</div>
             <div style={{ fontSize: 12.5, color: C.text3, marginTop: 8, maxWidth: 400, margin: "8px auto 0" }}>
-              {ats.scoreDesc}
+              {band ? band.meaning : ats.scoreDesc}
             </div>
+            <details style={{ marginTop: 14, maxWidth: 460, marginInline: "auto", textAlign: "left" }}>
+              <summary style={{ cursor: "pointer", fontSize: 12, color: C.accent2, fontWeight: 700 }}>How is this score calculated?</summary>
+              <p style={{ fontSize: 12, color: C.text3, lineHeight: 1.6, margin: "8px 0 0" }}>{READINESS_EXPLAINER}</p>
+            </details>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
               {result.issues.filter(i => i.level === "critical").length > 0 && (
                 <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
@@ -7438,8 +7439,8 @@ Awards: ${form.awards}`;
 
     // Keyword analysis
     const STOP = new Set(["and","or","the","a","an","in","of","to","for","with","on","at","by","from","as","is","are","was","were","be","been","have","has","had","do","does","did","will","would","could","should","may","might","can","this","that","their","they","we","you","i","it","its","our","your","which","who","what","when","where","how","not","but","if","than","then","so","yet","both","also","just","more","most","very","too","about","into","each","many","all","any","some","such","no","only","same","other","per","via","able","using"]);
-    const getKws = (jd) => new Set(jd.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !STOP.has(w)));
-    const scoreText = (text, kws) => { if (!kws || !kws.size) return 0; const words = text.toLowerCase().split(/\W+/); return Math.min(100, Math.round((words.filter(w => kws.has(w)).length / kws.size) * 300)); };
+    const getKws = (jd) => new Set(((String(jd || "").toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu)) || []).filter(w => w.length > 2 && !STOP.has(w)));
+    const scoreText = (text, kws) => { if (!kws || !kws.size) return 0; const words = (String(text || "").toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu)) || []; const uniq = new Set(words.filter(w => kws.has(w))); return Math.min(100, Math.round((uniq.size / kws.size) * 300)); };
     const badge = (score) => score >= 40 ? {label:"Strong match", color:"#10B981"} : score >= 15 ? {label:"Relevant", color:"#F59E0B"} : {label:"Low match", color:"#64748B"};
 
     const analyzeJD = () => {

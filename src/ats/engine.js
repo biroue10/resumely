@@ -9,8 +9,27 @@ import { SYNONYM_GROUPS, PHRASES, TECH_TOKENS, BOILERPLATE } from "./synonyms.js
 
 export const LANG_LABEL = { en: "EN", fr: "FR", es: "ES", de: "DE", ar: "AR" };
 
-const stripDiacritics = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "");
-const normalize = (w) => stripDiacritics(String(w || "").toLowerCase()).replace(/[^a-z0-9_؀-ۿ]/g, "");
+const stripDiacritics = (s) => s.normalize("NFD").replace(/\p{M}/gu, "");
+// Unicode-aware normalization: lowercase, fold diacritics (so "Compétences"
+// matches "competences"), and keep letters/numbers from ANY script (Latin,
+// Arabic, Cyrillic, CJK…) — never silently drop non-Latin characters.
+const normalize = (w) => stripDiacritics(String(w || "").toLowerCase()).replace(/[^\p{L}\p{N}_]/gu, "");
+
+// Split text into word-like tokens. Prefer Intl.Segmenter (true Unicode word
+// boundaries, correct for scripts without spaces); fall back to a Unicode
+// property-class regex. Both keep whole words only — no partial/substring
+// matches — and preserve every script.
+function segmentWords(text, locale) {
+  if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
+    try {
+      const seg = new Intl.Segmenter(locale || "en", { granularity: "word" });
+      const out = [];
+      for (const part of seg.segment(text)) if (part.isWordLike) out.push(part.segment);
+      return out;
+    } catch { /* fall through to regex */ }
+  }
+  return text.match(/[\p{L}\p{N}_]+/gu) || [];
+}
 
 // Conservative stemmer (collapses manage/managing/managed, compétence(s), etc.).
 function stem(w) {
@@ -71,12 +90,16 @@ export function detectLanguage(text) {
   return best;
 }
 
-// Tokenize text into meaningful keyword surface forms (stopwords/boilerplate removed).
-function tokenize(text, stopSet, dropBoilerplate) {
-  const normText = applyPhrases(stripDiacritics(String(text || "").toLowerCase()));
-  const tokens = normText.split(/[^a-z0-9_؀-ۿ]+/).filter(Boolean);
+// Tokenize text into meaningful keyword surface forms (stopwords/boilerplate
+// removed). Unicode + locale aware. Diacritics are folded for matching so the
+// same word matches across accented/unaccented spellings; non-Latin scripts
+// (e.g. Arabic) are preserved, never discarded.
+function tokenize(text, stopSet, dropBoilerplate, locale) {
+  const lower = String(text || "").toLocaleLowerCase(locale || "en");
+  const normText = applyPhrases(stripDiacritics(lower));
   const out = [];
-  for (const tok of tokens) {
+  for (const raw of segmentWords(normText, locale)) {
+    const tok = raw.replace(/[^\p{L}\p{N}_]/gu, "");
     if (tok.length < 2) continue;
     if (/^\d+$/.test(tok)) continue;
     if (stopSet.has(tok)) continue;
@@ -106,11 +129,11 @@ export function analyzeKeywords(resumeText, jdText) {
   const stopR = new Set([...STOPWORDS[langResume], ...STOPWORDS.en]);
   const stopJ = new Set([...STOPWORDS[langJd], ...STOPWORDS.en]);
 
-  const resumeCanon = new Set(tokenize(resumeText, stopR, false).map(canonicalOf));
+  const resumeCanon = new Set(tokenize(resumeText, stopR, false, langResume).map(canonicalOf));
 
   // Dedupe JD keywords by canonical; keep the highest weight + a readable label.
   const jdKw = new Map();
-  for (const tok of tokenize(jdText, stopJ, true)) {
+  for (const tok of tokenize(jdText, stopJ, true, langJd)) {
     const canon = canonicalOf(tok);
     const w = weightOf(tok);
     const prev = jdKw.get(canon);
