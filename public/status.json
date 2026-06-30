@@ -1,0 +1,16 @@
+{
+  "updatedAt": "2026-07-01T00:00:00Z",
+  "overall": "operational",
+  "source": "manual",
+  "note": "Component states are intended to be updated by an external uptime monitor (see docs/STATUS_MONITORING.md). Until that monitor is connected, treat states as informational, not a measured real-time guarantee.",
+  "components": [
+    { "id": "web", "group": "ApplyCraft", "name": "Website & app (applycraft.io)", "desc": "Homepage, app JavaScript, resume & cover-letter builders, and PDF/DOCX export (these run in your browser).", "state": "operational" },
+    { "id": "ai", "group": "ApplyCraft", "name": "AI helper API", "desc": "Optional AI endpoints, proxied to the AI provider.", "state": "operational" },
+    { "id": "account", "group": "ApplyCraft", "name": "Account & cloud sync API", "desc": "Optional passwordless sign-in and Master Profile sync.", "state": "operational" },
+    { "id": "payments", "group": "ApplyCraft", "name": "Payments & pass activation", "desc": "Active Search Pass checkout and activation.", "state": "operational" },
+    { "id": "cloudflare", "group": "Third-party providers", "name": "Cloudflare (hosting / CDN)", "desc": "Hosting and CDN provider.", "state": "operational", "link": "https://www.cloudflarestatus.com/" },
+    { "id": "anthropic", "group": "Third-party providers", "name": "Anthropic (AI)", "desc": "AI model provider for optional helpers.", "state": "operational", "link": "https://status.anthropic.com/" },
+    { "id": "lemonsqueezy", "group": "Third-party providers", "name": "Lemon Squeezy (payments)", "desc": "Payment processor / merchant of record.", "state": "operational", "link": "https://status.lemonsqueezy.com/" }
+  ],
+  "incidents": []
+}

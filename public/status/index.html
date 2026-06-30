@@ -4,10 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>System Status | ApplyCraft</title>
-<meta name="description" content="ApplyCraft system status — all services operational. Check real-time availability of the resume builder."/>
+<meta name="description" content="ApplyCraft system status — current component states, incident history, and third-party provider status for the resume and cover letter builder."/>
 <link rel="canonical" href="https://applycraft.io/status/"/>
 <meta property="og:title" content="System Status | ApplyCraft"/>
-<meta property="og:description" content="ApplyCraft system status — all services operational. Check real-time availability of the resume builder."/>
+<meta property="og:description" content="ApplyCraft system status — current component states, incident history, and third-party provider status for the resume and cover letter builder."/>
 <meta property="og:url" content="https://applycraft.io/status/"/>
 <meta property="og:image" content="https://applycraft.io/og.png"/>
 <meta property="og:image:secure_url" content="https://applycraft.io/og.png"/>
@@ -17,7 +17,7 @@
 <meta property="og:image:alt" content="ApplyCraft resume builder interface"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="System Status | ApplyCraft"/>
-<meta name="twitter:description" content="ApplyCraft system status — all services operational. Check real-time availability of the resume builder."/>
+<meta name="twitter:description" content="ApplyCraft system status — current component states, incident history, and third-party provider status for the resume and cover letter builder."/>
 <meta name="twitter:image" content="https://applycraft.io/og.png"/>
 <meta name="twitter:image:alt" content="ApplyCraft resume builder interface"/>
 <link rel="icon" href="/favicon.svg"/>
@@ -69,82 +69,28 @@
 <div class="prose">
 
 <h1>System Status</h1>
-<p class="lead">Current status of ApplyCraft services. Updated automatically on each deployment.</p>
+<p class="lead">Current status of ApplyCraft services. Component states are published from <code>/status.json</code>, which is kept up to date by external monitoring — not from deployment timestamps.</p>
 
-<div style="display:flex;align-items:center;gap:14px;padding:20px 24px;background:#052e16;border:1px solid #16a34a44;border-radius:12px;margin-bottom:40px">
-  <div style="width:14px;height:14px;border-radius:50%;background:#22c55e;box-shadow:0 0 12px #22c55e88;flex-shrink:0"></div>
-  <div>
-    <div style="font-size:16px;font-weight:700;color:#4ade80">All systems operational</div>
-    <div style="font-size:12px;color:#16a34a;margin-top:2px">Last checked: 2026-06-27</div>
-  </div>
+<!-- Rendered by /status.js from /status.json. The block below is an honest
+     no-JavaScript fallback. -->
+<div id="status-root">
+  <noscript>
+    <p style="color:#94A3B8;font-size:14px">Live status requires JavaScript. The current component states are published in
+      <a href="/status.json">/status.json</a>. For provider status, see
+      <a href="https://www.cloudflarestatus.com/" rel="noopener">Cloudflare</a>,
+      <a href="https://status.anthropic.com/" rel="noopener">Anthropic</a>, and
+      <a href="https://status.lemonsqueezy.com/" rel="noopener">Lemon Squeezy</a>.</p>
+  </noscript>
+  <p style="color:#64748B;font-size:14px">Loading current status…</p>
 </div>
 
-<h2>Services</h2>
-
-<div class="status-row">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="status-dot"></div>
-    <div>
-      <div style="font-size:14px;font-weight:600;color:#E4EBF5">applycraft.io — Resume Builder</div>
-      <div style="font-size:12px;color:#475569">Main application</div>
-    </div>
-  </div>
-  <span class="badge badge-green">Operational</span>
-</div>
-
-<div class="status-row">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="status-dot"></div>
-    <div>
-      <div style="font-size:14px;font-weight:600;color:#E4EBF5">PDF Export</div>
-      <div style="font-size:12px;color:#475569">Browser-side PDF generation</div>
-    </div>
-  </div>
-  <span class="badge badge-green">Operational</span>
-</div>
-
-<div class="status-row">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="status-dot"></div>
-    <div>
-      <div style="font-size:14px;font-weight:600;color:#E4EBF5">DOCX Export</div>
-      <div style="font-size:12px;color:#475569">Browser-side DOCX generation</div>
-    </div>
-  </div>
-  <span class="badge badge-green">Operational</span>
-</div>
-
-<div class="status-row">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="status-dot"></div>
-    <div>
-      <div style="font-size:14px;font-weight:600;color:#E4EBF5">CDN &amp; Static Assets</div>
-      <div style="font-size:12px;color:#475569">Cloudflare Pages</div>
-    </div>
-  </div>
-  <span class="badge badge-green">Operational</span>
-</div>
-
-<div class="status-row">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="status-dot"></div>
-    <div>
-      <div style="font-size:14px;font-weight:600;color:#E4EBF5">Google Fonts</div>
-      <div style="font-size:12px;color:#475569">Typography CDN</div>
-    </div>
-  </div>
-  <span class="badge badge-green">Operational</span>
-</div>
-
-<h2 style="margin-top:48px">Uptime</h2>
-<p>ApplyCraft is served via Cloudflare's global CDN. Cloudflare publishes its own infrastructure SLA, but that is Cloudflare's figure for its network — not a measured uptime guarantee for ApplyCraft, and we don't present it as one. We're working on independent, measured monitoring (see the roadmap).</p>
-<p>Because the app runs entirely in the browser with no backend server, the only dependency is the CDN delivering the initial JavaScript bundle.</p>
-
-<h2>Incident history</h2>
-<p style="color:#475569;font-size:14px">No incidents in the last 90 days.</p>
+<h2 style="margin-top:44px">About these states</h2>
+<p>We report each component as <strong>Operational</strong>, <strong>Degraded performance</strong>, <strong>Partial outage</strong>, or <strong>Major outage</strong>. ApplyCraft components are listed separately from third-party providers (Cloudflare, Anthropic, Lemon Squeezy), whose own status pages are linked above.</p>
+<p>We do <strong>not</strong> claim a specific uptime percentage and do not present Cloudflare's infrastructure SLA as ApplyCraft's measured uptime. The setup for independent, measured monitoring is documented in the repository (<code>docs/STATUS_MONITORING.md</code>).</p>
 
 <hr/>
-<p style="font-size:13px;color:#475569">Issues? Email <a href="mailto:hello@applycraft.io">hello@applycraft.io</a></p>
+<p style="font-size:13px;color:#475569">Seeing a problem that isn't reflected here? Report it: <a href="mailto:hello@applycraft.io">hello@applycraft.io</a></p>
+<script src="/status.js" defer></script>
 
 </div>
 </main>
