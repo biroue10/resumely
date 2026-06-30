@@ -5744,6 +5744,25 @@ Awards: ${form.awards}`;
     const [aiOut, setAiOut] = useState("");
     const [aiBusy, setAiBusy] = useState(false);
     const lastAiRef = useRef(0);
+    const fileRef = useRef(null);
+    const [reading, setReading] = useState(false);
+
+    // Read an uploaded PDF/DOCX/TXT into the resume box (client-side, lazy libs).
+    const onUploadFile = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (e.target) e.target.value = "";
+      if (!file) return;
+      setReading(true);
+      try {
+        const { extractResumeText } = await import("./ats/extractText.js");
+        const text = await extractResumeText(file);
+        if (text && text.trim()) setLocalText(text.trim());
+        else { setStatusMsg("That file had no readable text (it may be a scanned image). Paste the text instead."); setTimeout(() => setStatusMsg(""), 3500); }
+      } catch {
+        setStatusMsg("Couldn't read that file. Paste your resume text instead.");
+        setTimeout(() => setStatusMsg(""), 3500);
+      } finally { setReading(false); }
+    };
 
     // Detected languages for the badges (client-side, cheap).
     const resumeLang = localText.trim().length > 20 ? detectLanguage(localText) : null;
@@ -5861,8 +5880,16 @@ Awards: ${form.awards}`;
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, textTransform: "uppercase",
-              letterSpacing: "1px", marginBottom: 8 }}>Your resume{langBadge(resumeLang)}</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: "1px" }}>Your resume{langBadge(resumeLang)}</span>
+              <button type="button" onClick={() => fileRef.current && fileRef.current.click()} disabled={reading}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, background: `${C.accent}14`,
+                  border: `1px solid ${C.accent}40`, borderRadius: 7, padding: "4px 10px", fontSize: 11.5, fontWeight: 700,
+                  color: C.accent2, cursor: reading ? "wait" : "pointer", fontFamily: "inherit" }}>
+                {reading ? "Reading…" : "📎 Upload PDF/DOCX"}
+              </button>
+              <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" onChange={onUploadFile} style={{ display: "none" }} />
+            </div>
             <textarea value={localText} onChange={e => setLocalText(e.target.value)}
               placeholder={"Paste your full resume here...\n\nJane Smith\njane@email.com | +1 555 000 0000\n\nEXPERIENCE\nSenior Engineer — Acme (2021–Present)\n• Led migration cutting deploy time 60%\n\nSKILLS\nPython, React, AWS"}
               style={{ width: "100%", height: 240, resize: "vertical", background: C.elevated,
@@ -7019,11 +7046,23 @@ Awards: ${form.awards}`;
         <UploadResumeModal
           open={uploadModalOpen}
           onClose={() => setUploadModalOpen(false)}
-          onImprove={(file, email) => {
+          onImprove={async (file, email) => {
             setUploadedResume(file);
-            setForm(f => ({ ...f, email: email || f.email }));
             setUploadModalOpen(false);
+            setStatusMsg("Reading your resume…");
+            try {
+              const { extractResumeText } = await import("./ats/extractText.js");
+              const text = await extractResumeText(file);
+              const parsed = parseResume(text);
+              if (email) parsed.email = parsed.email || email;
+              hydrateFromParsed(parsed);
+              setStatusMsg("Resume imported — review your details below.");
+            } catch {
+              if (email) setForm(f => ({ ...f, email: email || f.email }));
+              setStatusMsg("Couldn't read that file automatically — you can paste your text in the ATS Checker instead.");
+            }
             startResume("resume_upload");
+            setTimeout(() => setStatusMsg(""), 3500);
           }}
         />
 
