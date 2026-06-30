@@ -135,8 +135,8 @@
       <tbody>
         <tr>
           <td>PDF export</td>
-          <td>Generated PDFs use jsPDF with embedded fonts. The PDF is not tagged (no semantic structure) and is not fully accessible to screen readers. It is intended for printing and submission — not for screen-reader consumption.</td>
-          <td>By design. We recommend copying resume text using the "Copy" button for screen-reader use.</td>
+          <td>Generated PDFs contain a real, selectable/extractable text layer (not images), which helps applicant tracking systems parse them. However, the PDF is <strong>not tagged</strong> (no semantic structure), so it is not fully accessible to screen readers. The built-in PDF fonts render Latin-script languages (including accented French, Spanish, German); <strong>Arabic and other non-Latin scripts are not rendered in PDF</strong> — use DOCX for those.</td>
+          <td>Not yet tagged (a limitation we're transparent about). For Arabic/RTL or non-Latin scripts, export DOCX. For screen-reader use, the "Copy" button copies the resume text.</td>
         </tr>
         <tr>
           <td>DOCX export</td>

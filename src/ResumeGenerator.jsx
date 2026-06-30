@@ -5,6 +5,7 @@ import { initAnalytics, track, EVENTS } from "./analytics.js";
 import * as account from "./account.js";
 import { analyzeKeywords, detectLanguage, LANG_LABEL } from "./ats/engine.js";
 import { scoreFromIssues, scoreBand, issueCost, READINESS_EXPLAINER } from "./ats/scoring.js";
+import { pdfSafe, containsNonLatin1 } from "./pdf/text.js";
 import { parseResume } from "./ats/parseResume.js";
 import * as resumes from "./resumes.js";
 import { buildShareUrl } from "./share.js";
@@ -735,7 +736,7 @@ const STATUS_UI = {
     docxDownloaded: "DOCX downloaded.", docxSuccess: "DOCX downloaded. You can keep editing or create a matching cover letter.", docxFail: "DOCX download failed. Your resume is still saved in this browser.",
     noReadableText: "That file had no readable text (it may be a scanned image). Paste the text instead.", couldntReadFile: "Couldn't read that file. Paste your resume text instead.",
     resumeImported: "Resume imported into the builder.", readingResume: "Reading your resume…", importedReview: "Resume imported — review your details below.",
-    couldntReadAuto: "Couldn't read that file automatically — you can paste your text in the ATS Checker instead.", localDataDeleted: "ApplyCraft local data deleted from this browser." },
+    couldntReadAuto: "Couldn't read that file automatically — you can paste your text in the ATS Checker instead.", localDataDeleted: "ApplyCraft local data deleted from this browser.", pdfNonLatin: "PDF export uses Latin-script fonts. For Arabic or other non-Latin scripts, use DOCX export so the text is preserved." },
   fr: { photoType: "La photo de profil doit être au format JPG, PNG ou WebP et faire moins de 2 Mo.", photoRead: "Impossible de lire l'image sélectionnée.",
     draftFail: "Impossible d'enregistrer ce brouillon dans votre navigateur.", resumeSaved: "CV enregistré.", accountToSave: "Créez un compte gratuit pour enregistrer votre CV.",
     newStarted: "Nouveau CV commencé.", linkCopied: "Lien de partage copié dans le presse-papiers.", copied: "Copié.", resumeTextCopied: "Texte du CV copié dans le presse-papiers",
@@ -744,7 +745,7 @@ const STATUS_UI = {
     docxDownloaded: "DOCX téléchargé.", docxSuccess: "DOCX téléchargé. Vous pouvez continuer à modifier ou créer une lettre de motivation assortie.", docxFail: "Échec du téléchargement du DOCX. Votre CV reste enregistré dans ce navigateur.",
     noReadableText: "Ce fichier ne contenait aucun texte lisible (il s'agit peut-être d'une image scannée). Collez plutôt le texte.", couldntReadFile: "Impossible de lire ce fichier. Collez plutôt le texte de votre CV.",
     resumeImported: "CV importé dans l'éditeur.", readingResume: "Lecture de votre CV…", importedReview: "CV importé — vérifiez vos informations ci-dessous.",
-    couldntReadAuto: "Impossible de lire ce fichier automatiquement — vous pouvez coller votre texte dans le vérificateur ATS.", localDataDeleted: "Données locales d'ApplyCraft supprimées de ce navigateur." },
+    couldntReadAuto: "Impossible de lire ce fichier automatiquement — vous pouvez coller votre texte dans le vérificateur ATS.", localDataDeleted: "Données locales d'ApplyCraft supprimées de ce navigateur.", pdfNonLatin: "L'export PDF utilise des polices latines. Pour l'arabe ou d'autres écritures non latines, utilisez l'export DOCX pour préserver le texte." },
   es: { photoType: "La foto de perfil debe ser JPG, PNG o WebP y pesar menos de 2 MB.", photoRead: "No se pudo leer la imagen seleccionada.",
     draftFail: "No se pudo guardar este borrador en tu navegador.", resumeSaved: "Currículum guardado.", accountToSave: "Crea una cuenta gratis para guardar tu currículum.",
     newStarted: "Has empezado un nuevo currículum.", linkCopied: "Enlace para compartir copiado al portapapeles.", copied: "Copiado.", resumeTextCopied: "Texto del currículum copiado al portapapeles",
@@ -753,7 +754,7 @@ const STATUS_UI = {
     docxDownloaded: "DOCX descargado.", docxSuccess: "DOCX descargado. Puedes seguir editando o crear una carta de presentación a juego.", docxFail: "Error al descargar el DOCX. Tu currículum sigue guardado en este navegador.",
     noReadableText: "Ese archivo no tenía texto legible (puede ser una imagen escaneada). Pega el texto en su lugar.", couldntReadFile: "No se pudo leer ese archivo. Pega el texto de tu currículum en su lugar.",
     resumeImported: "Currículum importado al editor.", readingResume: "Leyendo tu currículum…", importedReview: "Currículum importado — revisa tus datos abajo.",
-    couldntReadAuto: "No se pudo leer ese archivo automáticamente — puedes pegar el texto en el verificador ATS.", localDataDeleted: "Datos locales de ApplyCraft eliminados de este navegador." },
+    couldntReadAuto: "No se pudo leer ese archivo automáticamente — puedes pegar el texto en el verificador ATS.", localDataDeleted: "Datos locales de ApplyCraft eliminados de este navegador.", pdfNonLatin: "La exportación PDF usa fuentes latinas. Para árabe u otras escrituras no latinas, usa la exportación DOCX para conservar el texto." },
   ar: { photoType: "يجب أن تكون صورة الملف الشخصي بصيغة JPG أو PNG أو WebP وأقل من 2 ميغابايت.", photoRead: "تعذّرت قراءة الصورة المحددة.",
     draftFail: "تعذّر حفظ هذه المسودة في متصفحك.", resumeSaved: "تم حفظ السيرة الذاتية.", accountToSave: "أنشئ حساباً مجانياً لحفظ سيرتك الذاتية.",
     newStarted: "تم بدء سيرة ذاتية جديدة.", linkCopied: "تم نسخ رابط المشاركة إلى الحافظة.", copied: "تم النسخ.", resumeTextCopied: "تم نسخ نص السيرة الذاتية إلى الحافظة",
@@ -762,7 +763,7 @@ const STATUS_UI = {
     docxDownloaded: "تم تنزيل DOCX.", docxSuccess: "تم تنزيل DOCX. يمكنك متابعة التحرير أو إنشاء خطاب تقديم مطابق.", docxFail: "فشل تنزيل DOCX. سيرتك الذاتية لا تزال محفوظة في هذا المتصفح.",
     noReadableText: "لم يحتوِ هذا الملف على نص قابل للقراءة (قد يكون صورة ممسوحة ضوئياً). الصق النص بدلاً من ذلك.", couldntReadFile: "تعذّرت قراءة هذا الملف. الصق نص سيرتك الذاتية بدلاً من ذلك.",
     resumeImported: "تم استيراد السيرة الذاتية إلى المُحرِّر.", readingResume: "جارٍ قراءة سيرتك الذاتية…", importedReview: "تم استيراد السيرة الذاتية — راجع بياناتك أدناه.",
-    couldntReadAuto: "تعذّرت قراءة هذا الملف تلقائياً — يمكنك لصق النص في فاحص ATS.", localDataDeleted: "تم حذف بيانات ApplyCraft المحلية من هذا المتصفح." },
+    couldntReadAuto: "تعذّرت قراءة هذا الملف تلقائياً — يمكنك لصق النص في فاحص ATS.", localDataDeleted: "تم حذف بيانات ApplyCraft المحلية من هذا المتصفح.", pdfNonLatin: "يستخدم تصدير PDF خطوطاً لاتينية. للعربية أو الكتابات غير اللاتينية، استخدم تصدير DOCX للحفاظ على النص." },
   de: { photoType: "Das Profilfoto muss JPG, PNG oder WebP sein und unter 2 MB liegen.", photoRead: "Das ausgewählte Bild konnte nicht gelesen werden.",
     draftFail: "Dieser Entwurf konnte in deinem Browser nicht gespeichert werden.", resumeSaved: "Lebenslauf gespeichert.", accountToSave: "Erstelle ein kostenloses Konto, um deinen Lebenslauf zu speichern.",
     newStarted: "Neuen Lebenslauf begonnen.", linkCopied: "Freigabelink in die Zwischenablage kopiert.", copied: "Kopiert.", resumeTextCopied: "Lebenslauftext in die Zwischenablage kopiert",
@@ -771,7 +772,7 @@ const STATUS_UI = {
     docxDownloaded: "DOCX heruntergeladen.", docxSuccess: "DOCX heruntergeladen. Du kannst weiter bearbeiten oder ein passendes Anschreiben erstellen.", docxFail: "DOCX-Download fehlgeschlagen. Dein Lebenslauf ist weiterhin in diesem Browser gespeichert.",
     noReadableText: "Diese Datei enthielt keinen lesbaren Text (möglicherweise ein gescanntes Bild). Füge stattdessen den Text ein.", couldntReadFile: "Diese Datei konnte nicht gelesen werden. Füge stattdessen deinen Lebenslauftext ein.",
     resumeImported: "Lebenslauf in den Editor importiert.", readingResume: "Dein Lebenslauf wird gelesen…", importedReview: "Lebenslauf importiert — überprüfe deine Angaben unten.",
-    couldntReadAuto: "Diese Datei konnte nicht automatisch gelesen werden — du kannst den Text in den ATS-Prüfer einfügen.", localDataDeleted: "Lokale ApplyCraft-Daten aus diesem Browser gelöscht." },
+    couldntReadAuto: "Diese Datei konnte nicht automatisch gelesen werden — du kannst den Text in den ATS-Prüfer einfügen.", localDataDeleted: "Lokale ApplyCraft-Daten aus diesem Browser gelöscht.", pdfNonLatin: "Der PDF-Export nutzt lateinische Schriften. Für Arabisch oder andere nicht-lateinische Schriften nutze den DOCX-Export, um den Text zu erhalten." },
 };
 // ── Modal translations (upload-resume + feedback) (phase 5) ──
 const MODAL_UI = {
@@ -4375,13 +4376,13 @@ Awards: ${form.awards}`;
     setExportSuccess("");
     try {
     const { jsPDF } = await import("jspdf");
-    // jsPDF built-in fonts only cover Latin-1; normalise text to avoid garbled output
-    const safe = (str = "") =>
-      (str || "")
-        .normalize("NFD")                        // decompose accents
-        .replace(/[̀-ͯ]/g, "")         // strip combining marks
-        .replace(/[^\x00-\xFF]/g, "")            // drop non-latin-1 glyphs
-        .trim();
+    // jsPDF built-in fonts render WinAnsi/Latin-1 (accents kept, non-Latin dropped).
+    const safe = pdfSafe;
+    // Honest heads-up: PDF uses Latin-script fonts; warn for Arabic/other scripts.
+    if (containsNonLatin1([src.name, src.title, src.summary, (src.sections || []).map(s => (s.items || []).join(" ")).join(" ")].join(" "))) {
+      setStatusMsg(st.pdfNonLatin);
+      setTimeout(() => setStatusMsg(""), 6000);
+    }
 
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const pageW = 210;
@@ -6198,7 +6199,11 @@ Awards: ${form.awards}`;
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const pageW = 210; const margin = 20; const colW = pageW - 2 * margin;
     let y = margin;
-    const safe = s => (s || "").replace(/[^\x00-\x7F]/g, c => c);
+    const safe = pdfSafe;
+    if (containsNonLatin1([d.name, d.jobTitle, d.body, d.opening, d.closing].join(" "))) {
+      setStatusMsg(st.pdfNonLatin);
+      setTimeout(() => setStatusMsg(""), 6000);
+    }
     const checkY = (h = 10) => { if (y + h > 277) { doc.addPage(); y = margin; } };
     const [ar, ag, ab] = [
       parseInt(coverTpl.accent.slice(1,3),16),
