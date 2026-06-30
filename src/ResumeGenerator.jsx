@@ -3628,8 +3628,8 @@ Awards: ${form.awards}`;
     <header style={{ position: "sticky", top: 0, zIndex: 50,
       background: `linear-gradient(180deg, ${C.bg}f7 0%, ${C.bg}e8 100%)`,
       backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto", minHeight: isMobile ? 64 : 72,
-        padding: isMobile ? "0 12px" : "0 28px", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ width: "100%", minHeight: isMobile ? 64 : 72,
+        padding: isMobile ? "0 16px" : "0 32px", display: "flex", alignItems: "center", gap: 14 }}>
         <button type="button" onClick={() => setAppView("landing")}
           style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer",
             display: "flex", flexDirection: "column", alignItems: rtl ? "flex-end" : "flex-start", fontFamily: "inherit" }}>
@@ -3684,8 +3684,8 @@ Awards: ${form.awards}`;
       <header style={{ position: "sticky", top: 0, zIndex: 50, margin: isMobile ? "0 -4px 24px" : "0 0 42px",
         background: `linear-gradient(180deg, ${C.bg}f7 0%, ${C.bg}e8 100%)`,
         backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
-        <div style={{ maxWidth: 1180, margin: "0 auto", minHeight: isMobile ? 64 : 72,
-          padding: isMobile ? "0 12px" : "0 28px", display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: "100%", minHeight: isMobile ? 64 : 72,
+          padding: isMobile ? "0 16px" : "0 32px", display: "flex", alignItems: "center", gap: 14 }}>
           <button type="button" onClick={() => setAppView("landing")}
             style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer",
               display: "flex", flexDirection: "column", alignItems: rtl ? "flex-end" : "flex-start", fontFamily: "inherit" }}>
