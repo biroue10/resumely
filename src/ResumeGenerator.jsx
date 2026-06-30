@@ -3517,7 +3517,9 @@ Awards: ${form.awards}`;
     }
 
     // Contact line — split long contact into two rows if needed
-    const contactItems = (src.contact || []).filter(Boolean).map(safe).filter(Boolean);
+    const pdfEmail = safe(form.email || "");
+    // Email lives in the page footer (centered), so keep it out of the top contact line.
+    const contactItems = (src.contact || []).filter(Boolean).map(safe).filter(Boolean).filter((c) => c !== pdfEmail);
     if (contactItems.length) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9.5);
@@ -3545,6 +3547,11 @@ Awards: ${form.awards}`;
       y += lines.length * 5 + 5;
     }
 
+    // School/website links to make clickable in the PDF (from Education entries).
+    const eduLinks = (form.educationEntries || [])
+      .filter((e) => e.visible !== false && (e.titleUrl || "").trim() && (e.title || "").trim())
+      .map((e) => ({ title: e.title.trim(), url: e.titleUrl.trim() }));
+
     // Sections
     for (const section of (src.sections || [])) {
       checkY(16);
@@ -3564,7 +3571,15 @@ Awards: ${form.awards}`;
       for (const item of section.items) {
         const lines = doc.splitTextToSize(`- ${safe(item)}`, colW - 3);
         checkY(lines.length * 5 + 2);
-        doc.text(lines, margin, y);
+        const link = eduLinks.find((l) => item.startsWith(l.title));
+        if (link) {
+          doc.setTextColor(ar, ag, ab);
+          doc.textWithLink(lines[0], margin, y, { url: link.url });
+          if (lines.length > 1) { doc.setTextColor(55, 55, 55); doc.text(lines.slice(1), margin, y + 5); }
+          doc.setTextColor(55, 55, 55);
+        } else {
+          doc.text(lines, margin, y);
+        }
         y += lines.length * 5 + 2;
       }
       y += 4;
@@ -3581,6 +3596,7 @@ Awards: ${form.awards}`;
       doc.setFontSize(8);
       doc.setTextColor(160, 160, 160);
       doc.text(safe(src.name || ""), margin, 291);
+      if (pdfEmail) doc.text(pdfEmail, pageW / 2, 291, { align: "center" });
       doc.text(`${i} / ${totalPages}`, pageW - margin, 291, { align: "right" });
     }
 
