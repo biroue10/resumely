@@ -5,6 +5,7 @@ import { initAnalytics, track, EVENTS } from "./analytics.js";
 import * as account from "./account.js";
 import { analyzeKeywords, detectLanguage, LANG_LABEL } from "./ats/engine.js";
 import { parseResume } from "./ats/parseResume.js";
+import * as resumes from "./resumes.js";
 
 // ── UI translation codes (languages with full UI translation) ──────
 const UI_LANGS = new Set(["en", "fr", "es", "ar", "de"]);
@@ -1053,7 +1054,7 @@ function useIsMobile(bp = 768) {
 }
 
 const SITE_LANGUAGE_STORAGE_KEY = "ac_site_language";
-const LOCAL_STORAGE_KEYS = ["ac_resume_draft", "ac_resume_draft_saved_at", "ac_master", "ac_tracker", "ac_ats_text", SITE_LANGUAGE_STORAGE_KEY];
+const LOCAL_STORAGE_KEYS = ["ac_resume_draft", "ac_resume_draft_saved_at", "ac_master", "ac_tracker", "ac_ats_text", "ac_resumes", "ac_current_resume_id", "ac_subscription", SITE_LANGUAGE_STORAGE_KEY];
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 const MAX_RESUME_UPLOAD_BYTES = 8 * 1024 * 1024;
 const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -3286,6 +3287,69 @@ export default function ResumeGenerator() {
     track(EVENTS.RESUME_STARTED, { source });
   }, [tpl, recommendedTemplate]);
 
+  // ── Multiple resumes (save / open / new) with the free-tier limit ─────────
+  const [savedResumes, setSavedResumes] = useState(() => resumes.listResumes());
+  const [currentResumeId, setCurrentResumeId] = useState(() => {
+    try { return (typeof localStorage !== "undefined" && localStorage.getItem("ac_current_resume_id")) || null; } catch { return null; }
+  });
+  const [subModalOpen, setSubModalOpen] = useState(false);
+  useEffect(() => {
+    if (typeof localStorage === "undefined") return;
+    try { currentResumeId ? localStorage.setItem("ac_current_resume_id", currentResumeId) : localStorage.removeItem("ac_current_resume_id"); } catch { /* noop */ }
+  }, [currentResumeId]);
+  const refreshResumes = useCallback(() => setSavedResumes(resumes.listResumes()), []);
+
+  const saveCurrentResume = useCallback(() => {
+    // Updating an existing resume is always allowed; a brand-new save counts
+    // against the free limit.
+    if (!currentResumeId && !resumes.canCreateNew()) { setSubModalOpen(true); return; }
+    const title = form.name?.trim()
+      ? `${form.name.trim()}${form.title?.trim() ? ` — ${form.title.trim()}` : ""}`
+      : "Untitled resume";
+    const id = resumes.upsertResume({ id: currentResumeId, title, data: form });
+    setCurrentResumeId(id);
+    refreshResumes();
+    setStatusMsg("Resume saved.");
+    setTimeout(() => setStatusMsg(""), 2000);
+  }, [form, currentResumeId, refreshResumes]);
+
+  const newResume = useCallback(() => {
+    if (!resumes.canCreateNew()) { setSubModalOpen(true); return; }
+    setForm(emptyResumeForm);
+    setCurrentResumeId(null);
+    setTpl(null);
+    setNavPage("resume");
+    setStep("templates");
+    setStatusMsg("Started a new resume.");
+    setTimeout(() => setStatusMsg(""), 2000);
+  }, [emptyResumeForm]);
+
+  const openResume = useCallback((id) => {
+    const r = resumes.getResume(id);
+    if (!r) return;
+    setForm(migrateForm({ ...emptyResumeForm, ...r.data }));
+    setCurrentResumeId(id);
+    setNavPage("resume");
+    setStep(tpl ? "form" : "templates");
+  }, [emptyResumeForm, tpl]);
+
+  const removeResume = useCallback((id) => {
+    resumes.deleteResume(id);
+    refreshResumes();
+    setCurrentResumeId((cur) => (cur === id ? null : cur));
+  }, [refreshResumes]);
+
+  const handleSubscribe = useCallback(async () => {
+    track(EVENTS.CHECKOUT_STARTED, { plan: "monthly" });
+    try {
+      const { url, configured } = await account.startCheckout({ lang, plan: "monthly" });
+      if (configured && url) { window.location.href = url; return; }
+    } catch { /* fall through to coming-soon */ }
+    setSubModalOpen(false);
+    setStatusMsg(`Subscriptions launch soon — email ${AUTHOR.email} for early access.`);
+    setTimeout(() => setStatusMsg(""), 4500);
+  }, [lang]);
+
   const startWithTemplate = useCallback((template, source = "template") => {
     setTpl(template);
     setStep("form");
@@ -3884,6 +3948,45 @@ Awards: ${form.awards}`;
           )}
         </div>
       </header>
+
+      {savedResumes.length > 0 && (
+        <section aria-label="My resumes" style={{ maxWidth: 1180, margin: "0 auto 6px", padding: isMobile ? "0 4px" : "0 28px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: isMobile ? 18 : 22, fontWeight: 900, color: C.text1 }}>
+              My resumes
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: C.text3, marginInlineStart: 10 }}>
+                {resumes.isSubscribed() ? "Unlimited" : `${savedResumes.length} / ${resumes.FREE_RESUME_LIMIT} free`}
+              </span>
+            </h2>
+            <button type="button" onClick={newResume}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: C.grad, color: "#fff",
+                border: "none", borderRadius: 999, padding: "9px 18px", fontSize: 13.5, fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit" }}>
+              <span aria-hidden style={{ fontSize: 16, fontWeight: 800 }}>+</span> New resume
+            </button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(240px, 1fr))", gap: 12, marginBottom: 30 }}>
+            {savedResumes.map((r) => (
+              <div key={r.id} style={{ background: C.surface, border: `1px solid ${currentResumeId === r.id ? C.accent : C.border}`,
+                borderRadius: 12, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+                <button type="button" onClick={() => openResume(r.id)}
+                  style={{ background: "none", border: "none", textAlign: rtl ? "right" : "left", cursor: "pointer", padding: 0, fontFamily: "inherit" }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 800, color: C.text1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.title || "Untitled resume"}</div>
+                  <div style={{ fontSize: 11.5, color: C.text3, marginTop: 3 }}>Updated {new Date(r.updatedAt || Date.now()).toLocaleDateString()}</div>
+                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <button type="button" onClick={() => openResume(r.id)}
+                    style={{ flex: 1, background: `${C.accent}14`, border: `1px solid ${C.accent}40`, borderRadius: 8,
+                      padding: "6px 10px", fontSize: 12.5, fontWeight: 700, color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>Open</button>
+                  <button type="button" onClick={() => removeResume(r.id)} aria-label={`Delete ${r.title || "resume"}`}
+                    style={{ background: "transparent", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 9px",
+                      fontSize: 13, color: C.text3, cursor: "pointer", fontFamily: "inherit" }}>🗑</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section aria-labelledby="template-gallery-title" style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "0 4px" : "0 28px" }}>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 0.92fr) minmax(300px, 0.48fr)",
@@ -4658,6 +4761,10 @@ Awards: ${form.awards}`;
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <button type="button" onClick={saveCurrentResume} title="Save this resume to My Resumes"
+            style={{ ...softBtn, fontWeight: 700 }}>
+            💾 {currentResumeId ? "Save" : "Save resume"}
+          </button>
           <div style={{ position: "relative" }}>
             <button type="button" onClick={() => setCustomizeOpen(o => !o)}
               aria-expanded={customizeOpen}
@@ -7830,6 +7937,34 @@ Awards: ${form.awards}`;
           onLogin={user => { setCurrentUser(user); setAuthModal(false); }} />
         {ACCOUNTS_ENABLED && <SaveProfileModal open={saveProfileOpen} onClose={() => setSaveProfileOpen(false)} at={at} rtl={rtl} C={C} lang={lang} />}
         {ACCOUNTS_ENABLED && <UpsellModal feature={upsell} onClose={() => setUpsell(null)} onGetPass={handleStartCheckout} at={at} rtl={rtl} C={C} />}
+
+        {/* Subscription upsell — shown when the free resume limit is reached */}
+        {subModalOpen && (
+          <div onClick={() => setSubModalOpen(false)} role="dialog" aria-modal="true" aria-label="Subscribe for more resumes" dir={rtl ? "rtl" : "ltr"}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+            <div onClick={(e) => e.stopPropagation()}
+              style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, padding: "30px 28px", maxWidth: 420, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", color: C.accent2, marginBottom: 10 }}>Unlock more resumes</div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 800, color: C.text1 }}>You've reached {resumes.FREE_RESUME_LIMIT} free resumes</h3>
+              <p style={{ margin: "0 0 18px", fontSize: 13.5, color: C.text2, lineHeight: 1.6 }}>
+                The first {resumes.FREE_RESUME_LIMIT} resumes are free. Subscribe for <strong style={{ color: C.text1 }}>${resumes.SUBSCRIPTION.priceUsd}/{resumes.SUBSCRIPTION.period}</strong> to create and save unlimited resumes — all still editable and exportable as PDF &amp; DOCX.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                {["Unlimited saved resumes", "Switch between versions anytime", "Cancel anytime"].map((b) => (
+                  <div key={b} style={{ fontSize: 13, color: C.text2, display: "flex", gap: 8 }}><span style={{ color: SECTION_TOKENS.statusComplete }}>✓</span>{b}</div>
+                ))}
+              </div>
+              <button type="button" onClick={handleSubscribe}
+                style={{ width: "100%", background: C.grad, color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontSize: 14.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
+                Subscribe — ${resumes.SUBSCRIPTION.priceUsd}/{resumes.SUBSCRIPTION.period}
+              </button>
+              <button type="button" onClick={() => setSubModalOpen(false)}
+                style={{ width: "100%", background: "transparent", color: C.text3, border: "none", padding: "8px", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                Not now
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Mobile top bar */}
         {isMobile && !isFocusedToolView && (
