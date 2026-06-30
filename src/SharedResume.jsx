@@ -92,6 +92,7 @@ function SiteFooter() {
             </div>
             <div>
               <div style={col}>Resources</div>
+              <a href="/blog/" style={lk}>Blog</a>
               <a href="/help/" style={lk}>Help Center</a>
               <a href="/resume-builder/" style={lk}>Resume Guide</a>
               <a href="/ats-resume-builder/" style={lk}>ATS Guide</a>
