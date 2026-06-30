@@ -6721,6 +6721,27 @@ Awards: ${form.awards}`;
             ApplyCraft
           </button>
 
+          {!isMobile && (
+            <nav aria-label="Primary tools" style={{ display: "flex", gap: 4, marginLeft: rtl ? 0 : 18, marginRight: rtl ? 18 : 0 }}>
+              {primaryToolNav.map((item) => (
+                <button key={item.id} type="button"
+                  onClick={() => {
+                    setAppView("app");
+                    setNavPage(item.id);
+                    if (item.id === "resume") setStep("templates");
+                    if (item.id === "cover") setCoverStep("templates");
+                  }}
+                  style={{ border: "none", borderRadius: 8, padding: "9px 12px", background: "transparent",
+                    color: C.text2, cursor: "pointer", fontSize: 13.5, fontWeight: 650, fontFamily: "inherit",
+                    transition: "color .15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = C.text1; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = C.text2; }}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          )}
+
           <div style={{ flex: 1 }} />
 
           <button className="ac-nav-cta" onClick={() => startResume("nav_cta")}
