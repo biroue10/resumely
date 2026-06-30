@@ -7,12 +7,15 @@ import { analyzeKeywords, detectLanguage, LANG_LABEL } from "./ats/engine.js";
 import { parseResume } from "./ats/parseResume.js";
 import * as resumes from "./resumes.js";
 import { buildShareUrl } from "./share.js";
+import { PRODUCT } from "./product.js";
 
 // ── UI translation codes (languages with full UI translation) ──────
 const UI_LANGS = new Set(["en", "fr", "es", "ar", "de"]);
 const SITE_LANGUAGE_CODES = new Set(["en", "ar"]);
-const DOCUMENT_LANGUAGE_COUNT = 99;
-const UI_LANGUAGE_COUNT = UI_LANGS.size;
+// Centralized in src/product.js; verified against WORLD_LANGUAGES / UI_LANGS
+// by scripts/product-tests.mjs.
+const DOCUMENT_LANGUAGE_COUNT = PRODUCT.documentLanguageCount;
+const UI_LANGUAGE_COUNT = PRODUCT.interfaceLanguageCount;
 
 // ── All world languages for the picker ────────────────────────────
 const WORLD_LANGUAGES = [

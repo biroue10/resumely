@@ -14,6 +14,7 @@
     "validate:seo": "SEO_AUDIT_SKIP_HTTP=1 bash scripts/seo-audit.sh",
     "validate:performance": "node scripts/validate-performance.mjs",
     "analyze": "ANALYZE=true npm run build",
+    "test:product": "node scripts/product-tests.mjs",
     "test:a11y": "node scripts/a11y-check.mjs",
     "test:security": "node scripts/security-tests.mjs",
     "test:ux": "node scripts/ux-tests.mjs",

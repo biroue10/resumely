@@ -23,7 +23,7 @@ ATS-conscious templates · live preview · PDF and DOCX · no watermark · no cr
 
 ApplyCraft is a free, privacy-first resume and cover letter builder built for the global job market. No account. No watermark. No paywall. Just open the browser, pick a template, fill in your details, and download a polished PDF or DOCX in under 5 minutes.
 
-**22 templates · 99 document languages · ∞ free downloads**
+**46 templates · 99 document languages · ∞ free downloads**
 
 ---
 
@@ -72,7 +72,7 @@ Paste a flat job duty and ApplyCraft rewrites it into a quantified, recruiter-re
 
 | Step | What you do | What happens |
 |------|-------------|--------------|
-| **1 · Pick a template** | Browse 22 professional designs | Templates use ATS-conscious structure and responsive layouts |
+| **1 · Pick a template** | Browse 46 professional designs | Templates use ATS-conscious structure and responsive layouts |
 | **2 · Fill in your details** | Type into the live form | The preview updates in real time as you write |
 | **3 · Download and apply** | Click Export | PDF or DOCX — ready to send in under 5 minutes |
 
@@ -95,10 +95,10 @@ Stop retyping your CV for every job. With the Master Profile workflow:
 
 ---
 
-## 22 professional templates
+## 46 professional templates
 
 <div align="center">
-<img src="docs/screenshots/06_templates.png" alt="22 professional templates — Classic, Modern, Minimal, Bold, Elegant, Executive and more" width="540"/>
+<img src="docs/screenshots/06_templates.png" alt="46 professional templates — Classic, Modern, Minimal, Bold, Elegant, Executive and more" width="540"/>
 </div>
 
 <br/>
@@ -269,14 +269,14 @@ resume-app/
 
 ## Roadmap
 
-- [x] 22 resume templates + cover letter templates
+- [x] 46 resume templates + 18 cover letter templates
 - [x] PDF and DOCX export
 - [x] RTL support (Arabic, Hebrew, Farsi, Pashto, Urdu)
 - [x] 99 document languages, 5 full UI translations
 - [x] Free ATS checker (EN, FR, AR)
 - [x] Static prerendering (SSG) for SEO
 - [ ] Serverless API key proxy (Cloudflare Worker) for safe AI usage
-- [ ] More templates (target: 30)
+- [ ] More templates and layouts
 - [ ] Cover letter AI coaching
 - [ ] Saved sessions via Supabase (optional auth)
 - [ ] PDF export with full Unicode / non-Latin font support
