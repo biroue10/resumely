@@ -81,15 +81,13 @@ function SharedStyles({ pageSize }) {
       .ac-shared-stage {
         max-width: 1120px;
         margin: 0 auto;
-        padding: 2rem 1rem 3rem;
+        padding: calc(76px + 2rem) 1rem 3rem;
         display: flex;
         justify-content: center;
       }
       @media (max-width: 720px) {
-        .ac-site-nav-links { display: none !important; }
-        .ac-site-header > div { min-height: 64px !important; padding: 0 16px !important; }
         .ac-shared-main { padding: 0 !important; }
-        .ac-shared-stage { padding: 1rem 0.75rem 2rem !important; }
+        .ac-shared-stage { padding: calc(60px + 1rem) 0.75rem 2rem !important; }
         .ac-shared-document-wrap { width: 100%; }
       }
       @media print {

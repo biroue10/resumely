@@ -13,6 +13,7 @@ import { buildPrivateShareUrl } from "./share.js";
 import { ResumePaper, CoverLetterPaper, structureSectionItems } from "./documents/DocumentPapers.jsx";
 import { TEMPLATES, COVER_TEMPLATES, RESUME_TEMPLATE_COUNT, COVER_TEMPLATE_COUNT, RECOMMENDED_TEMPLATE_ID } from "./documents/templateRegistry.js";
 import { PRODUCT } from "./product.js";
+import { SiteHeader as SharedSiteHeader, SiteFooter as SharedSiteFooter } from "./siteChrome.jsx";
 import { UI, ENTRY_UI, ACCT_UI, LANDING_UI, BUILDER_UI, COVER_UI, ATS_UI, TRACKER_UI, MASTER_UI, STATUS_UI, MODAL_UI, LANDING2_UI, FOOTER_UI } from "./i18n/index.js";
 import {
   INTERFACE_LANGUAGES,
@@ -814,9 +815,10 @@ const COUNTRIES = [
 ];
 
 function useIsMobile(bp = 768) {
-  const [mobile, setMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < bp : false);
+  const [mobile, setMobile] = useState(false);
   useEffect(() => {
     const h = () => setMobile(window.innerWidth < bp);
+    h();
     window.addEventListener("resize", h);
     return () => window.removeEventListener("resize", h);
   }, [bp]);
@@ -7259,84 +7261,24 @@ Awards: ${form.awards}`;
       if (page === "resume") startResume("landing_link");
       else { setNavPage(page); setAppView("app"); }
     };
+    const footerNav = FOOTER_UI[lang] || FOOTER_UI.en;
     return (
       <div style={{ background: C.bg, color: C.text1, minHeight: "100vh", fontFamily: "'Inter', system-ui, sans-serif", overflowX: "hidden" }}>
         <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">{statusMsg}</div>
         {/* Nav */}
-        <nav style={{ position: "fixed", top: 0,
-          left: 0, right: 0, zIndex: 100, background: C.bg + "cc", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}>
-          <div className="ac-nav-inner" style={{ width: "100%", padding: isMobile ? "0 16px" : "0 32px", height: isMobile ? 60 : 76,
-            display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button className="ac-nav-logo" onClick={() => setAppView("landing")}
-            style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              border: "none", cursor: "pointer", padding: 0, flexShrink: 0,
-              fontSize: isMobile ? 20 : 26, fontWeight: 800, letterSpacing: "-0.8px", fontFamily: "inherit" }}>
-            ApplyCraft
-          </button>
-
-          {!isMobile && (
-            <nav aria-label="Primary tools" style={{ display: "flex", gap: 4, marginLeft: rtl ? 0 : 18, marginRight: rtl ? 18 : 0 }}>
-              {primaryToolNav.map((item) => (
-                <button key={item.id} type="button"
-                  onClick={() => {
-                    setAppView("app");
-                    setNavPage(item.id);
-                    if (item.id === "resume") setStep("templates");
-                    if (item.id === "cover") setCoverStep("templates");
-                  }}
-                  style={{ border: "none", borderRadius: 8, padding: "9px 12px", background: "transparent",
-                    color: C.text2, cursor: "pointer", fontSize: 13.5, fontWeight: 650, fontFamily: "inherit",
-                    transition: "color .15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = C.text1; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = C.text2; }}>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          )}
-
-          <div style={{ flex: 1 }} />
-
-          <button className="ac-nav-cta" onClick={() => startResume("nav_cta")}
-            style={{ background: C.grad, color: "#fff", border: "none", borderRadius: 3,
-              padding: isMobile ? "8px 14px" : "10px 24px", fontSize: isMobile ? 13 : 14, fontWeight: 700,
-              cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
-            {lx.createResume}
-          </button>
-
-          {isMobile && (
-            <button type="button" aria-label={landingMenuOpen ? "Close menu" : "Open menu"} aria-expanded={landingMenuOpen}
-              onClick={() => setLandingMenuOpen(o => !o)}
-              style={{ marginInlineStart: 8, width: 40, height: 40, borderRadius: 10, border: `1px solid ${C.border}`,
-                background: C.surface, color: C.text1, cursor: "pointer", flexShrink: 0, fontFamily: "inherit",
-                display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, lineHeight: 1 }}>
-              {landingMenuOpen ? "✕" : "☰"}
-            </button>
-          )}
-          </div>
-
-          {isMobile && landingMenuOpen && (
-            <nav aria-label="Menu" style={{ boxShadow: `inset 0 1px 0 ${C.border}`, background: `${C.bg}f5`,
-              backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
-              padding: "8px 12px 14px", display: "flex", flexDirection: "column", gap: 2 }}>
-              {primaryToolNav.map((item) => (
-                <button key={item.id} type="button"
-                  onClick={() => {
-                    setLandingMenuOpen(false);
-                    setAppView("app");
-                    setNavPage(item.id);
-                    if (item.id === "resume") setStep("templates");
-                    if (item.id === "cover") setCoverStep("templates");
-                  }}
-                  style={{ textAlign: rtl ? "right" : "left", border: "none", background: "transparent",
-                    color: C.text1, padding: "12px 10px", fontSize: 15, fontWeight: 700, cursor: "pointer",
-                    fontFamily: "inherit", borderRadius: 8 }}>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          )}
-        </nav>
+        <SharedSiteHeader
+          lang={lang}
+          onLogoClick={() => setAppView("landing")}
+          ctaLabel={lx.createResume}
+          onCtaClick={() => startResume("nav_cta")}
+          mobileMenuOpen={landingMenuOpen}
+          onMobileMenuToggle={() => setLandingMenuOpen(o => !o)}
+          navItems={[
+            { id: "resume", label: footerNav.resumeBuilder, onClick: () => { setLandingMenuOpen(false); setAppView("app"); setNavPage("resume"); setStep("templates"); } },
+            { id: "cover", label: footerNav.coverLetter, onClick: () => { setLandingMenuOpen(false); setAppView("app"); setNavPage("cover"); setCoverStep("templates"); } },
+            { id: "ats", label: footerNav.atsChecker, onClick: () => { setLandingMenuOpen(false); setAppView("app"); setNavPage("ats"); } },
+          ]}
+        />
         <AuthModal open={authModal} initialTab={authModalTab} onClose={() => setAuthModal(false)}
           onLogin={user => {
             try { localStorage.setItem("ac_account", JSON.stringify(user)); } catch { /* noop */ }
@@ -7935,7 +7877,7 @@ Awards: ${form.awards}`;
         </div>
 
         {/* Footer */}
-        <SiteFooter lang={lang} />
+        <SharedSiteFooter lang={lang} />
       </div>
     );
   }
@@ -8259,7 +8201,7 @@ Awards: ${form.awards}`;
           : (navPage === "tracker" || navPage === "master" || navPage === "ats")
             ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{pageBody}</div>
             : pageBody}
-        {!isFormView && <SiteFooter lang={lang} />}
+        {!isFormView && <SharedSiteFooter lang={lang} />}
         </div>
       </main>
     </div>
@@ -9311,78 +9253,6 @@ function IconInput({ icon, children }) {
       {React.cloneElement(children, {
         style: { ...children.props.style, paddingLeft: 34 }
       })}
-    </div>
-  );
-}
-
-function SiteFooter({ lang }) {
-  const f = FOOTER_UI[lang] || FOOTER_UI.en;
-  const col = { fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: C.text3, marginBottom: 16 };
-  const lk = { display: "block", fontSize: 13.5, color: C.text2, textDecoration: "none", padding: "4px 0" };
-  return (
-    <div style={{ padding: "56px 24px 32px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 40, marginBottom: 48 }}>
-          {/* Brand */}
-          <div style={{ maxWidth: 280 }}>
-            <a href="/" style={{ background: C.grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              fontSize: 20, fontWeight: 800, textDecoration: "none", display: "block", marginBottom: 12, letterSpacing: "-0.5px" }}>ApplyCraft</a>
-            <p style={{ fontSize: 13, color: C.text3, lineHeight: 1.75, margin: "0 0 16px" }}>
-              {f.brand.replace("{docs}", LOCALIZED_DOCUMENT_LANGUAGE_COUNT).replace("{ui}", UI_LANGUAGE_COUNT).replace("{tpl}", RESUME_TEMPLATE_COUNT)}
-            </p>
-            <a href={`mailto:${AUTHOR.email}`} style={{ fontSize: 13, color: C.text2, textDecoration: "none" }}>{AUTHOR.email}</a>
-          </div>
-          {/* Links */}
-          <div style={{ display: "flex", gap: 40, flexWrap: "wrap" }}>
-            <div>
-              <div style={col}>{f.product}</div>
-              <a href="/resume/templates" style={lk}>{f.resumeBuilder}</a>
-              <a href="/cover-letter/templates" style={lk}>{f.coverLetter}</a>
-              <a href="/ats-checker/" style={lk}>{f.atsChecker}</a>
-              <a href="/pricing/" style={lk}>{f.pricing}</a>
-              <a href="/changelog/" style={lk}>{f.changelog}</a>
-              <a href="/roadmap/" style={lk}>{f.roadmap}</a>
-              <a href="/status/" style={lk}>{f.status}</a>
-            </div>
-            <div>
-              <div style={col}>{f.company}</div>
-              <a href="/about/" style={lk}>{f.about}</a>
-              <a href="/contact/" style={lk}>{f.contact}</a>
-              {AUTHOR.github && <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer" style={lk}>GitHub</a>}
-            </div>
-            <div>
-              <div style={col}>{f.resources}</div>
-              <a href="/blog/" style={lk}>{f.blog}</a>
-              <a href="/help/" style={lk}>{f.help}</a>
-              <a href="/resume-builder/" style={lk}>{f.resumeGuide}</a>
-              <a href="/ats-resume-builder/" style={lk}>{f.atsGuide}</a>
-              <a href="/cover-letter-builder/" style={lk}>{f.coverGuide}</a>
-              <a href="/free-resume-builder/" style={lk}>{f.freeBuilder}</a>
-              <a href="/student-resume-builder/" style={lk}>{f.studentBuilder}</a>
-              <a href="/canadian-resume-builder/" style={lk}>{f.canadianBuilder}</a>
-            </div>
-            <div>
-              <div style={col}>{f.legal}</div>
-              <a href="/terms/" style={lk}>{f.terms}</a>
-              <a href="/privacy/" style={lk}>{f.privacy}</a>
-              <a href="/cookies/" style={lk}>{f.cookies}</a>
-              <a href="/refund-policy/" style={lk}>{f.refundPolicy}</a>
-              <a href="/gdpr/" style={lk}>{f.gdpr}</a>
-              <a href="/ai-disclosure/" style={lk}>{f.aiDisclosure}</a>
-              <a href="/accessibility/" style={lk}>{f.accessibility}</a>
-            </div>
-          </div>
-        </div>
-        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20,
-          display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <div style={{ fontSize: 12.5, color: C.text3 }}>© {new Date().getFullYear()} ApplyCraft by Biroue Digital Ltd · applycraft.io</div>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="lock" size={13} color={C.text3} /> {f.badge1}</span>
-            <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="spark" size={13} color={C.text3} /> {f.badge2}</span>
-            <span style={{ fontSize: 12, color: C.text3, display: "inline-flex", alignItems: "center", gap: 5 }}><LineIcon name="globe" size={13} color={C.text3} /> {f.badge3}</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
