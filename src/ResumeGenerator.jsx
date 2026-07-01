@@ -990,35 +990,35 @@ const LANDING2_UI = {
 const FOOTER_UI = {
   en: { brand: "Free resume and cover letter builder for the global job market. {docs} document languages, {ui} interface languages, {tpl} templates, no sign-up required.",
     product: "Product", company: "Company", resources: "Resources", legal: "Legal",
-    resumeBuilder: "Resume Builder", coverLetter: "Cover Letter", atsChecker: "ATS Checker", changelog: "Changelog", roadmap: "Roadmap", status: "Status",
+    resumeBuilder: "Resume Builder", coverLetter: "Cover Letter", atsChecker: "ATS Checker", pricing: "Pricing", changelog: "Changelog", roadmap: "Roadmap", status: "Status",
     about: "About & Founder", contact: "Contact", blog: "Blog", help: "Help Center", resumeGuide: "Resume Guide", atsGuide: "ATS Guide", coverGuide: "Cover Letter Guide",
     freeBuilder: "Free Resume Builder", studentBuilder: "Student Resume Builder", canadianBuilder: "Canadian Resume Builder",
     terms: "Terms of Service", privacy: "Privacy Policy", cookies: "Cookie Policy", refundPolicy: "Refund Policy", gdpr: "GDPR", aiDisclosure: "AI Disclosure", accessibility: "Accessibility",
     badge1: "No account required", badge2: "Optional AI helpers", badge3: "Browser-first editing" },
   fr: { brand: "Créateur gratuit de CV et de lettres de motivation pour le marché de l'emploi mondial. {docs} langues de document, {ui} langues d'interface, {tpl} modèles, sans inscription.",
     product: "Produit", company: "Entreprise", resources: "Ressources", legal: "Mentions légales",
-    resumeBuilder: "Créateur de CV", coverLetter: "Lettre de motivation", atsChecker: "Vérificateur ATS", changelog: "Journal des modifications", roadmap: "Feuille de route", status: "État du service",
+    resumeBuilder: "Créateur de CV", coverLetter: "Lettre de motivation", atsChecker: "Vérificateur ATS", pricing: "Tarifs", changelog: "Journal des modifications", roadmap: "Feuille de route", status: "État du service",
     about: "À propos et fondateur", contact: "Contact", blog: "Blog", help: "Centre d'aide", resumeGuide: "Guide du CV", atsGuide: "Guide ATS", coverGuide: "Guide de la lettre de motivation",
     freeBuilder: "Créateur de CV gratuit", studentBuilder: "Créateur de CV étudiant", canadianBuilder: "Créateur de CV canadien",
     terms: "Conditions d'utilisation", privacy: "Politique de confidentialité", cookies: "Politique relative aux cookies", refundPolicy: "Politique de remboursement", gdpr: "RGPD", aiDisclosure: "Divulgation IA", accessibility: "Accessibilité",
     badge1: "Aucun compte requis", badge2: "Assistants IA facultatifs", badge3: "Édition dans le navigateur" },
   es: { brand: "Creador gratuito de currículums y cartas de presentación para el mercado laboral global. {docs} idiomas de documento, {ui} idiomas de interfaz, {tpl} plantillas, sin registro.",
     product: "Producto", company: "Empresa", resources: "Recursos", legal: "Legal",
-    resumeBuilder: "Creador de currículums", coverLetter: "Carta de presentación", atsChecker: "Verificador ATS", changelog: "Registro de cambios", roadmap: "Hoja de ruta", status: "Estado",
+    resumeBuilder: "Creador de currículums", coverLetter: "Carta de presentación", atsChecker: "Verificador ATS", pricing: "Precios", changelog: "Registro de cambios", roadmap: "Hoja de ruta", status: "Estado",
     about: "Acerca de y fundador", contact: "Contacto", blog: "Blog", help: "Centro de ayuda", resumeGuide: "Guía del currículum", atsGuide: "Guía ATS", coverGuide: "Guía de la carta",
     freeBuilder: "Creador de currículums gratis", studentBuilder: "Creador de CV para estudiantes", canadianBuilder: "Creador de CV canadiense",
     terms: "Términos del servicio", privacy: "Política de privacidad", cookies: "Política de cookies", refundPolicy: "Política de reembolso", gdpr: "RGPD", aiDisclosure: "Divulgación de IA", accessibility: "Accesibilidad",
     badge1: "Sin cuenta requerida", badge2: "Asistentes de IA opcionales", badge3: "Edición en el navegador" },
   ar: { brand: "منشئ مجاني للسير الذاتية وخطابات التقديم لسوق العمل العالمي. {docs} لغة مستند، {ui} لغات واجهة، {tpl} قالباً، دون تسجيل.",
     product: "المنتج", company: "الشركة", resources: "الموارد", legal: "قانوني",
-    resumeBuilder: "منشئ السيرة الذاتية", coverLetter: "خطاب التقديم", atsChecker: "فاحص ATS", changelog: "سجل التغييرات", roadmap: "خارطة الطريق", status: "الحالة",
+    resumeBuilder: "منشئ السيرة الذاتية", coverLetter: "خطاب التقديم", atsChecker: "فاحص ATS", pricing: "الأسعار", changelog: "سجل التغييرات", roadmap: "خارطة الطريق", status: "الحالة",
     about: "حول والمؤسس", contact: "اتصل بنا", blog: "المدونة", help: "مركز المساعدة", resumeGuide: "دليل السيرة الذاتية", atsGuide: "دليل ATS", coverGuide: "دليل خطاب التقديم",
     freeBuilder: "منشئ سيرة ذاتية مجاني", studentBuilder: "منشئ سيرة ذاتية للطلاب", canadianBuilder: "منشئ سيرة ذاتية كندية",
     terms: "شروط الخدمة", privacy: "سياسة الخصوصية", cookies: "سياسة ملفات تعريف الارتباط", refundPolicy: "سياسة الاسترداد", gdpr: "اللائحة العامة لحماية البيانات", aiDisclosure: "الإفصاح عن الذكاء الاصطناعي", accessibility: "إمكانية الوصول",
     badge1: "لا حاجة لحساب", badge2: "مساعدو ذكاء اصطناعي اختياريون", badge3: "التحرير في المتصفح" },
   de: { brand: "Kostenloser Lebenslauf- und Anschreiben-Generator für den globalen Arbeitsmarkt. {docs} Dokumentsprachen, {ui} Oberflächensprachen, {tpl} Vorlagen, ohne Anmeldung.",
     product: "Produkt", company: "Unternehmen", resources: "Ressourcen", legal: "Rechtliches",
-    resumeBuilder: "Lebenslauf-Generator", coverLetter: "Anschreiben", atsChecker: "ATS-Prüfer", changelog: "Änderungsprotokoll", roadmap: "Roadmap", status: "Status",
+    resumeBuilder: "Lebenslauf-Generator", coverLetter: "Anschreiben", atsChecker: "ATS-Prüfer", pricing: "Preise", changelog: "Änderungsprotokoll", roadmap: "Roadmap", status: "Status",
     about: "Über uns & Gründer", contact: "Kontakt", blog: "Blog", help: "Hilfecenter", resumeGuide: "Lebenslauf-Leitfaden", atsGuide: "ATS-Leitfaden", coverGuide: "Anschreiben-Leitfaden",
     freeBuilder: "Kostenloser Lebenslauf-Generator", studentBuilder: "Lebenslauf-Generator für Studenten", canadianBuilder: "Kanadischer Lebenslauf-Generator",
     terms: "Nutzungsbedingungen", privacy: "Datenschutzerklärung", cookies: "Cookie-Richtlinie", refundPolicy: "Rückerstattungsrichtlinie", gdpr: "DSGVO", aiDisclosure: "KI-Offenlegung", accessibility: "Barrierefreiheit",
@@ -11259,6 +11259,7 @@ function SiteFooter({ lang }) {
               <a href="/resume/templates" style={lk}>{f.resumeBuilder}</a>
               <a href="/cover-letter/templates" style={lk}>{f.coverLetter}</a>
               <a href="/ats-checker/" style={lk}>{f.atsChecker}</a>
+              <a href="/pricing/" style={lk}>{f.pricing}</a>
               <a href="/changelog/" style={lk}>{f.changelog}</a>
               <a href="/roadmap/" style={lk}>{f.roadmap}</a>
               <a href="/status/" style={lk}>{f.status}</a>
