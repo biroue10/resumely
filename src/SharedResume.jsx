@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { decodeShare, normalizeSharedDocument } from "./share.js";
+import { decodeShare, fetchShortSharedDocument, normalizeSharedDocument, SHARE_ID_RE } from "./share.js";
 import { isRtlLang } from "./i18n/languages.js";
 import { ResumePaper, CoverLetterPaper } from "./documents/DocumentPapers.jsx";
 import { getResumeTemplateById, getCoverTemplateById } from "./documents/templateRegistry.js";
@@ -15,6 +15,57 @@ const TEXT2   = "#B6C2D6";
 const TEXT3   = "#7186A6";
 const GRAD    = "linear-gradient(135deg,#6366F1 0%,#3B82F6 100%)";
 const EMAIL = "hello@applycraft.io";
+
+const ERROR_COPY = {
+  en: {
+    loading: "Loading...",
+    invalidTitle: "This shared link is empty or invalid.",
+    invalidBody: "Ask the sender for a fresh link, or build your own resume for free.",
+    notFoundTitle: "This shared link was not found.",
+    notFoundBody: "It may have been deleted, expired, or copied incorrectly.",
+    expiredTitle: "This shared link has expired.",
+    expiredBody: "Ask the sender to create a new short link.",
+    networkTitle: "The document could not be loaded.",
+    networkBody: "Check your connection and try again.",
+    cta: "Build my resume - free",
+  },
+  fr: {
+    loading: "Chargement...",
+    invalidTitle: "Ce lien partagé est vide ou invalide.",
+    invalidBody: "Demandez un nouveau lien à l'expéditeur ou créez votre CV gratuitement.",
+    notFoundTitle: "Ce lien partagé est introuvable.",
+    notFoundBody: "Il a peut-être été supprimé, expiré ou copié incorrectement.",
+    expiredTitle: "Ce lien partagé a expiré.",
+    expiredBody: "Demandez à l'expéditeur de créer un nouveau lien court.",
+    networkTitle: "Le document n'a pas pu être chargé.",
+    networkBody: "Vérifiez votre connexion puis réessayez.",
+    cta: "Créer mon CV gratuitement",
+  },
+  ar: {
+    loading: "جار التحميل...",
+    invalidTitle: "رابط المشاركة فارغ أو غير صالح.",
+    invalidBody: "اطلب من المرسل رابطًا جديدًا أو أنشئ سيرتك الذاتية مجانًا.",
+    notFoundTitle: "لم يتم العثور على رابط المشاركة.",
+    notFoundBody: "ربما تم حذفه أو انتهت صلاحيته أو تم نسخه بشكل غير صحيح.",
+    expiredTitle: "انتهت صلاحية رابط المشاركة.",
+    expiredBody: "اطلب من المرسل إنشاء رابط قصير جديد.",
+    networkTitle: "تعذر تحميل المستند.",
+    networkBody: "تحقق من اتصالك ثم حاول مرة أخرى.",
+    cta: "إنشاء سيرتي الذاتية مجانًا",
+  },
+};
+
+function browserCopy() {
+  if (typeof navigator === "undefined") return ERROR_COPY.en;
+  const code = String(navigator.language || "en").toLowerCase().split("-")[0];
+  return ERROR_COPY[code] || ERROR_COPY.en;
+}
+
+function shareIdFromPath(pathname) {
+  const match = String(pathname || "").match(/^\/r\/([^/]+)$/);
+  const id = match?.[1] || "";
+  return SHARE_ID_RE.test(id) ? id : "";
+}
 
 function Logo({ size = 24 }) {
   return (
@@ -170,12 +221,29 @@ function SharedStyles({ pageSize }) {
 export default function SharedResume() {
   const [doc, setDoc] = useState(null);
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const frag = window.location.hash.replace(/^#/, "");
-    setDoc(frag ? normalizeSharedDocument(decodeShare(frag)) : null);
-    setReady(true);
+    let cancelled = false;
+    async function load() {
+      const shareId = shareIdFromPath(window.location.pathname);
+      try {
+        if (shareId) {
+          const loaded = await fetchShortSharedDocument(shareId);
+          if (!cancelled) setDoc(loaded);
+        } else {
+          const frag = window.location.hash.replace(/^#/, "");
+          if (!cancelled) setDoc(frag ? normalizeSharedDocument(decodeShare(frag)) : null);
+        }
+      } catch (err) {
+        if (!cancelled) setLoadError(err?.code || "network_error");
+      } finally {
+        if (!cancelled) setReady(true);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   const resolved = useMemo(() => {
@@ -185,6 +253,22 @@ export default function SharedResume() {
     return { rtl, template };
   }, [doc]);
 
+  const copy = doc?.l && ERROR_COPY[doc.l] ? ERROR_COPY[doc.l] : browserCopy();
+  const errorTitle = loadError === "expired"
+    ? copy.expiredTitle
+    : loadError === "not_found"
+      ? copy.notFoundTitle
+      : loadError
+        ? copy.networkTitle
+        : copy.invalidTitle;
+  const errorBody = loadError === "expired"
+    ? copy.expiredBody
+    : loadError === "not_found"
+      ? copy.notFoundBody
+      : loadError
+        ? copy.networkBody
+        : copy.invalidBody;
+
   return (
     <div style={{ minHeight: "100vh", background: PAGE_BG, display: "flex", flexDirection: "column",
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
@@ -193,14 +277,14 @@ export default function SharedResume() {
 
       <main className="ac-shared-main" style={{ flex: 1, padding: "32px 16px 56px" }}>
         {!ready ? (
-          <div style={{ color: TEXT3, textAlign: "center", padding: 60 }}>Loading...</div>
+          <div style={{ color: TEXT3, textAlign: "center", padding: 60 }}>{copy.loading}</div>
         ) : !doc || !resolved ? (
-          <div style={{ color: TEXT2, textAlign: "center", padding: 60, maxWidth: 460, margin: "0 auto" }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT1, marginBottom: 8 }}>This shared link is empty or invalid.</div>
-            <div style={{ fontSize: 14, marginBottom: 20 }}>Ask the sender for a fresh link, or build your own resume for free.</div>
+          <div dir={copy === ERROR_COPY.ar ? "rtl" : "ltr"} style={{ color: TEXT2, textAlign: "center", padding: 60, maxWidth: 460, margin: "0 auto" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT1, marginBottom: 8 }}>{errorTitle}</div>
+            <div style={{ fontSize: 14, marginBottom: 20 }}>{errorBody}</div>
             <a href="/resume/templates" style={{ background: GRAD, color: "#fff", textDecoration: "none",
               borderRadius: 3, padding: "11px 22px", fontSize: 14, fontWeight: 700, display: "inline-block" }}>
-              Build my resume - free
+              {copy.cta}
             </a>
           </div>
         ) : (

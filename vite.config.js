@@ -74,7 +74,7 @@ export default defineConfig({
       // Per-route canonical + hreflang (genuine clusters only) + noindex for the
       // user-shared viewer. Build-time only — no client JS.
       const tags = [`<link rel="canonical" href="${canonicalFor(path)}" />`];
-      if (path === "/r") tags.push(`<meta name="robots" content="noindex,follow" />`);
+      if (path === "/r" || path.startsWith("/r/")) tags.push(`<meta name="robots" content="noindex,follow" />`);
       for (const a of hreflangFor(path)) {
         tags.push(`<link rel="alternate" hreflang="${a.hreflang}" href="${a.href}" />`);
       }

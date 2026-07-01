@@ -4,6 +4,10 @@ const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const MODEL = "claude-3-5-haiku-20241022";
 const MAX_BODY_BYTES = 16 * 1024;
+const MAX_SHARE_BODY_BYTES = 128 * 1024;
+const MAX_SHARE_PAYLOAD_BYTES = 96 * 1024;
+const SHARE_TTL_DEFAULT_DAYS = 30;
+const SHARE_TTL_MAX_DAYS = 90;
 const MAX_TEXT_CHARS = 6000;
 const MAX_TRANSLATE_CHARS = 10000;
 const MAX_RESPONSE_CHARS = 14000;
@@ -15,6 +19,15 @@ const RATE_MAX_PER_HOUR = 40;
 const GLOBAL_HOURLY_BUDGET = 1500;
 const rateBuckets = new Map();
 const globalBudget = { windowStart: 0, count: 0 };
+const SHARE_ID_RE = /^[A-Za-z0-9_-]{8,24}$/;
+const SHARE_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+const SHARE_TEMPLATE_IDS = new Set([
+  "blank", "classic", "modern", "minimal", "bold", "elegant", "executive", "creative", "tech", "sharp",
+  "slate", "prism", "compact", "horizon", "nordic", "dusk", "vertex", "academy", "spark", "stone",
+  "ivy", "carbon", "pulse", "atlas", "nova", "ember", "linear", "folio", "signal", "orbit",
+  "mariner", "summit", "ledger", "craft", "mono", "aurora", "canvas", "keystone", "blueprint",
+  "delta", "terra", "metro", "verve", "consultant", "founder", "graduate", "clinical",
+]);
 
 const ACTIONS = {
   "generate-resume": {
@@ -139,8 +152,8 @@ function corsFor(request, env) {
     allowed: true,
     headers: {
       "Access-Control-Allow-Origin": origin,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-Delete-Token",
       "Access-Control-Max-Age": "600",
       "Vary": "Origin",
     },
@@ -210,11 +223,11 @@ async function checkRateLimitKV(env, request, now = Date.now()) {
   }
 }
 
-async function readLimitedBody(request) {
+async function readLimitedBody(request, maxBytes = MAX_BODY_BYTES) {
   const contentLength = request.headers.get("Content-Length");
-  if (contentLength && Number(contentLength) > MAX_BODY_BYTES) return { tooLarge: true };
+  if (contentLength && Number(contentLength) > maxBytes) return { tooLarge: true };
   const body = await request.text();
-  if (new TextEncoder().encode(body).length > MAX_BODY_BYTES) return { tooLarge: true };
+  if (new TextEncoder().encode(body).length > maxBytes) return { tooLarge: true };
   return { body };
 }
 
@@ -256,6 +269,205 @@ function validatePayload(payload) {
       context: (payload.context || "").trim(),
     },
   };
+}
+
+function shareStore(env) {
+  return env.SHARE_KV || env.AC_KV || null;
+}
+
+function generateShareId(length = 10) {
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  let out = "";
+  for (const b of bytes) out += SHARE_ID_ALPHABET[b % SHARE_ID_ALPHABET.length];
+  return out;
+}
+
+async function sha256Hex(value) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function hasUnsafeKey(value, depth = 0) {
+  if (!value || typeof value !== "object") return false;
+  if (depth > 8) return true;
+  if (Array.isArray(value)) return value.some((item) => hasUnsafeKey(item, depth + 1));
+  for (const key of Object.keys(value)) {
+    if (key === "__proto__" || key === "prototype" || key === "constructor") return true;
+    if (hasUnsafeKey(value[key], depth + 1)) return true;
+  }
+  return false;
+}
+
+function validateShareValue(value, depth = 0) {
+  if (value == null) return true;
+  if (typeof value === "string") return value.length <= 12000 && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(value);
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value === "boolean") return true;
+  if (Array.isArray(value)) return depth < 8 && value.length <= 500 && value.every((item) => validateShareValue(item, depth + 1));
+  if (typeof value === "object") {
+    const keys = Object.keys(value);
+    return depth < 8 && keys.length <= 80 && keys.every((key) => key.length <= 80 && validateShareValue(value[key], depth + 1));
+  }
+  return false;
+}
+
+function validateSharePayload(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return { error: ["INVALID_PAYLOAD", "Invalid shared document.", 400] };
+  }
+  if (hasUnsafeKey(payload)) return { error: ["INVALID_PAYLOAD", "Invalid shared document.", 400] };
+  if (Number(payload.v) !== 2) return { error: ["UNSUPPORTED_VERSION", "Unsupported shared document version.", 400] };
+  if (payload.k !== "resume" && payload.k !== "cover") {
+    return { error: ["UNSUPPORTED_DOCUMENT_TYPE", "Unsupported shared document type.", 400] };
+  }
+  if (typeof payload.t !== "string" || !SHARE_TEMPLATE_IDS.has(payload.t)) {
+    return { error: ["UNSUPPORTED_TEMPLATE", "Unsupported template.", 400] };
+  }
+  if (typeof payload.l !== "string" || !Object.prototype.hasOwnProperty.call(LANGUAGE_NAMES, payload.l)) {
+    return { error: ["UNSUPPORTED_LANGUAGE", "Unsupported document language.", 400] };
+  }
+  if (payload.p !== "a4" && payload.p !== "letter") {
+    return { error: ["UNSUPPORTED_PAGE_SIZE", "Unsupported page size.", 400] };
+  }
+  if (!payload.c || typeof payload.c !== "object" || Array.isArray(payload.c)) {
+    return { error: ["INVALID_CUSTOMIZATION", "Invalid template customization.", 400] };
+  }
+  if (!payload.d || typeof payload.d !== "object" || Array.isArray(payload.d)) {
+    return { error: ["INVALID_DOCUMENT_DATA", "Invalid document data.", 400] };
+  }
+  const serialized = JSON.stringify(payload);
+  if (new TextEncoder().encode(serialized).length > MAX_SHARE_PAYLOAD_BYTES) {
+    return { error: ["PAYLOAD_TOO_LARGE", "The shared document is too large.", 413] };
+  }
+  if (!validateShareValue(payload.c) || !validateShareValue(payload.d)) {
+    return { error: ["INVALID_PAYLOAD", "Invalid shared document.", 400] };
+  }
+  return {
+    value: {
+      v: 2,
+      k: payload.k,
+      t: payload.t,
+      l: payload.l,
+      p: payload.p,
+      c: payload.c,
+      d: payload.d,
+    },
+  };
+}
+
+async function createUniqueShareId(store) {
+  for (let i = 0; i < 6; i += 1) {
+    const id = generateShareId(10);
+    const exists = await store.get(`share:${id}`);
+    if (!exists) return id;
+  }
+  return null;
+}
+
+async function handleShare(request, env, url) {
+  const cors = corsFor(request, env);
+  if (request.method === "OPTIONS") {
+    if (!cors.allowed) return new Response(null, { status: 403, headers: { "Vary": "Origin", ...SECURITY_HEADERS } });
+    return new Response(null, { status: 204, headers: { ...cors.headers, ...SECURITY_HEADERS } });
+  }
+
+  const store = shareStore(env);
+  if (!store) return errorResponse("SHARE_STORAGE_UNAVAILABLE", "Sharing is temporarily unavailable.", 503, cors.headers);
+
+  const idMatch = url.pathname.match(/^\/api\/share\/([^/]+)$/);
+  if (url.pathname === "/api/share" && request.method === "POST") {
+    if (!cors.allowed) return errorResponse("FORBIDDEN_ORIGIN", "This origin is not allowed.", 403, cors.headers);
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!contentType.toLowerCase().startsWith("application/json")) {
+      return errorResponse("UNSUPPORTED_MEDIA_TYPE", "Content-Type must be application/json.", 415, cors.headers);
+    }
+    const rate = await checkRateLimitKV(env, request);
+    if (!rate.allowed) {
+      return errorResponse("RATE_LIMITED", "Too many requests. Please try again later.", 429, cors.headers, {
+        "Retry-After": String(Math.max(1, rate.retryAfter || 60)),
+      });
+    }
+    const limitedBody = await readLimitedBody(request, MAX_SHARE_BODY_BYTES);
+    if (limitedBody.tooLarge) return errorResponse("PAYLOAD_TOO_LARGE", "The request payload is too large.", 413, cors.headers);
+    let body;
+    try {
+      body = JSON.parse(limitedBody.body);
+    } catch {
+      return errorResponse("MALFORMED_JSON", "The request body is not valid JSON.", 400, cors.headers);
+    }
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return errorResponse("INVALID_JSON", "Expected a JSON object.", 400, cors.headers);
+    }
+    const validation = validateSharePayload(body.payload);
+    if (validation.error) {
+      const [code, message, status] = validation.error;
+      return errorResponse(code, message, status, cors.headers);
+    }
+    const requestedDays = Number(body.expiresInDays || SHARE_TTL_DEFAULT_DAYS);
+    const days = Math.max(1, Math.min(SHARE_TTL_MAX_DAYS, Number.isFinite(requestedDays) ? requestedDays : SHARE_TTL_DEFAULT_DAYS));
+    const now = Date.now();
+    const createdAt = new Date(now).toISOString();
+    const expiresAt = new Date(now + days * 24 * 60 * 60 * 1000).toISOString();
+    const shareId = await createUniqueShareId(store);
+    if (!shareId) return errorResponse("SHARE_ID_UNAVAILABLE", "Could not create a share link. Please try again.", 503, cors.headers);
+    const deleteToken = generateShareId(24);
+    const record = {
+      payload: validation.value,
+      createdAt,
+      expiresAt,
+      deleteTokenHash: await sha256Hex(deleteToken),
+    };
+    await store.put(`share:${shareId}`, JSON.stringify(record), {
+      expirationTtl: Math.ceil((new Date(expiresAt).getTime() - now) / 1000),
+    });
+    const origin = env.APP_ORIGIN || new URL(request.url).origin;
+    return jsonResponse({ ok: true, shareId, url: `${origin}/r/${shareId}`, expiresAt, deleteToken }, 201, cors.headers);
+  }
+
+  if (idMatch && request.method === "GET") {
+    const shareId = idMatch[1];
+    if (!SHARE_ID_RE.test(shareId)) return jsonResponse({ ok: false, error: "not_found" }, 404, cors.headers);
+    const raw = await store.get(`share:${shareId}`);
+    if (!raw) return jsonResponse({ ok: false, error: "not_found" }, 404, cors.headers);
+    let record;
+    try {
+      record = JSON.parse(raw);
+    } catch {
+      return jsonResponse({ ok: false, error: "invalid_link" }, 500, cors.headers);
+    }
+    if (record.expiresAt && new Date(record.expiresAt).getTime() <= Date.now()) {
+      await store.delete(`share:${shareId}`);
+      return jsonResponse({ ok: false, error: "expired" }, 410, cors.headers);
+    }
+    const validation = validateSharePayload(record.payload);
+    if (validation.error) return jsonResponse({ ok: false, error: "invalid_link" }, 422, cors.headers);
+    return jsonResponse({
+      ok: true,
+      payload: { ...validation.value, createdAt: record.createdAt, expiresAt: record.expiresAt },
+    }, 200, cors.headers);
+  }
+
+  if (idMatch && request.method === "DELETE") {
+    if (!cors.allowed) return errorResponse("FORBIDDEN_ORIGIN", "This origin is not allowed.", 403, cors.headers);
+    const shareId = idMatch[1];
+    if (!SHARE_ID_RE.test(shareId)) return jsonResponse({ ok: false, error: "not_found" }, 404, cors.headers);
+    const raw = await store.get(`share:${shareId}`);
+    if (!raw) return jsonResponse({ ok: false, error: "not_found" }, 404, cors.headers);
+    const token = request.headers.get("X-Delete-Token") || "";
+    if (!token || !SHARE_ID_RE.test(token)) return jsonResponse({ ok: false, error: "forbidden" }, 403, cors.headers);
+    let record;
+    try {
+      record = JSON.parse(raw);
+    } catch {
+      return jsonResponse({ ok: false, error: "invalid_link" }, 500, cors.headers);
+    }
+    if ((await sha256Hex(token)) !== record.deleteTokenHash) return jsonResponse({ ok: false, error: "forbidden" }, 403, cors.headers);
+    await store.delete(`share:${shareId}`);
+    return jsonResponse({ ok: true }, 200, cors.headers);
+  }
+
+  return errorResponse("METHOD_NOT_ALLOWED", "Method not allowed.", 405, cors.headers, { Allow: "GET, POST, DELETE, OPTIONS" });
 }
 
 function normalizeAnthropicText(data) {
@@ -419,8 +631,22 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/api/ai") return handleAi(request, env);
     if (url.pathname === "/api/feedback") return handleFeedback(request, env);
+    if (url.pathname === "/api/share" || url.pathname.startsWith("/api/share/")) return handleShare(request, env, url);
+    if (request.method === "GET" && /^\/r\/[A-Za-z0-9_-]{8,24}$/.test(url.pathname)) {
+      const assetUrl = new URL("/r.html", url.origin);
+      return withSecurityHeaders(await env.ASSETS.fetch(new Request(assetUrl, request)));
+    }
     return withSecurityHeaders(await env.ASSETS.fetch(request));
   },
 };
 
-export const __securityTest = { validatePayload, checkRateLimit, MAX_BODY_BYTES, ACTIONS };
+export const __securityTest = {
+  validatePayload,
+  validateSharePayload,
+  generateShareId,
+  checkRateLimit,
+  MAX_BODY_BYTES,
+  MAX_SHARE_BODY_BYTES,
+  ACTIONS,
+  SHARE_ID_RE,
+};

@@ -1,13 +1,14 @@
 // ──────────────────────────────────────────────────────────────────────────
-// Shareable-resume links. The whole document is LZ-compressed into the URL
-// fragment (after #) — nothing is uploaded to a server (browser-first). The
-// viewer at /r decodes and renders it.
+// Shareable document links. Short public links are stored by the Worker.
+// The older LZ-compressed URL fragment format remains available as a private
+// offline fallback and for backward compatibility.
 // ──────────────────────────────────────────────────────────────────────────
 
 import LZString from "lz-string";
 
 const SUPPORTED_SHARE_LANGS = new Set(["en", "fr", "ar", "es", "de"]);
 const RTL_CONTENT_RE = /[\u0590-\u08ff\uFB1D-\uFDFF\uFE70-\uFEFF]/g;
+export const SHARE_ID_RE = /^[A-Za-z0-9_-]{8,24}$/;
 
 // Legacy base64url fallback (links created before LZ compression).
 function fromB64Url(s) {
@@ -84,4 +85,51 @@ export function normalizeSharedDocument(raw) {
 export function buildShareUrl(payload) {
   const origin = (typeof window !== "undefined" && window.location && window.location.origin) || "https://applycraft.io";
   return `${origin}/r#${encodeShare(payload)}`;
+}
+
+export const buildPrivateShareUrl = buildShareUrl;
+
+export async function createShortShareLink(payload, { expiresInDays = 30 } = {}) {
+  const response = await fetch("/api/share", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payload, expiresInDays }),
+  });
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+  if (!response.ok || !data?.ok || !data?.url) {
+    const code = data?.error?.code || data?.error || "network_error";
+    const err = new Error(code);
+    err.code = code;
+    err.status = response.status;
+    throw err;
+  }
+  return data;
+}
+
+export async function fetchShortSharedDocument(shareId) {
+  if (!SHARE_ID_RE.test(String(shareId || ""))) {
+    const err = new Error("invalid_link");
+    err.code = "invalid_link";
+    throw err;
+  }
+  const response = await fetch(`/api/share/${shareId}`, { headers: { Accept: "application/json" } });
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+  if (!response.ok || !data?.ok || !data?.payload) {
+    const code = data?.error || data?.error?.code || (response.status === 404 ? "not_found" : "network_error");
+    const err = new Error(code);
+    err.code = code;
+    err.status = response.status;
+    throw err;
+  }
+  return normalizeSharedDocument(data.payload);
 }
