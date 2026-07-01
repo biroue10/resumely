@@ -6,21 +6,22 @@ Cloudflare KV namespace.
 Required binding:
 
 ```text
-SHARE_KV
+SHARES
 ```
 
-The Worker also falls back to the existing `AC_KV` binding if `SHARE_KV` is not
-configured. Without either binding, `/api/share` returns a safe
+The Worker also accepts `SHARE_KV` or the existing `AC_KV` binding as fallback
+names, but production should bind the namespace as `SHARES`. Without one of
+these bindings, `/api/share` returns a safe
 `SHARE_STORAGE_UNAVAILABLE` response and no document content is stored.
 
 Recommended setup:
 
 ```bash
-npx wrangler kv namespace create SHARE_KV
+npx wrangler kv namespace create SHARES
 ```
 
-Then add the returned namespace ID to the Cloudflare Worker/Pages deployment as
-the `SHARE_KV` binding. Keep `RATE_LIMIT_KV` bound separately when available so
+Then add the returned namespace ID to the Cloudflare Worker deployment as the
+`SHARES` binding. Keep `RATE_LIMIT_KV` bound separately when available so
 share creation and AI endpoints use centralized rate limiting across isolates.
 
 Privacy behavior:

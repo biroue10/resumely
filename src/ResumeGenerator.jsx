@@ -849,6 +849,7 @@ const SHARE_LINK_UI = {
     stored: "Your resume content will be stored securely to make the short link work.",
     confirm: "Creating a short public link stores a copy of this document so anyone with the link can view it. This link will expire automatically.",
     failed: "Short link could not be created. Please try again.",
+    storageMissing: "Short-link storage is not configured. Add a Cloudflare KV binding named SHARES.",
     privateReady: "Private offline link created. It keeps the document inside the URL.",
   },
   fr: {
@@ -864,6 +865,7 @@ const SHARE_LINK_UI = {
     stored: "Le contenu de votre CV sera stocké de manière sécurisée pour permettre le fonctionnement du lien court.",
     confirm: "La création d'un lien public court stocke une copie de ce document afin que toute personne disposant du lien puisse le consulter. Ce lien expirera automatiquement.",
     failed: "Impossible de créer le lien court. Veuillez réessayer.",
+    storageMissing: "Le stockage des liens courts n'est pas configuré. Ajoutez une liaison Cloudflare KV nommée SHARES.",
     privateReady: "Lien privé hors ligne créé. Il conserve le document dans l'URL.",
   },
   ar: {
@@ -879,6 +881,7 @@ const SHARE_LINK_UI = {
     stored: "سيتم تخزين محتوى سيرتك الذاتية بشكل آمن لكي يعمل الرابط القصير.",
     confirm: "يؤدي إنشاء رابط عام قصير إلى تخزين نسخة من هذا المستند حتى يتمكن أي شخص لديه الرابط من عرضه. ستنتهي صلاحية هذا الرابط تلقائيًا.",
     failed: "تعذر إنشاء الرابط القصير. حاول مرة أخرى.",
+    storageMissing: "لم يتم إعداد تخزين الروابط القصيرة. أضف ربط Cloudflare KV باسم SHARES.",
     privateReady: "تم إنشاء رابط خاص دون اتصال. يحتفظ بالمستند داخل عنوان URL.",
   },
 };
@@ -3327,8 +3330,10 @@ p, li, div, span {
       setStatusMsg(st.linkCopied);
       setTimeout(() => setStatusMsg(""), 2500);
       return result;
-    } catch {
-      setStatusMsg(shareCopy.failed);
+    } catch (err) {
+      const missingStorage = err?.code === "SHARE_STORAGE_UNAVAILABLE";
+      const dev = typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV;
+      setStatusMsg(missingStorage && dev ? shareCopy.storageMissing : shareCopy.failed);
       setTimeout(() => setStatusMsg(""), 3500);
       return null;
     } finally {

@@ -173,9 +173,17 @@ const env = {
 let response = await worker.fetch(shareRequest("/api/share", {
   method: "POST",
   body: JSON.stringify({ payload: arabicModernResume, expiresInDays: 30 }),
+}), { ASSETS: env.ASSETS });
+assert.equal(response.status, 503, "share creation should fail closed when KV is not bound");
+let body = await readJson(response);
+assert.equal(body.error.code, "SHARE_STORAGE_UNAVAILABLE", "missing KV binding should return a clear storage error");
+
+response = await worker.fetch(shareRequest("/api/share", {
+  method: "POST",
+  body: JSON.stringify({ payload: arabicModernResume, expiresInDays: 30 }),
 }), env);
 assert.equal(response.status, 201, "create share should succeed");
-let body = await readJson(response);
+body = await readJson(response);
 assert.equal(body.ok, true, "create share response should be ok");
 assert.match(body.shareId, SHARE_ID_RE, "create share should return a URL-safe ID");
 assert.equal(body.url, `https://applycraft.io/r/${body.shareId}`, "create share should return clean short URL");
