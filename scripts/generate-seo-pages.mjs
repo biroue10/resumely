@@ -245,19 +245,23 @@ ${footer()}
 }
 
 // ── Resume card templates ──────────────────────────────────────────────────────
+function inlineList(items) {
+  return `<span class="inline-list">${items.map((item, index) => `${index > 0 ? '<span aria-hidden="true">·</span>' : ''}<span>${item}</span>`).join("")}</span>`;
+}
+
 function rcGeneric({ name, title, email, city, skills, jobs, edu }) {
   return `<div class="resume-card">
   <div class="rc-header">
     <div class="rc-name">${name}</div>
     <div class="rc-title">${title}</div>
     <div class="rc-contact">
-      <span>${email}</span><span>${city}</span>
+      <bdi dir="auto">${email}</bdi><span aria-hidden="true">·</span><bdi dir="auto">${city}</bdi>
     </div>
   </div>
   <div class="rc-body">
     <div class="rc-side">
       <div class="rc-section-title" style="margin-top:0">Skills</div>
-      <div class="rc-skills">${skills.map(s => `<span class="rc-skill">${s}</span>`).join("")}</div>
+      <div class="rc-skills">${skills.map(s => `<span class="rc-skill">${s}</span>`).join("\n        ")}</div>
     </div>
     <div class="rc-main">
       ${jobs.map(j => `<div class="rc-item">
@@ -503,7 +507,7 @@ const PAGES = [
     slug: "resume-in-french",
     canonicalPath: "/resume-in-french/",
     title: "CV en Français — Créez votre CV en ligne gratuitement | ApplyCraft",
-    description: "Créez un CV professionnel en français avec 22 modèles. Prévisualisation en direct, export PDF et DOCX. Gratuit, sans inscription.",
+    description: "Créez un CV professionnel en français avec 46 modèles. Prévisualisation en direct, export PDF et DOCX. Gratuit, sans inscription.",
     eyebrow: "CV en Français",
     h1: "Créez votre CV en Français",
     sub: "22 modèles professionnels, prévisualisation en direct, et export PDF ou DOCX — entièrement gratuit. Rédigez votre CV en français en quelques minutes.",
@@ -523,7 +527,7 @@ const PAGES = [
         <span class="rc-skill">Rédaction web</span><span class="rc-skill">E-mailing</span>
       </div>
       <div class="rc-section-title" style="margin-top:16px">Langues</div>
-      <div class="rc-item-desc">Français (natif)<br/>Anglais (courant)<br/>Espagnol (intermédiaire)</div>
+      <div class="rc-item-desc">${inlineList(["Français (natif)", "Anglais (courant)", "Espagnol (intermédiaire)"])}</div>
     </div>
     <div class="rc-main">
       <div class="rc-section-title" style="margin-top:0">Expérience professionnelle</div>
@@ -1093,7 +1097,7 @@ const EXAMPLES = [
         <span class="rc-skill">AWS</span><span class="rc-skill">CI/CD</span>
       </div>
       <div class="rc-section-title" style="margin-top:16px">Langues</div>
-      <div class="rc-item-desc">Français (langue maternelle)<br/>Anglais (C1 — TOEIC 960)<br/>Espagnol (B1)</div>
+      <div class="rc-item-desc">${inlineList(["Français (langue maternelle)", "Anglais (C1 — TOEIC 960)", "Espagnol (B1)"])}</div>
       <div class="rc-section-title" style="margin-top:16px">Centres d'intérêt</div>
       <div class="rc-item-desc">Développement open-source (200+ commits GitHub)<br/>Running (Marathon de Lyon 2024)</div>
     </div>

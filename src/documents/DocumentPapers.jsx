@@ -15,6 +15,20 @@ function ContactLine({ items, separator = " · ", style }) {
   );
 }
 
+function ContactStack({ items, style, itemStyle }) {
+  const values = (Array.isArray(items) ? items : []).filter(Boolean);
+  if (!values.length) return null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, lineHeight: 1.35, ...style }}>
+      {values.map((item, index) => (
+        <bdi key={index} dir="auto" style={{ unicodeBidi: "isolate", overflowWrap: "anywhere", wordBreak: "normal", ...itemStyle }}>
+          {item}
+        </bdi>
+      ))}
+    </div>
+  );
+}
+
 function BidiText({ children, style }) {
   return <span dir="auto" style={{ unicodeBidi: "plaintext", overflowWrap: "anywhere", ...style }}>{children}</span>;
 }
@@ -147,10 +161,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.2, marginBottom: 4 }}>{data.name}</div>
             <div style={{ fontSize: 11, opacity: 0.72, marginBottom: 18, fontStyle: "italic" }}>{data.title}</div>
             <div style={{ height: 1, background: "rgba(255,255,255,0.22)", marginBottom: 14 }} />
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7, overflowWrap: "anywhere",
-                wordBreak: "normal", lineHeight: 1.4 }}><bdi dir="auto">{c}</bdi></div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7 }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px",
@@ -238,11 +249,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
           <div style={{ fontSize: 27, fontWeight: 800, color: "#fff", letterSpacing: "-0.3px",
             lineHeight: 1.1 }}>{data.name}</div>
           {data.title && <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.75)", marginTop: 5 }}>{data.title}</div>}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 14px", marginTop: 10 }}>
-            {data.contact.map((c, i) => (
-              <span key={i} style={{ fontSize: 10.5, color: "rgba(255,255,255,0.68)" }}>{c}</span>
-            ))}
-          </div>
+          <ContactLine items={data.contact} style={{ marginTop: 10, fontSize: 10.5, color: "rgba(255,255,255,0.68)" }} />
         </div>
         <div style={{ padding: "22px 28px" }}>
           {data.summary && (
@@ -292,10 +299,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             <div style={{ fontSize: 18, fontWeight: 700, color: "#1a1a1a", lineHeight: 1.2, marginBottom: 4 }}>{data.name}</div>
             <div style={{ fontSize: 11.5, color: tpl.accent, marginBottom: 16, fontStyle: "italic" }}>{data.title}</div>
             <div style={{ height: 1, background: tpl.accent + "55", marginBottom: 16 }} />
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, color: "#555", marginBottom: 8, lineHeight: 1.5,
-                wordBreak: "break-all" }}>{c}</div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10.5, color: "#555", marginBottom: 8 }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px",
@@ -347,11 +351,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
               {data.title && <div style={{ fontSize: 11.5, color: tpl.accent, marginTop: 6, fontWeight: 600,
                 textTransform: "uppercase", letterSpacing: "0.9px" }}>{data.title}</div>}
             </div>
-            <div style={{ textAlign: "right" }}>
-              {data.contact.map((c, i) => (
-                <div key={i} style={{ fontSize: 10.5, color: "#666", marginBottom: 3, lineHeight: 1.5 }}>{c}</div>
-              ))}
-            </div>
+            <ContactStack items={data.contact} style={{ alignItems: rtl ? "flex-start" : "flex-end", fontSize: 10.5, color: "#666" }} />
           </div>
           <div style={{ height: 3, background: tpl.accent, marginBottom: 18 }} />
           {data.summary && (
@@ -405,10 +405,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             <div style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.2, marginBottom: 3 }}>{data.name}</div>
             <div style={{ fontSize: 10.5, opacity: 0.72, marginBottom: 18, fontStyle: "italic" }}>{data.title}</div>
             <div style={{ height: 1, background: "rgba(255,255,255,0.22)", marginBottom: 14 }} />
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10, opacity: 0.8, marginBottom: 7, wordBreak: "break-all",
-                lineHeight: 1.4 }}>{c}</div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10, opacity: 0.8, marginBottom: 7 }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 18 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px",
@@ -546,10 +543,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             {data.title && <div style={{ fontSize: 11, color: tpl.accent, marginBottom: 18,
               fontWeight: 600, letterSpacing: "0.3px" }}>{data.title}</div>}
             <div style={{ height: 1, background: "rgba(255,255,255,0.12)", marginBottom: 14 }} />
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, color: "#94a3b8", marginBottom: 7,
-                wordBreak: "break-all", lineHeight: 1.4 }}>{c}</div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10.5, color: "#94a3b8", marginBottom: 7 }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase",
@@ -597,11 +591,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
           <div style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "-0.3px",
             lineHeight: 1.1 }}>{data.name}</div>
           {data.title && <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.78)", marginTop: 5 }}>{data.title}</div>}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 16px", marginTop: 10 }}>
-            {data.contact.map((c, i) => (
-              <span key={i} style={{ fontSize: 10.5, color: "rgba(255,255,255,0.68)" }}>{c}</span>
-            ))}
-          </div>
+          <ContactLine items={data.contact} style={{ marginTop: 10, fontSize: 10.5, color: "rgba(255,255,255,0.68)" }} />
         </div>
         <div style={{ height: 4, background: `linear-gradient(90deg, ${tpl.accent}, #3B82F6, transparent)` }} />
         <div style={{ padding: "20px 30px" }}>
@@ -651,11 +641,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
               {data.title && <div style={{ fontSize: 12, color: tpl.accent, marginTop: 4,
                 fontWeight: 600 }}>{data.title}</div>}
             </div>
-            <div style={{ textAlign: "right" }}>
-              {data.contact.map((c, i) => (
-                <div key={i} style={{ fontSize: 10.5, color: "#666", lineHeight: 1.6 }}>{c}</div>
-              ))}
-            </div>
+            <ContactStack items={data.contact} style={{ alignItems: rtl ? "flex-start" : "flex-end", fontSize: 10.5, color: "#666" }} />
           </div>
         </div>
         {/* Two-column body */}
@@ -720,11 +706,8 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
           {data.title && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.78)", marginTop: 6,
             letterSpacing: "2px", textTransform: "uppercase", fontWeight: 500 }}>{data.title}</div>}
         </div>
-        <div style={{ background: "#fafafa", borderBottom: "1px solid #eee", padding: "9px 32px",
-          display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "4px 18px" }}>
-          {data.contact.map((c, i) => (
-            <span key={i} style={{ fontSize: 10.5, color: "#555" }}>{c}</span>
-          ))}
+        <div style={{ background: "#fafafa", borderBottom: "1px solid #eee", padding: "9px 32px" }}>
+          <ContactLine items={data.contact} style={{ justifyContent: "center", fontSize: 10.5, color: "#555" }} />
         </div>
         <div style={{ padding: "20px 32px" }}>
           {data.summary && (
@@ -885,10 +868,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
           </div>
           <div style={{ width: "30%", background: tpl.accent + "0f",
             borderLeft: `1px solid ${tpl.accent}22`, padding: "28px 14px", flexShrink: 0 }}>
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10, color: "#555", marginBottom: 8,
-                lineHeight: 1.5, wordBreak: "break-all" }}>{c}</div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10, color: "#555", marginBottom: 8 }} />
             <div style={{ height: 1, background: tpl.accent + "44", margin: "14px 0" }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginBottom: 18 }}>
@@ -958,11 +938,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
           <div style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.3px",
             lineHeight: 1.1 }}>{data.name}</div>
           {data.title && <div style={{ fontSize: 12.5, color: tpl.accent, marginTop: 5, fontWeight: 600 }}>{data.title}</div>}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 12px", marginTop: 8 }}>
-            {data.contact.map((c, i) => (
-              <span key={i} style={{ fontSize: 10.5, color: "#666" }}>{c}</span>
-            ))}
-          </div>
+          <ContactLine items={data.contact} style={{ marginTop: 8, fontSize: 10.5, color: "#666" }} />
         </div>
         {data.summary && (
           <div style={{ margin: "0 28px 18px", fontSize: 12.5, lineHeight: 1.65, color: "#444",
@@ -1102,10 +1078,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             <div style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.2, marginBottom: 3 }}>{data.name}</div>
             {data.title && <div style={{ fontSize: 10.5, color: tpl.accent, marginBottom: 18 }}>{data.title}</div>}
             <div style={{ height: 1, background: "rgba(255,255,255,0.1)", marginBottom: 14 }} />
-            {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10, color: "#9ca3af", marginBottom: 8,
-                wordBreak: "break-all", lineHeight: 1.5 }}>{c}</div>
-            ))}
+            <ContactStack items={data.contact} style={{ fontSize: 10, color: "#9ca3af", marginBottom: 8 }} />
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase",
@@ -1312,9 +1285,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
             <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.2, marginBottom: 4 }}>{d.name}</div>
             {d.jobTitle && <div style={{ fontSize: 11, opacity: 0.72, marginBottom: 18, fontStyle: "italic" }}>{d.jobTitle}</div>}
             <div style={{ height: 1, background: "rgba(255,255,255,0.22)", marginBottom: 14 }} />
-            {[d.email, d.phone, d.location].filter(Boolean).map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7, wordBreak: "break-all", lineHeight: 1.4 }}>{c}</div>
-            ))}
+            <ContactStack items={[d.email, d.phone, d.location]} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7 }} />
           </div>
           <div style={{ flex: 1, padding: "28px 22px" }}>
             {d.date && <div style={{ fontSize: 11.5, color: "#888", marginBottom: 18 }}>{d.date}</div>}
@@ -1425,9 +1396,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
             <div style={{ fontSize: 17, fontWeight: 700, color: "#1a1a1a", lineHeight: 1.2, marginBottom: 4 }}>{d.name}</div>
             {d.jobTitle && <div style={{ fontSize: 11, color: tpl.accent, marginBottom: 16, fontStyle: "italic" }}>{d.jobTitle}</div>}
             <div style={{ height: 1, background: tpl.accent + "55", marginBottom: 14 }} />
-            {[d.email, d.phone, d.location].filter(Boolean).map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, color: "#555", marginBottom: 8, wordBreak: "break-all" }}>{c}</div>
-            ))}
+            <ContactStack items={[d.email, d.phone, d.location]} style={{ fontSize: 10.5, color: "#555", marginBottom: 8 }} />
             {d.date && (
               <div style={{ marginTop: 18 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase",

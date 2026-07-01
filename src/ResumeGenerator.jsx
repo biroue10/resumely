@@ -1660,10 +1660,8 @@ function HeroResumePreview({ isMobile }) {
                   letterSpacing: "0", fontWeight: 800 }}>Maya Bennett</h2>
                 <p style={{ margin: "4px 0 8px", fontSize: compact ? 11.5 : 12.5,
                   color: "rgba(255,255,255,0.88)", fontWeight: 700 }}>Senior Product Manager</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 9px", fontSize: 9.5,
-                  color: "rgba(255,255,255,0.84)", lineHeight: 1.35 }}>
-                  <span>maya@email.com</span><span>San Francisco</span><span>linkedin.com/in/maya</span>
-                </div>
+                <InlineList items={["maya@email.com", "San Francisco", "linkedin.com/in/maya"]}
+                  color="rgba(255,255,255,0.84)" fontSize={9.5} />
               </div>
             </header>
 
@@ -1761,6 +1759,21 @@ function ResumeMiniSection({ accent, title, children }) {
         letterSpacing: "1px", textTransform: "uppercase", fontWeight: 900 }}>{title}</h3>
       <div style={{ color: "#526174", fontSize: 10.8, lineHeight: 1.55 }}>{children}</div>
     </section>
+  );
+}
+
+function InlineList({ items, color = "inherit", separator = "·", justifyContent = "flex-start", fontSize }) {
+  const values = (Array.isArray(items) ? items : []).filter(Boolean);
+  return (
+    <span style={{ display: "inline-flex", flexWrap: "wrap", gap: "0.2rem 0.5rem", alignItems: "center",
+      justifyContent, color, fontSize, lineHeight: 1.35 }}>
+      {values.map((item, index) => (
+        <React.Fragment key={`${item}-${index}`}>
+          {index > 0 && <span aria-hidden="true" style={{ opacity: 0.72 }}>{separator}</span>}
+          <bdi dir="auto" style={{ unicodeBidi: "isolate", overflowWrap: "anywhere" }}>{item}</bdi>
+        </React.Fragment>
+      ))}
+    </span>
   );
 }
 
@@ -2348,10 +2361,10 @@ function ResumeLivePreview({ demo, tpl, lang, accent, activeField, compact, expa
             <h3 style={{ margin: 0, fontSize: expanded ? 32 : compact ? 23 : 28, lineHeight: 1.05, color: "inherit", fontWeight: 900, letterSpacing: "0" }}>{name}</h3>
             <p style={{ margin: "6px 0 11px", color: tpl.layout === "band" ? "rgba(255,255,255,0.86)" : accent,
               fontSize: expanded ? 15 : 12.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.8px" }}>{title}</p>
-            <div style={{ display: "flex", gap: "5px 12px", flexWrap: "wrap", color: tpl.layout === "band" ? "rgba(255,255,255,0.82)" : "#64748b",
-              fontSize: expanded ? 12.5 : 10.5, justifyContent: isRTL ? "flex-end" : "flex-start" }}>
-              <span>sarah@email.com</span><span>London, UK</span><span>linkedin.com/in/sarahokonkwo</span>
-            </div>
+            <InlineList items={["sarah@email.com", "London, UK", "linkedin.com/in/sarahokonkwo"]}
+              color={tpl.layout === "band" ? "rgba(255,255,255,0.82)" : "#64748b"}
+              fontSize={expanded ? 12.5 : 10.5}
+              justifyContent={isRTL ? "flex-end" : "flex-start"} />
           </div>
           <div aria-hidden style={{ width: expanded ? 64 : 52, height: expanded ? 64 : 52, borderRadius: "50%",
             background: `linear-gradient(135deg, ${accent}22, ${tpl.side})`, border: `2px solid ${accent}55`, flexShrink: 0,
@@ -2373,7 +2386,10 @@ function ResumeLivePreview({ demo, tpl, lang, accent, activeField, compact, expa
                 ))}
               </div>
             </PreviewSection>
-            <PreviewSection title={lang.languages} accent={accent}>English, French, Arabic</PreviewSection>
+            <PreviewSection title={lang.languages} accent={accent}>
+              <InlineList items={["English", "French", "Arabic"]} color="#4f5f73"
+                fontSize={expanded ? 12 : 10.8} justifyContent={isRTL ? "flex-end" : "flex-start"} />
+            </PreviewSection>
           </aside>
         )}
         <main style={{ padding: expanded ? "24px 30px" : "18px 22px" }}>

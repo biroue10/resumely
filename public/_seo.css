@@ -84,9 +84,8 @@ img{max-width:100%;height:auto}
 .rc-name{font-size:24px;font-weight:800;letter-spacing:-.5px;color:#111;margin-bottom:4px}
 .rc-title{font-size:13px;font-weight:600;color:#6366F1;text-transform:uppercase;
   letter-spacing:.8px;margin-bottom:10px}
-.rc-contact{font-size:11.5px;color:#555;display:flex;flex-wrap:wrap;gap:8px}
-.rc-contact span::before{content:'• ';color:#6366F1}
-.rc-contact span:first-child::before{content:''}
+.rc-contact{font-size:11.5px;color:#555;display:flex;flex-wrap:wrap;gap:.25rem .55rem;align-items:center;line-height:1.35}
+.rc-contact bdi{overflow-wrap:anywhere;unicode-bidi:isolate}
 .rc-body{display:grid;grid-template-columns:1fr 2fr;min-height:320px}
 .rc-side{background:#f8f8fd;padding:20px 20px;border-right:1px solid #eee}
 .rc-main{padding:20px 24px}
@@ -97,10 +96,12 @@ img{max-width:100%;height:auto}
 .rc-item-title{font-size:12.5px;font-weight:700;color:#111}
 .rc-item-sub{font-size:11px;color:#6366F1;margin-bottom:3px}
 .rc-item-date{font-size:10.5px;color:#888;margin-bottom:4px}
-.rc-item-desc{font-size:11.5px;color:#444;line-height:1.5}
-.rc-skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rc-item-desc{font-size:11.5px;color:#444;line-height:1.55;overflow-wrap:anywhere}
+.rc-skills{display:flex;flex-wrap:wrap;gap:.35rem .45rem;margin-top:6px}
 .rc-skill{background:#6366F114;border:1px solid #6366F122;
   border-radius:4px;padding:2px 8px;font-size:10.5px;color:#4F46E5;font-weight:500}
+.inline-list,.contact-row,.feature-checklist{display:flex;flex-wrap:wrap;gap:.25rem .55rem;align-items:center;line-height:1.35}
+.inline-list span,.contact-row bdi{overflow-wrap:anywhere;unicode-bidi:isolate}
 
 /* ── Sections ── */
 .section{padding:56px 0}
@@ -157,8 +158,10 @@ details p{padding:0 20px 16px;font-size:13.5px;color:var(--color-text-secondary)
   .nav{padding:0 16px}
   .hero{padding:48px 0 36px}
   .rc-body{grid-template-columns:1fr}
+  .rc-header{padding:24px 24px 18px}
+  .rc-side{border-right:none;border-bottom:1px solid #eee}
   .grid-2{grid-template-columns:1fr}
-  .preview-wrap{padding:16px}
+  .preview-wrap{padding:20px;margin:36px 0}
   .btn-secondary{margin-left:0}
   .footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
   .footer-bottom{align-items:flex-start;flex-direction:column}
