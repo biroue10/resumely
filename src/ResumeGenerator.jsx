@@ -2842,10 +2842,10 @@ export default function ResumeGenerator() {
     const direction = isRtlLang(docLang) ? "rtl" : "ltr";
     const title = type === "cover" ? "ApplyCraft cover letter" : "ApplyCraft resume";
     const instruction = lang === "fr"
-      ? "Dans la fenêtre d'impression, choisissez « Enregistrer au format PDF » comme destination."
+      ? "Pour obtenir un PDF propre, choisissez « Enregistrer au format PDF » et désactivez « En-têtes et pieds de page » dans la fenêtre d’impression."
       : lang === "ar"
-        ? "في نافذة الطباعة، اختر « حفظ كملف PDF » كوجهة."
-        : "In the print window, choose \"Save as PDF\" as the destination.";
+        ? "للحصول على ملف PDF نظيف، اختر « حفظ كملف PDF » وقم بإيقاف خيار « الرؤوس والتذييلات » في نافذة الطباعة."
+        : "For a clean PDF, choose \"Save as PDF\" and turn off \"Headers and footers\" in the print dialog.";
     const doc = printWindow.document;
     doc.documentElement.lang = docLang || "en";
     doc.documentElement.dir = direction;
@@ -2857,7 +2857,7 @@ export default function ResumeGenerator() {
 
     const style = doc.createElement("style");
     style.textContent = `
-@page { size: A4; margin: 14mm; }
+@page { size: A4; margin: 12mm; }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: #fff; color: #111; }
 body {
@@ -2871,7 +2871,7 @@ body {
   border-bottom: 1px solid #e2e8f0;
 }
 .print-root {
-  width: 182mm;
+  width: 186mm;
   margin: 0 auto;
   background: #fff;
   -webkit-print-color-adjust: exact;
@@ -2885,6 +2885,42 @@ section, article, header, main, aside {
   break-inside: avoid;
   page-break-inside: avoid;
 }
+.resume-paper,
+.resume-section,
+.resume-item,
+.resume-tag-list,
+.resume-contact-row,
+.resume-contact-block,
+.resume-bullets,
+.resume-bullets li {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.resume-paper {
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+}
+.resume-paper > div {
+  min-height: auto !important;
+  height: auto !important;
+  align-items: flex-start !important;
+}
+.resume-tag-list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.25rem 0.35rem !important;
+}
+.resume-bullets {
+  margin-top: 0.24rem !important;
+  margin-bottom: 0.42rem !important;
+}
+.resume-bullets li {
+  line-height: 1.38 !important;
+  margin-bottom: 0.14rem !important;
+}
 p, li, div, span {
   unicode-bidi: plaintext;
 }
@@ -2896,6 +2932,7 @@ p, li, div, span {
     box-shadow: none !important;
     transform: none !important;
   }
+  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }`;
     doc.head.appendChild(style);
 
@@ -2915,6 +2952,7 @@ p, li, div, span {
     clone.style.margin = "0";
     clone.style.transform = "none";
     clone.style.paddingBottom = "0";
+    clone.style.width = "100%";
     root.appendChild(clone);
     doc.body.appendChild(root);
 
@@ -3642,7 +3680,7 @@ Awards: ${form.awards}`;
       track(EVENTS.PDF_EXPORT_STARTED, { document_type: "resume", language: docLang, template: tpl?.id || "", document_direction: "rtl" });
       const opened = printDocumentPreview(resumePrintRef, "resume");
       setStatusMsg(opened
-        ? (lang === "fr" ? "Dans la fenêtre d'impression, choisissez Enregistrer au format PDF." : lang === "ar" ? "في نافذة الطباعة، اختر «حفظ كملف PDF»." : "In the print window, choose Save as PDF.")
+        ? (lang === "fr" ? "Pour obtenir un PDF propre, choisissez Enregistrer au format PDF et désactivez les en-têtes et pieds de page." : lang === "ar" ? "للحصول على ملف PDF نظيف، اختر حفظ كملف PDF وقم بإيقاف الرؤوس والتذييلات." : "For a clean PDF, choose Save as PDF and turn off Headers and footers.")
         : st.pdfFail);
       setExportSuccess(opened ? st.pdfSuccess : "");
       track(opened ? EVENTS.PDF_EXPORT_COMPLETED : EVENTS.PDF_EXPORT_FAILED, { document_type: "resume", language: docLang, template: tpl?.id || "", export_type: "html_print" });
@@ -5571,7 +5609,7 @@ Awards: ${form.awards}`;
       track(EVENTS.PDF_EXPORT_STARTED, { document_type: "cover", language: docLang, template: coverTpl?.id || "", document_direction: "rtl" });
       const opened = printDocumentPreview(coverPrintRef, "cover");
       setStatusMsg(opened
-        ? (lang === "fr" ? "Dans la fenêtre d'impression, choisissez Enregistrer au format PDF." : lang === "ar" ? "في نافذة الطباعة، اختر «حفظ كملف PDF»." : "In the print window, choose Save as PDF.")
+        ? (lang === "fr" ? "Pour obtenir un PDF propre, choisissez Enregistrer au format PDF et désactivez les en-têtes et pieds de page." : lang === "ar" ? "للحصول على ملف PDF نظيف، اختر حفظ كملف PDF وقم بإيقاف الرؤوس والتذييلات." : "For a clean PDF, choose Save as PDF and turn off Headers and footers.")
         : st.pdfFail);
       track(opened ? EVENTS.PDF_EXPORT_COMPLETED : EVENTS.PDF_EXPORT_FAILED, { document_type: "cover", language: docLang, template: coverTpl?.id || "", export_type: "html_print" });
       if (opened && docLang !== lang) track(EVENTS.MULTILINGUAL_COVER_LETTER_EXPORTED, { language: docLang, interface_language: lang, export_type: "pdf", template: coverTpl?.id || "" });

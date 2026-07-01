@@ -29,7 +29,7 @@ const builder = {
   "interfaceLanguage": "لغة الواجهة",
   "documentLanguage": "لغة المستند",
   "chooseDocumentLanguage": "اختر لغة المستند",
-  "languageSeparationNote": "لغة الواجهة تغيّر القوائم. لغة المستند تغيّر العناوين والاتجاه والتصدير دون ترجمة المحتوى الذي كتبته.",
+  "languageSeparationNote": "تغيير لغة المستند يحدّث عناوين الأقسام وتنسيق التواريخ واتجاه الصفحة والتخطيط، لكنه لا يترجم محتوى السيرة الذاتية الذي كتبته.",
   "templateLabel": "القالب",
   "atsConscious": "متوافق مع ATS",
   "languageLabel": "اللغة",

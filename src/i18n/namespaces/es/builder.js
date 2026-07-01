@@ -29,7 +29,7 @@ const builder = {
   "interfaceLanguage": "Idioma de la interfaz",
   "documentLanguage": "Idioma del documento",
   "chooseDocumentLanguage": "Elegir idioma del documento",
-  "languageSeparationNote": "El idioma de la interfaz cambia los menús. El idioma del documento cambia etiquetas, dirección y exportación sin traducir tu contenido.",
+  "languageSeparationNote": "Cambiar el idioma del documento actualiza los títulos de sección, los formatos de fecha, la dirección y el diseño. No traduce automáticamente el contenido que escribiste.",
   "templateLabel": "Plantilla",
   "atsConscious": "Optimizado para ATS",
   "languageLabel": "Idioma",

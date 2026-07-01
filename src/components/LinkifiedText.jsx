@@ -29,7 +29,11 @@ function renderText(value, keyPrefix) {
 export default function LinkifiedText({ text, className, style }) {
   const linksEnabled = useContext(LinkifyLinksEnabledContext);
   return (
-    <span className={className} style={style}>
+    <span
+      className={className}
+      dir="auto"
+      style={{ unicodeBidi: "plaintext", ...style }}
+    >
       {linkifyText(text).map((part, index) => {
         if (part.type !== "link" || !linksEnabled) {
           return <React.Fragment key={index}>{renderText(part.text, index)}</React.Fragment>;

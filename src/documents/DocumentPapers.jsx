@@ -5,7 +5,7 @@ function ContactLine({ items, separator = " · ", style }) {
   const values = (Array.isArray(items) ? items : []).filter(Boolean);
   if (!values.length) return null;
   return (
-    <span style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.15rem 0.35rem", lineHeight: 1.35, ...style }}>
+    <span className="resume-contact-row" style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.15rem 0.35rem", lineHeight: 1.35, ...style }}>
       {values.map((item, index) => (
         <React.Fragment key={index}>
           {index > 0 && <span aria-hidden="true">{separator}</span>}
@@ -108,7 +108,7 @@ function TagList({ items, style, tagStyle }) {
   const values = (Array.isArray(items) ? items : []).map((item) => String(item || "").trim()).filter(Boolean);
   if (!values.length) return null;
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem 0.4rem", alignItems: "center", ...style }}>
+    <div className="resume-tag-list" style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem 0.4rem", alignItems: "center", ...style }}>
       {values.map((item, index) => (
         <span key={index} dir="auto" style={{
           display: "inline-flex",
@@ -135,7 +135,7 @@ function ResumeSectionBody({ section, sidebar = false, accent = "#2563eb", tagSt
   return (
     <>
       {entries.map((entry, index) => (
-        <div key={index} style={{ marginTop: index ? 8 : 0, marginBottom: 8, ...itemStyle }}>
+        <div key={index} className="resume-item" style={{ marginTop: index ? 8 : 0, marginBottom: 8, ...itemStyle }}>
           {entry.title && (
             <div dir="auto" style={{
               fontWeight: 700,
@@ -203,7 +203,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     width: "100%", boxSizing: "border-box" };
 
   if (empty) {
-    return <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={{ ...paper, display: "flex", alignItems: "center", justifyContent: "center",
+    return <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={{ ...paper, display: "flex", alignItems: "center", justifyContent: "center",
       color: "#9ca3af", fontFamily: "'Inter', sans-serif", fontSize: 14, padding: 30, textAlign: "center" }}>
       {tpl.id === "blank"
         ? "Fill in the form — your plain-text resume will appear here."
@@ -219,7 +219,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
 
   if (tpl.id === "blank") {
     return withLinkPolicy(
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={{ ...paper, fontFamily: rtl ? "'Noto Sans Arabic', 'Tahoma', 'Arial', sans-serif" : "'Inter', system-ui, sans-serif" }}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={{ ...paper, fontFamily: rtl ? "'Noto Sans Arabic', 'Tahoma', 'Arial', sans-serif" : "'Inter', system-ui, sans-serif" }}>
         <div style={{ padding: "28px 32px" }}>
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontWeight: 700, fontSize: 22, color: "#111", letterSpacing: "-0.3px" }}>{data.name}</div>
@@ -267,7 +267,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
       </div>
     );
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "30px 34px" }}>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: "#111", letterSpacing: "0.5px",
@@ -305,7 +305,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "32%", background: tpl.accent, color: "#fff", padding: "28px 16px",
             flexShrink: 0 }}>
@@ -357,7 +357,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── MINIMAL (Precision Line — left-aligned, thin rules) ──────────
   if (tpl.id === "minimal") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "32px 36px" }}>
           <div style={{ marginBottom: 22 }}>
             <div style={{ fontSize: 30, fontWeight: 800, color: "#111", letterSpacing: "-0.5px",
@@ -396,7 +396,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── BOLD (full-bleed accent header, badge section headings) ──────
   if (tpl.id === "bold") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ background: tpl.accent, padding: "26px 28px 22px" }}>
           <div style={{ fontSize: 27, fontWeight: 800, color: "#fff", letterSpacing: "-0.3px",
             lineHeight: 1.1 }}>{data.name}</div>
@@ -434,7 +434,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "29%", background: tpl.accent + "0F", padding: "28px 16px",
             borderRight: `1px solid ${tpl.accent}22`, flexShrink: 0 }}>
@@ -485,7 +485,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── EXECUTIVE (split header, left-bar sections, gold rule) ───────
   if (tpl.id === "executive") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "28px 32px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end",
             marginBottom: 14 }}>
@@ -532,7 +532,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "34%", background: tpl.accent, color: "#fff", padding: "28px 16px",
             flexShrink: 0, display: "flex", flexDirection: "column" }}>
@@ -621,7 +621,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── SHARP (black & white corporate, full-width black rules) ─────
   if (tpl.id === "sharp") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "28px 36px" }}>
           <div style={{ paddingBottom: 14, marginBottom: 18, borderBottom: "2.5px solid #111" }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: "#111", letterSpacing: "0.5px",
@@ -663,7 +663,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "30%", background: "#0f172a", color: "#fff", padding: "28px 16px",
             flexShrink: 0 }}>
@@ -717,7 +717,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── PRISM (gradient header, accent line) ─────────────────────────
   if (tpl.id === "prism") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ background: `linear-gradient(135deg, ${tpl.accent} 0%, #3B82F6 100%)`,
           padding: "26px 30px 22px" }}>
           <div style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "-0.3px",
@@ -759,7 +759,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const expSection = data.sections.find(s => /exp|expér|work|employ/i.test(s.heading)) || data.sections[0];
     const restSections = data.sections.filter(s => s !== expSection);
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         {/* Header */}
         <div style={{ padding: "20px 26px 16px", borderBottom: `3px solid ${tpl.accent}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -827,7 +827,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── HORIZON (centered banner header) ─────────────────────────────
   if (tpl.id === "horizon") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ background: tpl.accent, padding: "30px 32px 22px", textAlign: "center" }}>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "1px",
             textTransform: "uppercase", lineHeight: 1.1 }}>{data.name}</div>
@@ -867,7 +867,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── NORDIC (Scandinavian minimal) ────────────────────────────────
   if (tpl.id === "nordic") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "36px 44px" }}>
           <div style={{ marginBottom: 28 }}>
             <div style={{ fontSize: 32, fontWeight: 300, color: "#111", letterSpacing: "-0.5px",
@@ -949,7 +949,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ flex: 1, padding: "28px 20px 28px 28px" }}>
             <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 14 }}>
@@ -1008,7 +1008,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── ACADEMY (academic/scholarly) ─────────────────────────────────
   if (tpl.id === "academy") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "32px 36px" }}>
           <div style={{ textAlign: "center", marginBottom: 20 }}>
             <div style={{ fontSize: 26, fontWeight: 700, color: "#111", letterSpacing: "0.3px",
@@ -1045,7 +1045,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── SPARK (vibrant section header bands) ─────────────────────────
   if (tpl.id === "spark") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "26px 28px 20px" }}>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.3px",
             lineHeight: 1.1 }}>{data.name}</div>
@@ -1082,7 +1082,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── STONE (warm gray header, understated serif) ───────────────────
   if (tpl.id === "stone") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ background: "#f6f4ef", borderBottom: "1px solid #e8e3da", padding: "28px 32px" }}>
           <div style={{ fontSize: 27, fontWeight: 700, color: "#2c2520", letterSpacing: "0.2px",
             lineHeight: 1.1 }}>{data.name}</div>
@@ -1123,7 +1123,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
   // ── IVY (British CV style, double rule) ──────────────────────────
   if (tpl.id === "ivy") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "30px 38px" }}>
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: "#111", lineHeight: 1.1 }}>{data.name}</div>
@@ -1162,7 +1162,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     const sideS = data.sections.filter(isSidebar);
     const mainS = data.sections.filter(s => !isSidebar(s));
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "31%", background: "#1e1e1e", color: "#e4e4e4",
             padding: "28px 16px", flexShrink: 0, display: "flex", flexDirection: "column" }}>
@@ -1262,7 +1262,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
 
   // ── FALLBACK (same as classic) ───────────────────────────────────
   return (
-    <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+    <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
       <div style={{ padding: "28px 32px", textAlign: "center" }}>
         <div style={{ fontSize: 26, fontWeight: 700, color: "#111" }}>{data.name}</div>
         {data.title && <div style={{ fontSize: 13, color: tpl.accent, marginTop: 4 }}>{data.title}</div>}
@@ -1317,7 +1317,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.blank) {
     return withLinkPolicy(
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "40px 48px", fontSize: 13, lineHeight: 1.85, color: "#333" }}>
           <div style={{ marginBottom: 20 }}>
             {d.name && <div style={{ fontWeight: 600 }}><LinkifiedText text={d.name} /></div>}
@@ -1346,7 +1346,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.id === "classic") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "36px 40px" }}>
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: "#111" }}><LinkifiedText text={d.name} /></div>
@@ -1380,7 +1380,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.id === "modern") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "32%", background: tpl.accent, color: "#fff", padding: "28px 16px", flexShrink: 0 }}>
             <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.2, marginBottom: 4 }}><LinkifiedText text={d.name} /></div>
@@ -1415,7 +1415,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.id === "minimal") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ padding: "36px 42px" }}>
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.5px" }}><LinkifiedText text={d.name} /></div>
@@ -1450,7 +1450,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.id === "bold") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ background: tpl.accent, padding: "24px 28px 20px" }}>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}><LinkifiedText text={d.name} /></div>
           {d.jobTitle && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginTop: 4 }}><LinkifiedText text={d.jobTitle} /></div>}
@@ -1490,7 +1490,7 @@ export function CoverLetterPaper({ tpl: rawTpl, data: d, rtl = false, lang = "en
 
   if (tpl.id === "elegant") {
     return (
-      <div lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
+      <div className="resume-paper" lang={lang} dir={rtl ? "rtl" : "ltr"} style={paper}>
         <div style={{ display: "flex", minHeight: "100%" }}>
           <div style={{ width: "29%", background: tpl.accent + "0F", padding: "28px 16px",
             borderRight: `1px solid ${tpl.accent}22`, flexShrink: 0 }}>

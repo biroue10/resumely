@@ -29,7 +29,7 @@ const builder = {
   "interfaceLanguage": "Interface language",
   "documentLanguage": "Document language",
   "chooseDocumentLanguage": "Choose document language",
-  "languageSeparationNote": "Interface language changes menus. Document language changes labels, direction, and export without translating your content.",
+  "languageSeparationNote": "Changing the document language updates section labels, date formatting, direction, and layout. It does not translate your written resume content.",
   "templateLabel": "Template",
   "atsConscious": "ATS-conscious",
   "languageLabel": "Language",

@@ -29,7 +29,7 @@ const builder = {
   "interfaceLanguage": "Oberflächensprache",
   "documentLanguage": "Dokumentsprache",
   "chooseDocumentLanguage": "Dokumentsprache wählen",
-  "languageSeparationNote": "Die Oberflächensprache ändert Menüs. Die Dokumentsprache ändert Beschriftungen, Richtung und Export, ohne deine Inhalte zu übersetzen.",
+  "languageSeparationNote": "Das Ändern der Dokumentsprache aktualisiert Abschnittstitel, Datumsformate, Schreibrichtung und Layout. Deine geschriebenen Inhalte werden nicht automatisch übersetzt.",
   "templateLabel": "Vorlage",
   "atsConscious": "ATS-optimiert",
   "languageLabel": "Sprache",
