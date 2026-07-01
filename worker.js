@@ -272,7 +272,7 @@ function validatePayload(payload) {
 }
 
 function shareStore(env) {
-  return env.SHARE_KV || env.AC_KV || null;
+  return env.SHARES || env.SHARE_KV || env.AC_KV || null;
 }
 
 function generateShareId(length = 10) {

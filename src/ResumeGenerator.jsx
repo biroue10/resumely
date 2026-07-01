@@ -840,39 +840,45 @@ const SHARE_LINK_UI = {
     create: "Create short public link",
     creating: "Creating link...",
     cancel: "Cancel",
+    email: "Email short public link",
+    copyShort: "Copy short link",
     privateLink: "Use private offline link instead",
     ready: "Your short link is ready.",
     canView: "Anyone with this link can view this document.",
-    expiresPrefix: "This link expires on",
+    expiresIn: "Link expires in 30 days.",
     stored: "Your resume content will be stored securely to make the short link work.",
-    confirm: "Short share links store a copy of this document so anyone with the link can view it. Do you want to continue?",
-    failed: "Could not create the share link. Please try again.",
+    confirm: "Creating a short public link stores a copy of this document so anyone with the link can view it. This link will expire automatically.",
+    failed: "Short link could not be created. Please try again.",
     privateReady: "Private offline link created. It keeps the document inside the URL.",
   },
   fr: {
     create: "Créer un lien public court",
     creating: "Création du lien...",
     cancel: "Annuler",
+    email: "Envoyer le lien public court",
+    copyShort: "Copier le lien court",
     privateLink: "Utiliser plutôt un lien privé hors ligne",
     ready: "Votre lien court est prêt.",
     canView: "Toute personne disposant de ce lien peut consulter ce document.",
-    expiresPrefix: "Ce lien expire le",
+    expiresIn: "Ce lien expire dans 30 jours.",
     stored: "Le contenu de votre CV sera stocké de manière sécurisée pour permettre le fonctionnement du lien court.",
-    confirm: "Les liens courts stockent une copie de ce document afin que toute personne disposant du lien puisse le consulter. Voulez-vous continuer ?",
-    failed: "Impossible de créer le lien de partage. Veuillez réessayer.",
+    confirm: "La création d'un lien public court stocke une copie de ce document afin que toute personne disposant du lien puisse le consulter. Ce lien expirera automatiquement.",
+    failed: "Impossible de créer le lien court. Veuillez réessayer.",
     privateReady: "Lien privé hors ligne créé. Il conserve le document dans l'URL.",
   },
   ar: {
     create: "إنشاء رابط عام قصير",
     creating: "جار إنشاء الرابط...",
     cancel: "إلغاء",
+    email: "إرسال الرابط العام القصير",
+    copyShort: "نسخ الرابط القصير",
     privateLink: "استخدام رابط خاص دون اتصال بدلًا من ذلك",
     ready: "الرابط القصير جاهز.",
     canView: "يمكن لأي شخص لديه هذا الرابط عرض هذا المستند.",
-    expiresPrefix: "ينتهي هذا الرابط في",
+    expiresIn: "ينتهي هذا الرابط خلال 30 يومًا.",
     stored: "سيتم تخزين محتوى سيرتك الذاتية بشكل آمن لكي يعمل الرابط القصير.",
-    confirm: "تخزن الروابط القصيرة نسخة من هذا المستند حتى يتمكن أي شخص لديه الرابط من عرضه. هل تريد المتابعة؟",
-    failed: "تعذر إنشاء رابط المشاركة. حاول مرة أخرى.",
+    confirm: "يؤدي إنشاء رابط عام قصير إلى تخزين نسخة من هذا المستند حتى يتمكن أي شخص لديه الرابط من عرضه. ستنتهي صلاحية هذا الرابط تلقائيًا.",
+    failed: "تعذر إنشاء الرابط القصير. حاول مرة أخرى.",
     privateReady: "تم إنشاء رابط خاص دون اتصال. يحتفظ بالمستند داخل عنوان URL.",
   },
 };
@@ -3307,11 +3313,11 @@ p, li, div, span {
   const [shareMeta, setShareMeta] = useState(null);
   const [shareCreating, setShareCreating] = useState(false);
   const shareCopy = SHARE_LINK_UI[lang] || SHARE_LINK_UI.en;
-  const shareLink = useCallback(async (getPayload) => {
+  const createShortPublicLink = useCallback(async (getPayload) => {
     setShareUrl("");
     setShareMeta(null);
     const ok = typeof window === "undefined" ? false : window.confirm(shareCopy.confirm);
-    if (!ok) return;
+    if (!ok) return null;
     setShareCreating(true);
     try {
       const result = await createShortShareLink(getPayload(), { expiresInDays: 30 });
@@ -3320,13 +3326,18 @@ p, li, div, span {
       try { navigator.clipboard && navigator.clipboard.writeText(result.url); } catch { /* noop */ }
       setStatusMsg(st.linkCopied);
       setTimeout(() => setStatusMsg(""), 2500);
+      return result;
     } catch {
       setStatusMsg(shareCopy.failed);
       setTimeout(() => setStatusMsg(""), 3500);
+      return null;
     } finally {
       setShareCreating(false);
     }
   }, [shareCopy, st.linkCopied]);
+  const shareLink = useCallback(async (getPayload) => {
+    await createShortPublicLink(getPayload);
+  }, [createShortPublicLink]);
   const privateShareLink = useCallback((getPayload) => {
     const url = buildPrivateShareUrl(getPayload());
     setShareUrl(url);
@@ -3335,11 +3346,13 @@ p, li, div, span {
     setStatusMsg(shareCopy.privateReady);
     setTimeout(() => setStatusMsg(""), 2500);
   }, [shareCopy.privateReady]);
-  const emailLink = useCallback((getPayload, subject) => {
-    const url = buildPrivateShareUrl(getPayload());
+  const emailLink = useCallback(async (getPayload, subject) => {
+    const result = await createShortPublicLink(getPayload);
+    if (!result?.url) return;
+    const url = result.url;
     const body = encodeURIComponent(`Here's my document, viewable in any browser:\n\n${url}\n\nMade free with ApplyCraft — applycraft.io`);
     if (typeof window !== "undefined") window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
-  }, []);
+  }, [createShortPublicLink]);
   const resumeSharePayload = useCallback(() => {
     const d = { name: liveData.name };
     if (liveData.title) d.title = liveData.title;
@@ -3364,10 +3377,10 @@ p, li, div, span {
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 8px)", insetInlineEnd: 0, zIndex: 120, width: 290,
           background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: "0 18px 54px rgba(0,0,0,0.5)", padding: 10 }}>
-          <button type="button" onClick={() => { emailLink(getPayload, subject); setOpen(false); }}
+          <button type="button" disabled={shareCreating} onClick={() => { emailLink(getPayload, subject); }}
             style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none",
-              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", borderRadius: 8 }}>
-            📧 Email this document
+              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: shareCreating ? "wait" : "pointer", fontFamily: "inherit", borderRadius: 8 }}>
+            📧 {shareCopy.email}
           </button>
           <button type="button" disabled={shareCreating} onClick={() => shareLink(getPayload)}
             style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none",
@@ -3387,7 +3400,7 @@ p, li, div, span {
               {!shareMeta?.privateOffline && (
                 <div style={{ fontSize: 11, color: C.text3, marginBottom: 6, lineHeight: 1.5 }}>
                   {shareCopy.canView}<br />{shareCopy.stored}
-                  {shareMeta?.expiresAt && <><br />{shareCopy.expiresPrefix} {new Date(shareMeta.expiresAt).toLocaleDateString()}.</>}
+                  <br />{shareCopy.expiresIn}
                 </div>
               )}
               <input readOnly value={shareUrl} onFocus={(e) => e.target.select()}
@@ -3395,7 +3408,7 @@ p, li, div, span {
                   border: `1px solid ${C.border}`, borderRadius: 6, color: C.text2, fontFamily: "inherit" }} />
               <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
                 <button type="button" onClick={() => { try { navigator.clipboard && navigator.clipboard.writeText(shareUrl); } catch { /* noop */ } setStatusMsg(st.copied); setTimeout(() => setStatusMsg(""), 1500); }}
-                  style={{ flex: 1, background: `${C.accent}18`, border: `1px solid ${C.accent}40`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>Copy</button>
+                  style={{ flex: 1, background: `${C.accent}18`, border: `1px solid ${C.accent}40`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>{shareMeta?.privateOffline ? "Copy" : shareCopy.copyShort}</button>
                 <a href={shareUrl} target="_blank" rel="noreferrer"
                   style={{ flex: 1, textAlign: "center", background: "transparent", border: `1px solid ${C.border}`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.text2, textDecoration: "none", fontFamily: "inherit" }}>Open ↗</a>
               </div>

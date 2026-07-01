@@ -150,13 +150,18 @@ assert.ok(/isCustom: Boolean\(form\.sectionTitles\?\.\[key\]\)/.test(generatorSo
 
 assert.ok(generatorSource.includes("createShortShareLink"), "share menu should call the short-link API");
 assert.ok(generatorSource.includes("window.confirm(shareCopy.confirm)"), "share menu should show a privacy confirmation before upload");
+assert.ok(generatorSource.includes("Creating a short public link stores a copy"), "share confirmation should explain short-link storage");
+assert.ok(generatorSource.includes("Copy short link"), "main copy button should identify short links");
+assert.ok(generatorSource.includes("Link expires in 30 days."), "share UI should show 30-day expiry copy");
 assert.ok(generatorSource.includes("buildPrivateShareUrl"), "private offline hash link should remain available");
+assert.equal((generatorSource.match(/buildPrivateShareUrl\(/g) || []).length, 1, "hash URL generation should be used only by the explicit private offline fallback");
+assert.ok(/const emailLink = useCallback\(async[\s\S]*createShortPublicLink/.test(generatorSource), "email sharing should create a short link, not a hash link");
 assert.ok(sharedSource.includes("fetchShortSharedDocument"), "shared viewer should fetch short-link payloads");
 assert.ok(sharedSource.includes("shareIdFromPath"), "shared viewer should support /r/:shareId");
 
 const kv = memoryKv();
 const env = {
-  SHARE_KV: kv,
+  SHARES: kv,
   APP_ORIGIN: "https://applycraft.io",
   ASSETS: {
     fetch: async (request) => new Response(`asset:${new URL(request.url).pathname}`, {
