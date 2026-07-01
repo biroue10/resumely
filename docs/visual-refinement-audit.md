@@ -10,7 +10,7 @@
 ## Issues found
 
 - Muted blue-gray text was too faint on dark surfaces in the React app and static SEO pages.
-- Product language claims were inconsistent: some pages said `50+ languages` while the app supports 99 document languages and 5 full interface languages.
+- Product language claims were inconsistent: some pages blurred the difference between writing content in many languages and production-ready localization.
 - Several prominent feature/trust icons used emoji glyphs, which are less reliable across platforms.
 - Homepage and SEO-page heading scales were slightly oversized relative to section content.
 - Cards were visually repetitive, especially in trust/multilingual sections.
@@ -20,7 +20,7 @@
 - Raised secondary and muted text contrast while preserving a three-level text hierarchy.
 - Added explicit design tokens for static SEO pages through CSS custom properties.
 - Added explicit React token values for success/warning/danger and shared radii.
-- Standardized visible claims to `99 document languages` and `5 interface languages`.
+- Standardized visible claims: users can write content in any language, while production-ready interface and document-label localization is currently English, French, and Arabic.
 - Replaced prominent landing/footer feature icons with lightweight inline stroke icons.
 - Slightly reduced hero heading scale and tightened letter spacing.
 - Added `npm run test:visual` to catch claim, token, and basic static-page structure regressions.

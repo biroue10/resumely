@@ -81,7 +81,7 @@ const landing2 = {
         "Almacenados en servidores"
       ],
       [
-        "5 idiomas de interfaz incl. árabe (RTL)",
+        "Localización en inglés, francés y árabe",
         "Solo inglés"
       ]
     ],
@@ -97,16 +97,16 @@ const landing2 = {
         "d": "Cambia las etiquetas estándar, la dirección del documento y la exportación sin modificar tu contenido escrito."
       },
       {
-        "t": "Interfaz traducida en {ui} idiomas",
-        "d": "Usa la interfaz en inglés, francés, español, árabe o alemán manteniendo separado el idioma del currículum."
+        "t": "Inglés, francés y árabe listos para producción",
+        "d": "Usa interfaz, etiquetas de documento y diseños RTL listos para producción en los idiomas actualmente validados."
       },
       {
         "t": "Soporte completo de derecha a izquierda",
         "d": "El árabe, el hebreo, el farsi y otros idiomas RTL se muestran con alineación y tipografía correctas."
       },
       {
-        "t": "El formato sobrevive a la traducción",
-        "d": "Tu diseño, plantilla y estilo permanecen estables tras la traducción. Solo cambian las palabras."
+        "t": "El formato sobrevive a los cambios de idioma",
+        "d": "Tu diseño, plantilla y estilo permanecen estables al cambiar etiquetas o dirección del documento. Tu contenido escrito no se traduce automáticamente."
       },
       {
         "t": "Cartas de presentación multilingües",

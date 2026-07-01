@@ -1,5 +1,6 @@
 // ──────────────────────────────────────────────────────────────────────────
-// Shareable document links. Short public links are stored by the Worker.
+// Shareable document links. Private offline links keep document data in the
+// URL fragment; the paused short-link API remains here for a future storage-backed release.
 // The older LZ-compressed URL fragment format remains available as a private
 // offline fallback and for backward compatibility.
 // ──────────────────────────────────────────────────────────────────────────

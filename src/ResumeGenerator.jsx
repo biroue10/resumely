@@ -9,7 +9,7 @@ import { pdfSafe, containsNonLatin1 } from "./pdf/text.js";
 import { useFocusTrap } from "./a11y/useFocusTrap.js";
 import { parseResume } from "./ats/parseResume.js";
 import * as resumes from "./resumes.js";
-import { buildPrivateShareUrl, createShortShareLink } from "./share.js";
+import { buildPrivateShareUrl } from "./share.js";
 import { ResumePaper, CoverLetterPaper } from "./documents/DocumentPapers.jsx";
 import { TEMPLATES, COVER_TEMPLATES, RESUME_TEMPLATE_COUNT, COVER_TEMPLATE_COUNT, RECOMMENDED_TEMPLATE_ID } from "./documents/templateRegistry.js";
 import { PRODUCT } from "./product.js";
@@ -837,52 +837,52 @@ const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 const UX_MEASUREMENT_ENABLED = false;
 const SHARE_LINK_UI = {
   en: {
-    create: "Create short public link",
+    create: "Create private offline link",
     creating: "Creating link...",
     cancel: "Cancel",
-    email: "Email short public link",
-    copyShort: "Copy short link",
-    privateLink: "Use private offline link instead",
-    ready: "Your short link is ready.",
-    canView: "Anyone with this link can view this document.",
-    expiresIn: "Link expires in 30 days.",
-    stored: "Your resume content will be stored securely to make the short link work.",
-    confirm: "Creating a short public link stores a copy of this document so anyone with the link can view it. This link will expire automatically.",
-    failed: "Short link could not be created. Please try again.",
-    storageMissing: "Short-link storage is not configured. Add a Cloudflare KV binding named SHARES.",
-    privateReady: "Private offline link created. It keeps the document inside the URL.",
+    email: "Email private offline link",
+    copyShort: "Copy private link",
+    privateLink: "Use private offline link",
+    ready: "Private offline share link ready.",
+    canView: "Anyone with the full link can view this document.",
+    expiresIn: "",
+    stored: "This link keeps the document data inside the URL, so it can be long.",
+    confirm: "",
+    failed: "Private offline link could not be created. Please try again.",
+    storageMissing: "",
+    privateReady: "Private offline share link ready.",
   },
   fr: {
-    create: "Créer un lien public court",
+    create: "Créer un lien privé hors ligne",
     creating: "Création du lien...",
     cancel: "Annuler",
-    email: "Envoyer le lien public court",
-    copyShort: "Copier le lien court",
-    privateLink: "Utiliser plutôt un lien privé hors ligne",
-    ready: "Votre lien court est prêt.",
-    canView: "Toute personne disposant de ce lien peut consulter ce document.",
-    expiresIn: "Ce lien expire dans 30 jours.",
-    stored: "Le contenu de votre CV sera stocké de manière sécurisée pour permettre le fonctionnement du lien court.",
-    confirm: "La création d'un lien public court stocke une copie de ce document afin que toute personne disposant du lien puisse le consulter. Ce lien expirera automatiquement.",
-    failed: "Impossible de créer le lien court. Veuillez réessayer.",
-    storageMissing: "Le stockage des liens courts n'est pas configuré. Ajoutez une liaison Cloudflare KV nommée SHARES.",
-    privateReady: "Lien privé hors ligne créé. Il conserve le document dans l'URL.",
+    email: "Envoyer le lien privé hors ligne",
+    copyShort: "Copier le lien privé",
+    privateLink: "Utiliser un lien privé hors ligne",
+    ready: "Lien privé hors ligne prêt.",
+    canView: "Toute personne disposant du lien complet peut consulter ce document.",
+    expiresIn: "",
+    stored: "Ce lien conserve les données du document dans l'URL ; il peut donc être long.",
+    confirm: "",
+    failed: "Impossible de créer le lien privé hors ligne. Veuillez réessayer.",
+    storageMissing: "",
+    privateReady: "Lien privé hors ligne prêt.",
   },
   ar: {
-    create: "إنشاء رابط عام قصير",
+    create: "إنشاء رابط خاص دون اتصال",
     creating: "جار إنشاء الرابط...",
     cancel: "إلغاء",
-    email: "إرسال الرابط العام القصير",
-    copyShort: "نسخ الرابط القصير",
-    privateLink: "استخدام رابط خاص دون اتصال بدلًا من ذلك",
-    ready: "الرابط القصير جاهز.",
-    canView: "يمكن لأي شخص لديه هذا الرابط عرض هذا المستند.",
-    expiresIn: "ينتهي هذا الرابط خلال 30 يومًا.",
-    stored: "سيتم تخزين محتوى سيرتك الذاتية بشكل آمن لكي يعمل الرابط القصير.",
-    confirm: "يؤدي إنشاء رابط عام قصير إلى تخزين نسخة من هذا المستند حتى يتمكن أي شخص لديه الرابط من عرضه. ستنتهي صلاحية هذا الرابط تلقائيًا.",
-    failed: "تعذر إنشاء الرابط القصير. حاول مرة أخرى.",
-    storageMissing: "لم يتم إعداد تخزين الروابط القصيرة. أضف ربط Cloudflare KV باسم SHARES.",
-    privateReady: "تم إنشاء رابط خاص دون اتصال. يحتفظ بالمستند داخل عنوان URL.",
+    email: "إرسال الرابط الخاص دون اتصال",
+    copyShort: "نسخ الرابط الخاص",
+    privateLink: "استخدام رابط خاص دون اتصال",
+    ready: "رابط المشاركة الخاص دون اتصال جاهز.",
+    canView: "يمكن لأي شخص لديه الرابط الكامل عرض هذا المستند.",
+    expiresIn: "",
+    stored: "يحتفظ هذا الرابط ببيانات المستند داخل عنوان URL، لذلك قد يكون طويلًا.",
+    confirm: "",
+    failed: "تعذر إنشاء الرابط الخاص دون اتصال. حاول مرة أخرى.",
+    storageMissing: "",
+    privateReady: "رابط المشاركة الخاص دون اتصال جاهز.",
   },
 };
 
@@ -3113,6 +3113,7 @@ p, li, div, span {
   const ms = MASTER_UI[lang] || MASTER_UI.en; // master profile strings
   const st = STATUS_UI[lang] || STATUS_UI.en; // toast / status messages
   const l2 = LANDING2_UI[lang] || LANDING2_UI.en; // landing marketing body
+  const why = l2.why || LANDING2_UI.en.why;
   const rtl = isRtlLang(interfaceLanguage);
   const set = useCallback((k) => (e) => setForm(f => ({ ...f, [k]: e.target.value })), []);
   const setField = useCallback((k, v) => setForm(f => ({ ...f, [k]: v })), []);
@@ -3313,51 +3314,27 @@ p, li, div, span {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [coverMoreOpen, setCoverMoreOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
-  const [shareMeta, setShareMeta] = useState(null);
-  const [shareCreating, setShareCreating] = useState(false);
   const shareCopy = SHARE_LINK_UI[lang] || SHARE_LINK_UI.en;
-  const createShortPublicLink = useCallback(async (getPayload) => {
-    setShareUrl("");
-    setShareMeta(null);
-    const ok = typeof window === "undefined" ? false : window.confirm(shareCopy.confirm);
-    if (!ok) return null;
-    setShareCreating(true);
+  const shareLink = useCallback((getPayload) => {
     try {
-      const result = await createShortShareLink(getPayload(), { expiresInDays: 30 });
-      setShareUrl(result.url);
-      setShareMeta({ expiresAt: result.expiresAt, deleteToken: result.deleteToken || "" });
-      try { navigator.clipboard && navigator.clipboard.writeText(result.url); } catch { /* noop */ }
-      setStatusMsg(st.linkCopied);
+      const url = buildPrivateShareUrl(getPayload());
+      setShareUrl(url);
+      try { navigator.clipboard && navigator.clipboard.writeText(url); } catch { /* noop */ }
+      setStatusMsg(shareCopy.privateReady);
       setTimeout(() => setStatusMsg(""), 2500);
-      return result;
-    } catch (err) {
-      const missingStorage = err?.code === "SHARE_STORAGE_UNAVAILABLE";
-      const dev = typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV;
-      setStatusMsg(missingStorage && dev ? shareCopy.storageMissing : shareCopy.failed);
-      setTimeout(() => setStatusMsg(""), 3500);
-      return null;
-    } finally {
-      setShareCreating(false);
+      return url;
+    } catch {
+      setStatusMsg(shareCopy.failed);
+      setTimeout(() => setStatusMsg(""), 2500);
+      return "";
     }
-  }, [shareCopy, st.linkCopied]);
-  const shareLink = useCallback(async (getPayload) => {
-    await createShortPublicLink(getPayload);
-  }, [createShortPublicLink]);
-  const privateShareLink = useCallback((getPayload) => {
-    const url = buildPrivateShareUrl(getPayload());
-    setShareUrl(url);
-    setShareMeta({ privateOffline: true });
-    try { navigator.clipboard && navigator.clipboard.writeText(url); } catch { /* noop */ }
-    setStatusMsg(shareCopy.privateReady);
-    setTimeout(() => setStatusMsg(""), 2500);
-  }, [shareCopy.privateReady]);
-  const emailLink = useCallback(async (getPayload, subject) => {
-    const result = await createShortPublicLink(getPayload);
-    if (!result?.url) return;
-    const url = result.url;
+  }, [shareCopy.failed, shareCopy.privateReady]);
+  const emailLink = useCallback((getPayload, subject) => {
+    const url = shareLink(getPayload);
+    if (!url) return;
     const body = encodeURIComponent(`Here's my document, viewable in any browser:\n\n${url}\n\nMade free with ApplyCraft — applycraft.io`);
     if (typeof window !== "undefined") window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
-  }, [createShortPublicLink]);
+  }, [shareLink]);
   const resumeSharePayload = useCallback(() => {
     const d = { name: liveData.name };
     if (liveData.title) d.title = liveData.title;
@@ -3377,43 +3354,35 @@ p, li, div, span {
   const renderMoreMenu = (open, setOpen, getPayload, subject) => (
     <div style={{ position: "relative" }}>
       <button type="button" aria-label="More options" aria-expanded={open}
-        onClick={() => { setOpen((o) => !o); setShareUrl(""); setShareMeta(null); }}
+        onClick={() => { setOpen((o) => !o); setShareUrl(""); }}
         style={{ ...softBtn, padding: "7px 11px", fontWeight: 800 }}>⋮</button>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 8px)", insetInlineEnd: 0, zIndex: 120, width: 290,
           background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, boxShadow: "0 18px 54px rgba(0,0,0,0.5)", padding: 10 }}>
-          <button type="button" disabled={shareCreating} onClick={() => { emailLink(getPayload, subject); }}
+          <button type="button" onClick={() => { emailLink(getPayload, subject); }}
             style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none",
-              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: shareCreating ? "wait" : "pointer", fontFamily: "inherit", borderRadius: 8 }}>
+              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", borderRadius: 8 }}>
             📧 {shareCopy.email}
           </button>
-          <button type="button" disabled={shareCreating} onClick={() => shareLink(getPayload)}
+          <button type="button" onClick={() => shareLink(getPayload)}
             style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none",
-              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: shareCreating ? "wait" : "pointer", fontFamily: "inherit", borderRadius: 8 }}>
-            🔗 {shareCreating ? shareCopy.creating : shareCopy.create}
-          </button>
-          <button type="button" onClick={() => privateShareLink(getPayload)}
-            style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none",
-              color: C.text2, padding: "10px 10px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", borderRadius: 8 }}>
-            {shareCopy.privateLink}
+              color: C.text1, padding: "10px 10px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", borderRadius: 8 }}>
+            🔗 {shareCopy.create}
           </button>
           {shareUrl && (
             <div style={{ marginTop: 8, padding: "9px 10px", background: C.elevated, borderRadius: 8 }}>
               <div style={{ fontSize: 11, color: C.text3, marginBottom: 6 }}>
-                {shareMeta?.privateOffline ? shareCopy.privateReady : shareCopy.ready}
+                {shareCopy.ready}
               </div>
-              {!shareMeta?.privateOffline && (
-                <div style={{ fontSize: 11, color: C.text3, marginBottom: 6, lineHeight: 1.5 }}>
-                  {shareCopy.canView}<br />{shareCopy.stored}
-                  <br />{shareCopy.expiresIn}
-                </div>
-              )}
+              <div style={{ fontSize: 11, color: C.text3, marginBottom: 6, lineHeight: 1.5 }}>
+                {shareCopy.stored}<br />{shareCopy.canView}
+              </div>
               <input readOnly value={shareUrl} onFocus={(e) => e.target.select()}
                 style={{ width: "100%", boxSizing: "border-box", fontSize: 11.5, padding: "6px 8px", background: C.surface,
                   border: `1px solid ${C.border}`, borderRadius: 6, color: C.text2, fontFamily: "inherit" }} />
               <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
                 <button type="button" onClick={() => { try { navigator.clipboard && navigator.clipboard.writeText(shareUrl); } catch { /* noop */ } setStatusMsg(st.copied); setTimeout(() => setStatusMsg(""), 1500); }}
-                  style={{ flex: 1, background: `${C.accent}18`, border: `1px solid ${C.accent}40`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>{shareMeta?.privateOffline ? "Copy" : shareCopy.copyShort}</button>
+                  style={{ flex: 1, background: `${C.accent}18`, border: `1px solid ${C.accent}40`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.accent2, cursor: "pointer", fontFamily: "inherit" }}>{shareCopy.copyShort}</button>
                 <a href={shareUrl} target="_blank" rel="noreferrer"
                   style={{ flex: 1, textAlign: "center", background: "transparent", border: `1px solid ${C.border}`, borderRadius: 7, padding: "6px", fontSize: 12, fontWeight: 700, color: C.text2, textDecoration: "none", fontFamily: "inherit" }}>Open ↗</a>
               </div>
@@ -7522,6 +7491,36 @@ Awards: ${form.awards}`;
             startResume("interactive_demo");
           }}
         />
+
+        {/* Why job seekers choose ApplyCraft */}
+        <FadeIn>
+          <section aria-labelledby="why-applycraft-title" style={{ padding: isMobile ? "56px 16px" : "72px 24px 32px" }}>
+            <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+              <div style={{ textAlign: "center", marginBottom: 30 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase",
+                  letterSpacing: "2px", color: C.accent2, marginBottom: 12 }}>{why.eyebrow}</p>
+                <h2 id="why-applycraft-title" style={{ fontSize: "clamp(24px, 3vw, 38px)", fontWeight: 800,
+                  letterSpacing: "-0.8px", color: C.text1, margin: 0, lineHeight: 1.15 }}>
+                  {why.title}
+                </h2>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
+                {why.items.map((item) => (
+                  <div key={item.t} style={{ background: C.surface, border: `1px solid ${C.border}`,
+                    borderRadius: 8, padding: 18, minHeight: 128 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 8, background: `${C.accent}16`,
+                      border: `1px solid ${C.accent}30`, color: C.accent2, display: "flex",
+                      alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                      <LineIcon name={item.icon} size={18} />
+                    </div>
+                    <h3 style={{ fontSize: 15, color: C.text1, margin: "0 0 7px", lineHeight: 1.25 }}>{item.t}</h3>
+                    <p style={{ fontSize: 13, color: C.text2, margin: 0, lineHeight: 1.55 }}>{item.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </FadeIn>
 
         {/* Master Profile teaser */}
         <FadeIn>

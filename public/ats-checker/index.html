@@ -333,7 +333,7 @@ With it, you'll also see:
       <div class="how-card">
         <div class="how-num">Keywords</div>
         <h3>Keyword match</h3>
-        <p>When you paste a job description, we tokenize both documents and show the exact overlap and gaps. Target 40%+ for competitive roles.</p>
+        <p>When you paste a job description, we tokenize both documents and show the exact overlap and gaps. Use the keyword match score as an ApplyCraft tailoring signal; it does not guarantee ATS success, interviews, or hiring outcomes.</p>
       </div>
     </div>
   </div>
@@ -374,7 +374,7 @@ With it, you'll also see:
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. Write in any language, with fully localized English, French, and Arabic support, 46 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder with 46 templates, free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.</p>
         <a href="mailto:hello@applycraft.io">hello@applycraft.io</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -448,7 +448,7 @@ const LOCALE = {
     longLines:   n => ({ title: `${n} line${n > 1 ? 's' : ''} over 180 characters`,  detail: 'Very long lines are often truncated or misread by ATS parsers. Split each bullet into one focused sentence — aim for 80–140 characters per bullet.' }),
     tooShort:   wc => ({ title: `Resume appears too short (${wc} words)`,            detail: `A strong resume typically has 350–800 words. Add more detail to your experience section — specific projects, technologies used, and measurable outcomes.` }),
     tooLong:    wc => ({ title: `Resume may be too long (${wc} words)`,              detail: `Most ATS systems and recruiters prefer resumes under 2 pages (~800 words). Consider condensing to the most relevant recent experience.` }),
-    kwLow:     pct => ({ title: `Low keyword match: ${pct}% vs. job description`,    detail: `Your resume matches only ${pct}% of unique keywords in the job description. Most ATS systems rank candidates with 40%+ match significantly higher. See the Missing Keywords section below.` }),
+    kwLow:     pct => ({ title: `Low keyword match: ${pct}% vs. job description`,    detail: `Your resume matches only ${pct}% of unique keywords in the job description. A higher score usually means your resume reflects more of the job posting's language, but it does not guarantee ATS success, interviews, or hiring outcomes. Review suggestions manually and avoid unnatural keyword stuffing.` }),
     kwMed:     pct => ({ title: `Keyword match: ${pct}% vs. job description`,        detail: `You match ${pct}% of the job's unique keywords. Strong ATS candidates typically hit 45–70% for targeted roles. Add missing keywords naturally in your skills and experience.` }),
   }
 };

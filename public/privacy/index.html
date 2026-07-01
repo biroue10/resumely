@@ -108,7 +108,10 @@
 <h3>2.3 Uploaded files</h3>
 <p>If you upload a PDF or DOCX with the "improve an existing resume" feature, the text is read in your browser to pre-fill the form. Avoid uploading sensitive documents if you are using a modified build or third-party mirror of ApplyCraft.</p>
 
-<h3>2.4 Technical logs</h3>
+<h3>2.4 Private offline share links</h3>
+<p>Private offline share links store the document data inside the URL fragment. Anyone with the full link can view the document, so only share it with people you trust. These links do not require server-side document storage, but they can be long.</p>
+
+<h3>2.5 Technical logs</h3>
 <p>Our hosting and CDN provider (Cloudflare) records standard server access logs — IP address, browser type, URL requested, and timestamp — for security and abuse prevention. We do not use these logs for advertising or to build a profile of you.</p>
 
 <h2 id="cookies">3. Cookies and analytics</h2>
@@ -116,7 +119,7 @@
 <p>Cloudflare may set strictly necessary security cookies (for example <code>__cf_bm</code>) for bot and abuse protection. Your work is kept in <code>localStorage</code>, not cookies. Full details are in the <a href="/cookies/">Cookie Policy</a>.</p>
 
 <h2 id="ai">4. AI features and your data</h2>
-<p>Optional AI helpers — generating or rewriting content, translation, ATS suggestions, and AI tailoring to a job description — send the text relevant to that action to our AI provider <strong>only when you click</strong>. The provider is <strong>Anthropic</strong> (the Claude model family), reached through a server proxy we operate on Cloudflare. The core builder, previews, and export never use AI. Do not submit content you are not comfortable having processed by a third party. Full details are in the <a href="/ai-disclosure/">AI Disclosure</a>.</p>
+<p>Optional AI helpers — generating or rewriting content, ATS suggestions, and AI tailoring to a job description — send the text relevant to that action to our AI provider <strong>only when you click</strong>. User-written résumé or cover-letter content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action. The provider is <strong>Anthropic</strong> (the Claude model family), reached through a server proxy we operate on Cloudflare. The core builder, previews, and export never use AI. Do not submit content you are not comfortable having processed by a third party. Full details are in the <a href="/ai-disclosure/">AI Disclosure</a>.</p>
 
 <h2 id="payments">5. Payments (optional paid pass)</h2>
 <p>The optional one-time "Active Search Pass" (US$7, non-recurring) unlocks AI tailoring and Master Profile cloud sync for 7 days. Payments are processed by <strong>Lemon Squeezy</strong>, the merchant of record, which handles billing and applicable taxes. We do not receive or store your full card details; we record only whether your pass is active and when it expires. See the <a href="/refund-policy/">Refund Policy</a>.</p>
@@ -163,7 +166,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. Write in any language, with fully localized English, French, and Arabic support, 46 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder with 46 templates, free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.</p>
         <a href="mailto:hello@applycraft.io">hello@applycraft.io</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">

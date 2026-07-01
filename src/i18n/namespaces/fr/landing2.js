@@ -81,7 +81,7 @@ const landing2 = {
         "Stockées sur des serveurs"
       ],
       [
-        "5 langues d'interface dont l'arabe (RTL)",
+        "Localisation anglais, français et arabe",
         "Anglais uniquement"
       ]
     ],
@@ -97,16 +97,16 @@ const landing2 = {
         "d": "Changez les libellés standard, le sens de lecture et l'export sans modifier le contenu que vous avez rédigé."
       },
       {
-        "t": "Interface traduite en {ui} langues",
-        "d": "Utilisez l'interface en anglais, français, espagnol, arabe ou allemand tout en gardant la langue du CV séparée."
+        "t": "Anglais, français et arabe prêts pour la production",
+        "d": "Utilisez une interface, des libellés de document et des mises en page RTL prêts pour la production dans les langues actuellement validées."
       },
       {
         "t": "Prise en charge complète de droite à gauche",
         "d": "L'arabe, l'hébreu, le farsi et d'autres langues RTL s'affichent avec un alignement et une typographie corrects."
       },
       {
-        "t": "La mise en forme survit à la traduction",
-        "d": "Votre mise en page, votre modèle et votre design restent stables après traduction. Seuls les mots changent."
+        "t": "La mise en forme survit aux changements de langue",
+        "d": "Votre mise en page, votre modèle et votre design restent stables lorsque vous changez les libellés ou la direction du document. Votre contenu écrit n'est pas traduit automatiquement."
       },
       {
         "t": "Lettres de motivation multilingues",
@@ -125,7 +125,7 @@ const landing2 = {
       },
       {
         "t": "Assistants IA facultatifs",
-        "b": "Utilisez les assistants IA ou de traduction uniquement si vous acceptez que le prestataire traite le texte soumis."
+        "b": "Utilisez les assistants IA uniquement si vous acceptez que le prestataire traite le texte soumis."
       },
       {
         "t": "Conception soucieuse de la vie privée",
@@ -163,7 +163,7 @@ const landing2 = {
       },
       {
         "q": "Stockez-vous ou vendez-vous mes données ?",
-        "a": "ApplyCraft n'exige pas de compte pour créer un CV. L'édition et l'export standards se font dans le navigateur ; les assistants IA et de traduction facultatifs peuvent traiter le texte que vous soumettez."
+        "a": "ApplyCraft n'exige pas de compte pour créer un CV. L'édition et l'export standards se font dans le navigateur ; les assistants IA facultatifs peuvent traiter le texte que vous choisissez de soumettre."
       },
       {
         "q": "Les modèles sont-ils compatibles ATS ?",

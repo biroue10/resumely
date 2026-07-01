@@ -32,7 +32,7 @@ function footer() {
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. Write in any language, with fully localized English, French, and Arabic support, 22 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder with 46 templates, free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.</p>
         <a href="mailto:hello@applycraft.io">hello@applycraft.io</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -283,10 +283,10 @@ const PAGES = [
     slug: "resume-builder",
     canonicalPath: "/resume-builder/",
     title: "Free Online Resume Builder — ApplyCraft",
-    description: "Build a professional resume online in minutes. Choose from 22 templates, get live preview, and download as PDF or DOCX. Free, no sign-up.",
+    description: "Build a professional resume online in minutes. Choose from 46 templates, get live preview, and download as PDF or DOCX. Free, no sign-up.",
     eyebrow: "Resume Builder",
     h1: "Free Online Resume Builder",
-    sub: "22 professional templates, live preview, AI polish, and instant PDF or DOCX download. Build your resume in minutes — no sign-up required.",
+    sub: "46 professional templates, live preview, AI polish, and instant PDF or DOCX download. Build your resume in minutes — no sign-up required.",
     keywords: "resume builder, online resume builder, free resume builder, professional resume, cv builder",
     resumeCard: rcGeneric({
       name: "Alex Morgan", title: "Senior Software Engineer",
@@ -306,7 +306,7 @@ const PAGES = [
       ctaHeading: "Ready to build your resume?",
       ctaSub: "Join thousands of job seekers who landed interviews using ApplyCraft templates.",
       items: [
-        { icon: "🎨", title: "22 Professional Templates", body: "From minimalist to creative, find the perfect template for your industry and seniority level." },
+        { icon: "🎨", title: "46 Professional Templates", body: "From minimalist to creative, find the perfect template for your industry and seniority level." },
         { icon: "⚡", title: "Live Preview", body: "See exactly how your resume looks as you type. No more guessing — what you see is what you get." },
         { icon: "🤖", title: "AI-Powered Polish", body: "Our AI rewrites weak bullet points into strong action-oriented achievements recruiters love." },
         { icon: "📄", title: "PDF & DOCX Export", body: "Download your finished resume as a perfectly formatted PDF or editable DOCX file instantly." },
@@ -574,10 +574,10 @@ const PAGES = [
     slug: "resume-in-arabic",
     canonicalPath: "/resume-in-arabic/",
     title: "إنشاء سيرة ذاتية بالعربية — مجاناً | ApplyCraft",
-    description: "أنشئ سيرة ذاتية احترافية باللغة العربية مع دعم الكتابة من اليمين إلى اليسار. 22 قالباً مجانياً، تصدير PDF و DOCX.",
+    description: "أنشئ سيرة ذاتية احترافية باللغة العربية مع دعم الكتابة من اليمين إلى اليسار. 46 قالباً مجانياً، تصدير PDF و DOCX.",
     eyebrow: "السيرة الذاتية بالعربية",
     h1: "أنشئ سيرتك الذاتية بالعربية",
-    sub: "22 قالباً احترافياً مع دعم كامل للغة العربية والكتابة من اليمين إلى اليسار. تنزيل PDF أو DOCX مجاناً — دون تسجيل.",
+    sub: "46 قالباً احترافياً مع دعم إنتاجي للعربية والكتابة من اليمين إلى اليسار. تنزيل PDF أو DOCX مجاناً — دون تسجيل.",
     keywords: "سيرة ذاتية بالعربية, نموذج سيرة ذاتية عربي, cv بالعربي, سيرة ذاتية مجانية, انشاء سيرة ذاتية",
     resumeCard: `<div class="resume-card" dir="rtl" style="text-align:right">
   <div class="rc-header" style="border-color:#6366F1">

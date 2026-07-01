@@ -4,11 +4,11 @@ function ContactLine({ items, separator = " · ", style }) {
   const values = (Array.isArray(items) ? items : []).filter(Boolean);
   if (!values.length) return null;
   return (
-    <span style={style}>
+    <span style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.15rem 0.35rem", lineHeight: 1.35, ...style }}>
       {values.map((item, index) => (
         <React.Fragment key={index}>
           {index > 0 && <span aria-hidden="true">{separator}</span>}
-          <bdi dir="auto" style={{ unicodeBidi: "isolate", overflowWrap: "anywhere" }}>{item}</bdi>
+          <bdi dir="auto" style={{ unicodeBidi: "isolate", overflowWrap: "anywhere", wordBreak: "normal" }}>{item}</bdi>
         </React.Fragment>
       ))}
     </span>
@@ -31,8 +31,10 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
     padding: preview ? 12 : 0,
     fontFamily: rtl ? "'Noto Sans Arabic', 'Tahoma', 'Arial', sans-serif" : tpl.font,
     direction: rtl ? "rtl" : "ltr",
-    textAlign: rtl ? "right" : "left",
+    textAlign: "start",
     unicodeBidi: "plaintext",
+    overflowWrap: "anywhere",
+    wordBreak: "normal",
     overflow: preview ? "visible" : "hidden",
     boxShadow: preview ? "0 2px 12px rgba(0,0,0,0.12)" : "0 4px 16px rgba(0,0,0,0.18)",
     width: "100%", boxSizing: "border-box" };
@@ -116,8 +118,8 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
                 </div>
               ) : s.items.map((it, j) => (
                 <div key={j} style={{ fontSize: 12.5, lineHeight: 1.65, color: "#333", marginBottom: 5,
-                  paddingLeft: 14, position: "relative", textAlign: "left" }}>
-                  <span style={{ position: "absolute", left: 0, color: tpl.accent }}>›</span>{it}
+                  paddingInlineStart: 14, position: "relative", textAlign: "start", unicodeBidi: "plaintext" }}>
+                  <span style={{ position: "absolute", insetInlineStart: 0, color: tpl.accent }}>›</span>{it}
                 </div>
               ))}
             </div>
@@ -146,8 +148,8 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
             <div style={{ fontSize: 11, opacity: 0.72, marginBottom: 18, fontStyle: "italic" }}>{data.title}</div>
             <div style={{ height: 1, background: "rgba(255,255,255,0.22)", marginBottom: 14 }} />
             {data.contact.map((c, i) => (
-              <div key={i} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7, wordBreak: "break-all",
-                lineHeight: 1.4 }}>{c}</div>
+              <div key={i} style={{ fontSize: 10.5, opacity: 0.82, marginBottom: 7, overflowWrap: "anywhere",
+                wordBreak: "normal", lineHeight: 1.4 }}><bdi dir="auto">{c}</bdi></div>
             ))}
             {sideS.map((s, i) => (
               <div key={i} style={{ marginTop: 20 }}>
@@ -176,7 +178,7 @@ export function ResumePaper({ tpl: rawTpl, result, rtl, lang = "en", placeholder
                 </div>
                 {s.items.map((it, j) => (
                   <div key={j} style={{ fontSize: 12.5, lineHeight: 1.6, color: "#333", marginBottom: 5,
-                    paddingLeft: 10, borderLeft: `2px solid ${tpl.accent}28` }}>{it}</div>
+                    paddingInlineStart: 10, borderInlineStart: `2px solid ${tpl.accent}28`, unicodeBidi: "plaintext" }}>{it}</div>
                 ))}
               </div>
             ))}

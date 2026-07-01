@@ -89,7 +89,7 @@ ${content}
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. Write in any language, with fully localized English, French, and Arabic support, 22 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder with 46 templates, free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.</p>
         <a href="mailto:${EMAIL}">${EMAIL}</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -141,20 +141,20 @@ const PAGES = {
   "privacy": {
     path: "/privacy/",
     title: "Privacy Policy",
-    description: "ApplyCraft collects no personal data. Your resume stays in your browser, never on our servers. Read our full privacy policy.",
+    description: "How ApplyCraft handles data: browser-first resume editing, optional account sync, cookieless analytics, optional AI helpers, private offline sharing, and payments explained.",
     content: `
 <h1>Privacy Policy</h1>
 <p class="meta">Last updated: ${TODAY} · Effective immediately</p>
-<p class="lead">ApplyCraft is built on a simple principle: <strong style="color:#E4EBF5">we cannot misuse data we do not have.</strong> This page explains exactly what we collect (very little), what we don't collect (almost everything), and what rights you have.</p>
+<p class="lead">ApplyCraft is designed to handle as little of your data as possible. The free builder is browser-first by default, while optional online features process selected data only when you choose to use them.</p>
 
-<div class="callout"><p>⚡ <strong style="color:#E4EBF5">Short version:</strong> We don't store your resume. We don't set cookies. We don't track you. Everything you type stays in your browser only.</p></div>
+<div class="callout"><p>⚡ <strong style="color:#E4EBF5">Short version:</strong> Free builder data is stored in your browser by default. If you use optional features such as cloud sync, accounts, AI helpers, or private offline sharing, selected data may be stored or processed so those features can work. ApplyCraft does not send résumé content to analytics.</p></div>
 
 <h2>1. Who we are</h2>
 <p>ApplyCraft is an independent product built and operated by Biroue Digital Ltd (<a href="mailto:${EMAIL}">${EMAIL}</a>). This website is accessible at <strong>applycraft.io</strong>.</p>
 
 <h2 id="data-we-collect">2. What data we collect</h2>
 <h3>2.1 Resume and cover letter content</h3>
-<p>By default, resume data is edited and stored only in your own browser. ApplyCraft does not require an account, and your resume content is not sent to or stored on our servers unless you explicitly opt into the features described in 2.4.</p>
+<p>By default, resume and cover-letter data is edited and stored only in your own browser. ApplyCraft does not require an account, and user-written content is not sent to or stored on our servers unless you explicitly use an optional online feature below.</p>
 
 <h3 id="optional-account">2.4 Optional account and Master Profile sync</h3>
 <p>You may optionally provide an email address to save your <strong>Master Profile</strong> and sync it across your devices. This is entirely optional — the resume builder, all templates, and PDF/DOCX export work fully without it.</p>
@@ -170,12 +170,15 @@ const PAGES = {
 <h3>2.3 Uploaded files</h3>
 <p>If you upload a PDF or DOCX resume using the upload feature, the intended behavior is browser-side processing. Avoid uploading sensitive documents if you are using a modified build or third-party mirror of ApplyCraft.</p>
 
+<h3>2.4 Private offline share links</h3>
+<p>Private offline share links store the document data inside the URL fragment. Anyone with the full link can view the document, so only share it with people you trust. These links do not require server-side document storage, but they can be long.</p>
+
 <h2 id="cookies">3. Cookies and tracking</h2>
 <p>ApplyCraft sets <strong>no advertising cookies</strong> and uses <strong>no cross-site tracking</strong> (no Google Analytics, no Facebook Pixel, no Hotjar, no ad networks). We use privacy-friendly, <strong>cookieless</strong> product analytics (Plausible) that counts anonymous, aggregated usage events (such as "a resume was started or exported"). These events contain no personal data — no names, emails, or resume content.</p>
 <p>Cloudflare, our CDN provider, may set a technical cookie (<code>__cf_bm</code>) for bot protection. This is a strictly necessary security cookie that does not track you for advertising purposes.</p>
 
 <h2>4. AI features and your data</h2>
-<p>Some optional AI features — generating a resume, translating it, achievement coaching, and AI tailoring to a job description — depend on external AI providers when you choose to use them. Do not use these optional features with sensitive content unless you are comfortable with the relevant provider processing the submitted text. The core builder and export do not use AI.</p>
+<p>Some optional AI helpers — such as achievement coaching or AI tailoring to a job description — depend on external AI providers when you choose to use them. User-written résumé or cover-letter content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action. Do not use optional AI helpers with sensitive content unless you are comfortable with the relevant provider processing the submitted text. The core builder and export do not use AI.</p>
 
 <h2 id="payments">4a. Payments (optional paid pass)</h2>
 <p>Power-ups (AI tailoring and Master Profile cloud sync) are available via an optional one-time "Active Search Pass." Payments are processed by <strong>Lemon Squeezy</strong>, which acts as the merchant of record and handles billing and applicable taxes. We do not receive or store your full card details; we record only whether your pass is active and when it expires. Lemon Squeezy's handling of payment data is governed by its own privacy policy.</p>
@@ -192,7 +195,7 @@ const PAGES = {
 <p>For any privacy-related request, contact us at <a href="mailto:${EMAIL}">${EMAIL}</a>. We respond within 72 hours.</p>
 
 <h2>6. Data retention</h2>
-<p>For the free, no-account builder we retain no user data. If you opt into Master Profile sync (section 2.4), we retain your email and stored Master Profile until you delete them via "Delete my saved data" or by contacting us. Cloudflare access logs are automatically deleted after 30 days. If you contact us by email, your email and its contents are retained only for as long as necessary to respond.</p>
+<p>For the free, no-account builder we do not store your active résumé content on our servers by default. If you opt into Master Profile sync, we retain your email and stored Master Profile until you delete them via "Delete my saved data" or by contacting us. Cloudflare access logs are automatically deleted after 30 days. If you contact us by email, your email and its contents are retained only for as long as necessary to respond.</p>
 
 <h2>7. Children's privacy</h2>
 <p>ApplyCraft is not directed at children under 13 (or 16 in the EU). We do not knowingly collect data from children. If you believe a child has submitted data, contact us and we will take appropriate action.</p>
@@ -246,7 +249,7 @@ const PAGES = {
   <li><strong>ATS-conscious templates.</strong> Layouts use readable typography, clear section labels, and text-based structure so applicant tracking systems can parse the document more reliably.</li>
   <li><strong>Global by default.</strong> ApplyCraft lets candidates write in any language, with production-ready English, French, and Arabic document labels, right-to-left layouts, and separate interface/document language choices.</li>
   <li><strong>Resume and cover letter together.</strong> You can build matching application documents instead of piecing together separate files from different tools.</li>
-  <li><strong>Optional AI helpers.</strong> Writing, tailoring, and translation features are available when useful, but the core builder does not depend on AI or force it into the workflow.</li>
+  <li><strong>Optional AI helpers.</strong> Writing and tailoring helpers are available when useful, but the core builder does not depend on AI or force it into the workflow.</li>
   <li><strong>Practical exports.</strong> Download PDF or DOCX files you can submit directly, share with recruiters, or keep as your own editable records.</li>
 </ul>
 
@@ -309,13 +312,13 @@ const PAGES = {
 <h2>Languages</h2>
 
 <h3>How do I change the resume language?</h3>
-<p>Use the language selector in the toolbar at the top of the form. Changing the language updates all section labels, date formats, and placeholder text automatically.</p>
+<p>Use the document language selector in the builder. Changing document language localizes standard section labels, date formats, document direction, and export metadata. It does not translate your written résumé or cover-letter content.</p>
 
 <h3>Does ApplyCraft support Arabic and other RTL languages?</h3>
-<p>Yes. Arabic, Hebrew, Farsi, and all RTL languages are fully supported. The layout automatically mirrors when an RTL language is selected.</p>
+<p>Arabic is production-ready for interface text, document labels, and RTL-aware layouts. Other RTL languages use the same direction-aware rendering where available, but English, French, and Arabic are the currently production-ready localized languages.</p>
 
-<h3>Can I translate my existing resume?</h3>
-<p>Yes. Use the "Translate" button in the toolbar. It converts all your current content to the selected language.</p>
+<h3>Does changing document language translate my existing resume?</h3>
+<p>Changing document language does not automatically translate your professional summary, experience descriptions, job titles, skills, education details, or cover-letter paragraphs. User-written content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action.</p>
 
 <h2>Downloading</h2>
 
@@ -331,13 +334,16 @@ const PAGES = {
 <h2>Privacy and data</h2>
 
 <h3>Where is my resume data stored?</h3>
-<p>Your active edits live in the browser session. ApplyCraft does not provide accounts or cloud resume storage, so download your document before closing the tab.</p>
+<p>Free builder data is stored in your browser by default. If you use optional features such as cloud sync, accounts, AI helpers, or private offline sharing, selected data may be stored or processed so those features can work. ApplyCraft does not send résumé content to analytics.</p>
 
 <h3>Is my data used to train AI?</h3>
-<p>Optional AI or translation features may send submitted text to external services when enabled. Avoid those optional features for sensitive content unless you are comfortable with that processing.</p>
+<p>User-written résumé or cover-letter content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action. Avoid optional AI helpers for sensitive content unless you are comfortable with that processing.</p>
 
 <h3>How do I delete my data?</h3>
-<p>Close the tab. Instantly and permanently deleted. No deletion request form required.</p>
+<p>Use the local data controls in the app or clear this site's browser storage. Closing a tab does not always remove local drafts stored by your browser.</p>
+
+<h3>How do private offline share links work?</h3>
+<p>Private offline share links store the document data inside the URL fragment. Anyone with the full link can view the document, so only share it with people you trust. These links do not require server-side document storage, but they can be long.</p>
 
 <h2>Still need help?</h2>
 <p>Email <a href="mailto:${EMAIL}">${EMAIL}</a> — we read and respond to every message, usually within 24 hours.</p>
@@ -385,14 +391,14 @@ const PAGES = {
   <h2>Multilingual &amp; RTL</h2>
   <p><span class="badge badge-green">New</span> Separate interface and document languages, with localized English, French, and Arabic labels.</p>
   <p><span class="badge badge-green">New</span> Full RTL layout support for Arabic, Hebrew, and Farsi.</p>
-  <p><span class="badge badge-green">New</span> Translate button — convert existing resume content to a new language instantly.</p>
+  <p><span class="badge badge-green">New</span> Document language controls localize labels, date formatting, and direction without automatically translating user-written content.</p>
   <p><span class="badge badge-green">New</span> 6 cover letter templates with live preview.</p>
 </div>
 
 <div class="changelog-entry">
   <p class="meta">v1.1 · June 2026</p>
   <h2>Template expansion &amp; AI polish</h2>
-  <p><span class="badge badge-green">New</span> 22 professional resume templates (up from the initial 5).</p>
+  <p><span class="badge badge-green">New</span> Expanded professional resume template library.</p>
   <p><span class="badge badge-green">New</span> AI Polish — rewrites bullet points into strong, action-oriented achievements.</p>
   <p><span class="badge badge-green">New</span> DOCX export in addition to PDF.</p>
   <p><span class="badge badge-blue">Improved</span> Live preview updates in real time as you type.</p>
@@ -401,7 +407,7 @@ const PAGES = {
 <div class="changelog-entry">
   <p class="meta">v1.0 · June 2026</p>
   <h2>Initial launch</h2>
-  <p>ApplyCraft goes live. Resume builder with 5 templates, PDF export, basic multilingual support, no sign-up requirement, and no watermarks.</p>
+  <p>ApplyCraft goes live with PDF export, basic multilingual support, no sign-up requirement, and no watermarks.</p>
 </div>
 `,
   },
@@ -427,7 +433,7 @@ const PAGES = {
 
 <div class="roadmap-item">
   <h3>Job description keyword matching</h3>
-  <p>Paste a job posting and see which keywords in your resume match and which are missing. Improve your ATS score before you apply.</p>
+  <p>Paste a job posting and see which keywords in your resume match and which are missing. Use the result as a tailoring signal, not as a guarantee of ATS success or interviews.</p>
 </div>
 
 <div class="roadmap-item">
@@ -460,8 +466,13 @@ const PAGES = {
 </div>
 
 <div class="roadmap-item">
-  <h3>QR code for digital resume link</h3>
-  <p>Generate a shareable link and QR code for your resume that doesn't require hosting personal data on our servers.</p>
+  <h3>Short public share links</h3>
+  <p>Short public links are planned for later. They will require storing a copy of the shared document and will include a clear privacy notice before creation.</p>
+</div>
+
+<div class="roadmap-item">
+  <h3>Private offline share links</h3>
+  <p>Current: private offline share links are available using URL fragments. They do not require server-side document storage, but the links can be long.</p>
 </div>
 
 <div class="roadmap-item">
@@ -485,16 +496,16 @@ const PAGES = {
   "status": {
     path: "/status/",
     title: "System Status",
-    description: "ApplyCraft system status — all services operational. Check real-time availability of the resume builder.",
+    description: "ApplyCraft system status — manually maintained service status for the resume builder.",
     content: `
 <h1>System Status</h1>
-<p class="lead">Current status of ApplyCraft services. Updated automatically on each deployment.</p>
+<p class="lead">Current status of ApplyCraft services. This status page is currently updated from manually maintained status data. Automated monitoring is planned.</p>
 
 <div style="display:flex;align-items:center;gap:14px;padding:20px 24px;background:#052e16;border:1px solid #16a34a44;border-radius:12px;margin-bottom:40px">
   <div style="width:14px;height:14px;border-radius:50%;background:#22c55e;box-shadow:0 0 12px #22c55e88;flex-shrink:0"></div>
   <div>
     <div style="font-size:16px;font-weight:700;color:#4ade80">All systems operational</div>
-    <div style="font-size:12px;color:#16a34a;margin-top:2px">Last checked: ${TODAY}</div>
+    <div style="font-size:12px;color:#16a34a;margin-top:2px">Manual status update: ${TODAY}</div>
   </div>
 </div>
 
@@ -556,8 +567,8 @@ const PAGES = {
 </div>
 
 <h2 style="margin-top:48px">Uptime</h2>
-<p>ApplyCraft is a static site served via Cloudflare's global CDN with 100+ edge locations. It inherits Cloudflare's 99.99% uptime SLA.</p>
-<p>Because the app runs entirely in the browser with no backend server, the only dependency is the CDN delivering the initial JavaScript bundle.</p>
+<p>ApplyCraft is served through Cloudflare infrastructure, but this page is not connected to automated uptime monitoring yet.</p>
+<p>The free builder is browser-first, so core editing and export continue locally after the app has loaded. Network access is still required to load the site and optional online features.</p>
 
 <h2>Incident history</h2>
 <p style="color:#475569;font-size:14px">No incidents in the last 90 days.</p>

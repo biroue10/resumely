@@ -81,7 +81,7 @@ const landing2 = {
         "Auf Servern gespeichert"
       ],
       [
-        "5 Oberflächensprachen inkl. Arabisch (RTL)",
+        "Lokalisierung auf Englisch, Französisch und Arabisch",
         "Nur Englisch"
       ]
     ],
@@ -97,16 +97,16 @@ const landing2 = {
         "d": "Wechsle Standardbeschriftungen, Dokumentrichtung und Exportverhalten, ohne deinen geschriebenen Inhalt zu ändern."
       },
       {
-        "t": "Vollständige Oberflächenübersetzung in {ui} Sprachen",
-        "d": "Nutze die Editor-Oberfläche auf Englisch, Französisch, Spanisch, Arabisch oder Deutsch, während die Lebenslaufsprache getrennt bleibt."
+        "t": "Englisch, Französisch und Arabisch produktionsreif",
+        "d": "Nutze produktionsreife Oberfläche, Dokumentbeschriftungen und RTL-Layouts in den aktuell validierten Sprachen."
       },
       {
         "t": "Vollständige Rechts-nach-links-Unterstützung",
         "d": "Arabisch, Hebräisch, Farsi und andere RTL-Sprachen werden mit korrekter Ausrichtung und Typografie dargestellt."
       },
       {
-        "t": "Formatierung übersteht die Übersetzung",
-        "d": "Dein Layout, deine Vorlage und dein Design bleiben nach der Übersetzung stabil. Nur die Wörter ändern sich."
+        "t": "Formatierung bleibt bei Sprachwechseln stabil",
+        "d": "Dein Layout, deine Vorlage und dein Design bleiben stabil, wenn du Dokumentbeschriftungen oder Richtung wechselst. Dein geschriebener Inhalt wird nicht automatisch übersetzt."
       },
       {
         "t": "Mehrsprachige Anschreiben",
@@ -125,7 +125,7 @@ const landing2 = {
       },
       {
         "t": "Optionale KI-Helfer",
-        "b": "Nutze KI- oder Übersetzungshelfer nur, wenn du damit einverstanden bist, dass der Anbieter den übermittelten Text verarbeitet."
+        "b": "Nutze KI-Helfer nur, wenn du damit einverstanden bist, dass der Anbieter den übermittelten Text verarbeitet."
       },
       {
         "t": "Datenschutzbewusstes Design",
@@ -163,7 +163,7 @@ const landing2 = {
       },
       {
         "q": "Speichert oder verkauft ihr meine Daten?",
-        "a": "ApplyCraft benötigt kein Kontoprofil, um einen Lebenslauf zu erstellen. Standard-Bearbeitung und -Export sind browser-first; optionale KI- und Übersetzungshelfer können den von dir übermittelten Text verarbeiten."
+        "a": "ApplyCraft benötigt kein Kontoprofil, um einen Lebenslauf zu erstellen. Standard-Bearbeitung und -Export sind browser-first; optionale KI-Helfer können den Text verarbeiten, den du bewusst übermittelst."
       },
       {
         "q": "Sind die Vorlagen ATS-kompatibel?",

@@ -81,7 +81,7 @@ const landing2 = {
         "Stored on servers"
       ],
       [
-        "5 interface languages incl. Arabic (RTL)",
+        "English, French & Arabic localization",
         "English only"
       ]
     ],
@@ -97,16 +97,16 @@ const landing2 = {
         "d": "Switch standard resume section labels, direction, and export behavior without changing your written content."
       },
       {
-        "t": "Full interface translation in {ui} languages",
-        "d": "Use the builder interface in English, French, Spanish, Arabic, or German while keeping the resume language separate."
+        "t": "Production-ready English, French, and Arabic",
+        "d": "Use fully localized interface text, document labels, and RTL-aware layouts in the languages we currently treat as production-ready."
       },
       {
         "t": "Full right-to-left support",
         "d": "Arabic, Hebrew, Farsi and other RTL languages render with correct alignment, mirroring, and typography."
       },
       {
-        "t": "Formatting survives translation",
-        "d": "Your layout, template, and design stay stable after translation. Only the words change."
+        "t": "Formatting survives language changes",
+        "d": "Your layout, template, and design stay stable when you switch document labels or direction. Your written content is not translated automatically."
       },
       {
         "t": "Multilingual cover letters",
@@ -117,7 +117,7 @@ const landing2 = {
   "priv": {
     "eyebrow": "Privacy & trust",
     "title": "Your resume data stays yours. Always.",
-    "desc": "Resume data is personal. ApplyCraft is designed around browser-first editing and export, without requiring an account or cloud resume storage.",
+    "desc": "Resume data is personal. ApplyCraft is designed around browser-first editing and export by default, with optional online features only when you deliberately use them.",
     "cards": [
       {
         "t": "No account required",
@@ -125,7 +125,7 @@ const landing2 = {
       },
       {
         "t": "Optional AI helpers",
-        "b": "Use AI or translation helpers only when you are comfortable with the relevant provider processing submitted text."
+        "b": "Use AI helpers only when you are comfortable with the relevant provider processing submitted text."
       },
       {
         "t": "Privacy-conscious design",
@@ -147,6 +147,42 @@ const landing2 = {
     "del": "Delete local data",
     "read": "Read our full Privacy Policy →"
   },
+  "why": {
+    "eyebrow": "Why ApplyCraft",
+    "title": "Why job seekers choose ApplyCraft",
+    "items": [
+      {
+        "icon": "document",
+        "t": "Free PDF and DOCX",
+        "d": "Download professional files without hitting an export paywall."
+      },
+      {
+        "icon": "check",
+        "t": "No signup required",
+        "d": "Start building immediately without an email address or account."
+      },
+      {
+        "icon": "check",
+        "t": "No watermark",
+        "d": "Your exported résumé and cover letter stay clean and employer-ready."
+      },
+      {
+        "icon": "lock",
+        "t": "Browser-first privacy",
+        "d": "Core editing and export happen in your browser by default."
+      },
+      {
+        "icon": "globe",
+        "t": "English, French, and Arabic",
+        "d": "Production-ready interface, document labels, and RTL-aware layouts."
+      },
+      {
+        "icon": "spark",
+        "t": "One-time pass",
+        "d": "Optional paid power-ups use a one-time pass, not a subscription trap."
+      }
+    ]
+  },
   "ea": {
     "title": "We're just getting started",
     "p1": "ApplyCraft is a new, independent tool built by one person who got tired of resume builders that paywalled basic features, added watermarks, and stored personal data without consent.",
@@ -163,7 +199,7 @@ const landing2 = {
       },
       {
         "q": "Do you store or sell my data?",
-        "a": "ApplyCraft does not require an account profile to build a resume. Standard editing and export are browser-first; optional AI and translation helpers may process the text you choose to submit."
+        "a": "ApplyCraft does not require an account profile to build a resume. Standard editing and export are browser-first; optional AI helpers may process the text you choose to submit."
       },
       {
         "q": "Are the templates ATS-compatible?",

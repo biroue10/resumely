@@ -24,7 +24,7 @@ const ERROR_COPY = {
     notFoundTitle: "This shared link was not found.",
     notFoundBody: "It may have been deleted, expired, or copied incorrectly.",
     expiredTitle: "This shared link has expired.",
-    expiredBody: "Ask the sender to create a new short link.",
+    expiredBody: "Ask the sender for a fresh link.",
     networkTitle: "The document could not be loaded.",
     networkBody: "Check your connection and try again.",
     cta: "Build my resume - free",
@@ -36,7 +36,7 @@ const ERROR_COPY = {
     notFoundTitle: "Ce lien partagé est introuvable.",
     notFoundBody: "Il a peut-être été supprimé, expiré ou copié incorrectement.",
     expiredTitle: "Ce lien partagé a expiré.",
-    expiredBody: "Demandez à l'expéditeur de créer un nouveau lien court.",
+    expiredBody: "Demandez un nouveau lien à l'expéditeur.",
     networkTitle: "Le document n'a pas pu être chargé.",
     networkBody: "Vérifiez votre connexion puis réessayez.",
     cta: "Créer mon CV gratuitement",
@@ -48,7 +48,7 @@ const ERROR_COPY = {
     notFoundTitle: "لم يتم العثور على رابط المشاركة.",
     notFoundBody: "ربما تم حذفه أو انتهت صلاحيته أو تم نسخه بشكل غير صحيح.",
     expiredTitle: "انتهت صلاحية رابط المشاركة.",
-    expiredBody: "اطلب من المرسل إنشاء رابط قصير جديد.",
+    expiredBody: "اطلب من المرسل رابطًا جديدًا.",
     networkTitle: "تعذر تحميل المستند.",
     networkBody: "تحقق من اتصالك ثم حاول مرة أخرى.",
     cta: "إنشاء سيرتي الذاتية مجانًا",
@@ -114,7 +114,7 @@ function SiteFooter() {
           <div style={{ maxWidth: 280 }}>
             <Logo size={20} />
             <p style={{ fontSize: 13, color: TEXT3, lineHeight: 1.75, margin: "12px 0 16px" }}>
-              Free resume and cover letter builder for the global job market. No sign-up required.
+              Free resume and cover letter builder with free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.
             </p>
             <a href={`mailto:${EMAIL}`} style={{ fontSize: 13, color: TEXT2, textDecoration: "none" }}>{EMAIL}</a>
           </div>

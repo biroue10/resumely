@@ -107,13 +107,13 @@
 <h2>Languages</h2>
 
 <h3>How do I change the resume language?</h3>
-<p>Use the language selector in the toolbar at the top of the form. Changing the language updates all section labels, date formats, and placeholder text automatically.</p>
+<p>Use the document language selector in the builder. Changing document language localizes standard section labels, date formats, document direction, and export metadata. It does not translate your written résumé or cover-letter content.</p>
 
 <h3>Does ApplyCraft support Arabic and other RTL languages?</h3>
-<p>Yes. Arabic, Hebrew, Farsi, and all RTL languages are fully supported. The layout automatically mirrors when an RTL language is selected.</p>
+<p>Arabic is production-ready for interface text, document labels, and RTL-aware layouts. Other RTL languages use the same direction-aware rendering where available, but English, French, and Arabic are the currently production-ready localized languages.</p>
 
-<h3>Can I translate my existing resume?</h3>
-<p>Yes. Use the "Translate" button in the toolbar. It converts all your current content to the selected language.</p>
+<h3>Does changing document language translate my existing resume?</h3>
+<p>Changing document language does not automatically translate your professional summary, experience descriptions, job titles, skills, education details, or cover-letter paragraphs. User-written content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action.</p>
 
 <h2>Downloading</h2>
 
@@ -129,13 +129,16 @@
 <h2>Privacy and data</h2>
 
 <h3>Where is my resume data stored?</h3>
-<p>Your active edits live in the browser session. ApplyCraft does not provide accounts or cloud resume storage, so download your document before closing the tab.</p>
+<p>Free builder data is stored in your browser by default. If you use optional features such as cloud sync, accounts, AI helpers, or private offline sharing, selected data may be stored or processed so those features can work. ApplyCraft does not send résumé content to analytics.</p>
 
 <h3>Is my data used to train AI?</h3>
-<p>Optional AI or translation features may send submitted text to external services when enabled. Avoid those optional features for sensitive content unless you are comfortable with that processing.</p>
+<p>User-written résumé or cover-letter content is not translated, uploaded, or processed by AI unless you explicitly choose an AI-powered action. Avoid optional AI helpers for sensitive content unless you are comfortable with that processing.</p>
 
 <h3>How do I delete my data?</h3>
-<p>Close the tab. Instantly and permanently deleted. No deletion request form required.</p>
+<p>Use the local data controls in the app or clear this site's browser storage. Closing a tab does not always remove local drafts stored by your browser.</p>
+
+<h3>How do private offline share links work?</h3>
+<p>Private offline share links store the document data inside the URL fragment. Anyone with the full link can view the document, so only share it with people you trust. These links do not require server-side document storage, but they can be long.</p>
 
 <h2>Still need help?</h2>
 <p>Email <a href="mailto:hello@applycraft.io">hello@applycraft.io</a> — we read and respond to every message, usually within 24 hours.</p>
@@ -147,7 +150,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="footer-logo">ApplyCraft</a>
-        <p>Free resume and cover letter builder for the global job market. Write in any language, with fully localized English, French, and Arabic support, 46 templates, no sign-up required.</p>
+        <p>Free resume and cover letter builder with 46 templates, free PDF and DOCX exports, no watermark, no signup, browser-first editing, and production-ready English, French, and Arabic localization.</p>
         <a href="mailto:hello@applycraft.io">hello@applycraft.io</a>
       </div>
       <nav class="footer-grid" aria-label="Footer">
@@ -156,7 +159,6 @@
           <a href="/">Resume Builder</a>
           <a href="/cover-letter-builder/">Cover Letter Builder</a>
           <a href="/ats-checker/">ATS Checker</a>
-          <a href="/pricing/">Pricing</a>
           <a href="/changelog/">Changelog</a>
           <a href="/roadmap/">Roadmap</a>
           <a href="/status/">Status</a>
@@ -178,13 +180,9 @@
         </div>
         <div>
           <h2>Legal</h2>
-          <a href="/terms/">Terms of Service</a>
           <a href="/privacy/">Privacy Policy</a>
-          <a href="/cookies/">Cookie Policy</a>
-          <a href="/refund-policy/">Refund Policy</a>
-          <a href="/gdpr/">GDPR</a>
-          <a href="/ai-disclosure/">AI Disclosure</a>
-          <a href="/accessibility/">Accessibility</a>
+          <a href="/privacy/#gdpr">GDPR</a>
+          <a href="/privacy/#cookies">Cookies</a>
         </div>
       </nav>
     </div>
